@@ -28,3 +28,4 @@ coverage.txt
 __pycache__/
 *.py[cod]
 *$py.class
+.python-version
