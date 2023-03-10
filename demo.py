@@ -40,7 +40,7 @@ def run(playwright: Playwright) -> None:
     context = browser.new_context(viewport={ 'width': 414, 'height': 896 }, bypass_csp=True)  # https://playwright.dev/python/docs/api/class-browser#browser-new-context
     page = context.new_page()
     page.goto(url)
-    page.wait_for_timeout(1000)  # Waits for the given timeout in milliseconds.    
+    page.wait_for_timeout(1000)  # Waits for the given timeout in milliseconds.
     page.evaluate(loadReadability)
     article = page.evaluate(parseArticle)
 
@@ -56,4 +56,3 @@ def run(playwright: Playwright) -> None:
 
 with sync_playwright() as playwright:
     run(playwright)
-
