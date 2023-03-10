@@ -29,3 +29,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 .python-version
+
+# Playwright
+user_data_dir
