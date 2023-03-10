@@ -321,8 +321,36 @@ details summary:not([role]) {
     color: var(--muted-color);
 }
 
+.article-container  {
+  max-width: 900px !important;
+  padding-top: 0;
+}
+
+.article-container article {
+  margin-top: 0;
+  margin-bottom: 10px;
+  padding: var(--block-spacing-vertical) var(--block-spacing-vertical);
+}
+
+.article-container article p,
+.article-container article ul,
+.article-container article table {
+  font-size: .875rem;
+}
+
+.article-container article img {
+  margin-bottom: 20px;
+  max-width: 100%;
+}
+
 main {
   flex:1;
+}
+
+.extra-info {
+  padding: var(--block-spacing-horizontal) var(--block-spacing-horizontal);
+  font-size: .75rem;
+  text-align: center;
 }
 
 code {

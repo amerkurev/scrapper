@@ -2,12 +2,13 @@
 import os
 import json
 import uuid
+import datetime
 
 from http import HTTPStatus as Status
 from pathlib import Path
 from urllib.parse import urlparse
 
-from flask import Flask, request, send_file
+from flask import Flask, request, render_template
 from playwright.sync_api import sync_playwright
 
 
@@ -30,18 +31,22 @@ app = Flask(__name__, static_folder=STATIC_DIR)
 
 @app.route('/', methods=['GET'])
 def index():
-    return send_file('index.html')
+    return render_template('index.html')
+
+
+@app.route('/view/<uuid:random_uuid>', methods=['GET'])
+def result_html(random_uuid):
+    data = load_result(str(random_uuid))
+    if data:
+        data['hideTitle'] = data['title'] in data['content']  # if occurs in content, hide it
+        return render_template('view.html', data=data)
+    return 'Not found', Status.OK
 
 
 @app.route('/result/<uuid:random_uuid>', methods=['GET'])
-def result(random_uuid):
-    random_uuid = str(random_uuid)
-    path = USER_DATA_DIR / random_uuid[:2] / random_uuid
-    if not path.exists():
-        return 'Not found', Status.NOT_FOUND
-    with open(path, mode='r') as f:
-        data = json.load(f)
-    return data
+def result_json(random_uuid):
+    data = load_result(str(random_uuid))
+    return data if data else 'Not found', Status.OK
 
 
 @app.route('/parse', methods=['GET'])
@@ -82,15 +87,27 @@ def parse():
     # Save result to disk
     if status_code == Status.OK:
         random_uuid = str(uuid.uuid4())
-        article['result_uri'] = f'{scheme}://{host}/result/{random_uuid}'
-        save_to_disk(article, name=random_uuid)
+        article['id'] = random_uuid
+        article['url'] = url
+        article['parsed'] = datetime.datetime.utcnow().isoformat()  # ISO 8601 format
+        article['resultUri'] = f'{scheme}://{host}/result/{random_uuid}'
+        dump_result(article, name=random_uuid)
 
     return article, status_code
 
 
-def save_to_disk(data, name):
+def dump_result(data, name):
     path = USER_DATA_DIR / name[:2]
     if not os.path.exists(path):
         os.makedirs(path, exist_ok=True)
     with open(path / name, mode='w') as f:
         json.dump(data, f, ensure_ascii=True)
+
+
+def load_result(name):
+    path = USER_DATA_DIR / name[:2] / name
+    if not path.exists():
+        return None
+    with open(path, mode='r') as f:
+        data = json.load(f)
+    return data
