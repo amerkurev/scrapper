@@ -44,21 +44,23 @@
         scrapeIt.setAttribute("aria-busy", "true");
     });
 
-    // watch for changes in the query params
-    var url = document.getElementById("url");
-    url.addEventListener("input", (e) => {
+    // watch for changes in the query params and update the snippet
+    function updateSnippet() {
         var params = formatParams();
         var snippet = document.getElementById("snippet");
         var snippetLink = document.getElementById("snippetLink");
         var snippetLabel = document.getElementById("snippetLabel");
         if (params === "") {
-          snippet.style.display = "none";
+            snippet.style.display = "none";
         } else {
-          var hostname = window.location.protocol + "//" + window.location.host;
-          snippetLink.innerHTML = hostname + params;
-          snippetLink.setAttribute("href", "/parse" + params);
-          snippetLabel.innerHTML = "Request URL:"
-          snippet.style.display = "block";
+            var hostname = window.location.protocol + "//" + window.location.host;
+            snippetLink.innerHTML = hostname + "/parse" + params;
+            snippetLink.setAttribute("href", "/parse" + params);
+            snippetLabel.innerHTML = "Request URL:"
+            snippet.style.display = "block";
         }
-    });
+    }
+
+    var url = document.getElementById("url");
+    url.addEventListener("input", updateSnippet);
 }();
