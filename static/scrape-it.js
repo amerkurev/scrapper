@@ -17,17 +17,28 @@
     var scrapeIt = document.getElementById("scrape-it");
     scrapeIt.addEventListener("click", (e) => {
         e.preventDefault();
+        var errors = document.getElementById("errors");
         var params = formatParams();
-        if (params === "") return;
         var xhr = new XMLHttpRequest();
         xhr.open("GET", "/parse" + params, true);
         xhr.send();
         xhr.onreadystatechange = (e) => {
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                var response = JSON.parse(xhr.responseText);
-                window.location.href = "/view/" + response.id;
+            if (xhr.readyState == 4) { // DONE: The operation is complete.
+                if (xhr.status == 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    window.location.href = "/view/" + response.id;
+                } else {
+                    // Handle error
+                    var response = JSON.parse(xhr.responseText);
+                    // Print array of errors as li elements
+                    errors.innerHTML = response.err.map((err) => {
+                        return "<li>" + err + "</li>";
+                    });
+                    errors.style.display = "block";
+                }
+                scrapeIt.innerHTML = "Scrape it!";
+                scrapeIt.removeAttribute("aria-busy");
             }
-            // TODO: Handle errors
         };
         scrapeIt.innerHTML = "Please wait…";
         scrapeIt.setAttribute("aria-busy", "true");

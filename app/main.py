@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 
 from flask import Flask, request, render_template
 from playwright.sync_api import sync_playwright
+from .validator import validate_args
 
 
 IN_DOCKER = os.environ.get('IN_DOCKER')
@@ -51,8 +52,11 @@ def result_json(random_uuid):
 
 @app.route('/parse', methods=['GET'])
 def parse():
+    err = validate_args(args=request.args)
+    if err:
+        return {'err': err}, Status.BAD_REQUEST
+
     url = request.args.get('url')
-    # TODO: if it's not URL, return 400!
 
     with sync_playwright() as playwright:
         # https://playwright.dev/python/docs/api/class-browsertype#browser-type-launch
@@ -71,12 +75,9 @@ def parse():
         host = p.netloc
         readability_path = '/static/libs/readability/Readability.js'
         readability_src = f'{scheme}://{host}{readability_path}'
-        readability_readerable_path = '/static/libs/readability/Readability-readerable.js'
-        readability_readerable_src = f'{scheme}://{host}{readability_readerable_path}'
 
         # Evaluating JavaScript
         page.evaluate(LOAD_SCRIPT_JS % {'src': readability_src})
-        page.evaluate(LOAD_SCRIPT_JS % {'src': readability_readerable_src})
         article = page.evaluate(PARSE_ARTICLE_JS)
 
         context.close()
