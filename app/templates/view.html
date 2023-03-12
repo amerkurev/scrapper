@@ -37,11 +37,20 @@
     <div class="extra-info">
       {{ data.siteName }}: <a target="_blank" href="{{ data.url }}">{{ data.url }}</a>
     </div>
-      {% if data.articleTagExists %}
-      {{ data.content|safe }}
-      {% else %}
-      <article>{{ data.content|safe }}</article>
-      {% endif %}
+
+    {# Title    #}
+    {% if not data.titleInContent and not data.hasH1Tag and not data.hasH2Tag  %}
+    <h1>{{ data.title }}</h1>
+    {% endif %}
+
+    {# Content (article tag in content)    #}
+    {% if data.hasArticleTag %}
+    {{ data.content|safe }}
+    {# Content (add external article tag)    #}
+    {% else %}
+    <article>{{ data.content|safe }}</article>
+    {% endif %}
+
     <div class="extra-info">
       The page was parsed at {{ data.parsed }}<br>
       Copy to share: <a href="{{ data.result_url }}">{{ data.resultUri }}</a>
@@ -60,6 +69,5 @@
     </div>
   </footer>
   <script src="/static/dark-mode.js"></script>
-  <script src="/static/scrape-it.js"></script>
 </body>
 </html>

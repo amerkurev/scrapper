@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 from flask import Flask, request, render_template
 from playwright.sync_api import sync_playwright
 from .validator import validate_args
+from .inspector import inspect_content
 
 
 IN_DOCKER = os.environ.get('IN_DOCKER')
@@ -39,15 +40,15 @@ def index():
 def result_html(random_uuid):
     data = load_result(str(random_uuid))
     if data:
-        data['articleTagExists'] = '</article>' in data['content']
+        inspect_content(data)  # data will be modified (will be set a lot of new keys)
         return render_template('view.html', data=data)
-    return 'Not found', Status.OK
+    return 'Not found', Status.NOT_FOUND
 
 
 @app.route('/result/<uuid:random_uuid>', methods=['GET'])
 def result_json(random_uuid):
     data = load_result(str(random_uuid))
-    return data if data else 'Not found', Status.OK
+    return data if data else 'Not found', Status.NOT_FOUND
 
 
 @app.route('/parse', methods=['GET'])
