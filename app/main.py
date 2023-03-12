@@ -20,10 +20,10 @@ STATIC_DIR = Path(os.environ.get('STATIC_DIR', BASE_DIR / 'static'))
 USER_DATA_DIR = Path(os.environ.get('USER_DATA_DIR', BASE_DIR / 'user_data_dir'))
 
 
-with open(APP_HOME / 'load_script.js', mode='r') as fd:
+with open(APP_HOME / 'scripts' / 'load_script.js', mode='r') as fd:
     LOAD_SCRIPT_JS = fd.read()
 
-with open(APP_HOME / 'parse_article.js', mode='r') as fd:
+with open(APP_HOME / 'scripts' / 'parse_article.js', mode='r') as fd:
     PARSE_ARTICLE_JS = fd.read()
 
 
