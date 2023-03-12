@@ -12,29 +12,30 @@ def inspect_content(data):
 
     tree = BeautifulSoup(content, 'html.parser')
 
-    # traverse the tree
-    for elem in tree.find_all():
-        if elem.name == 'h1':
+    # 1. traverse the tree and find the h1, h2 and article tags
+    for el in tree.find_all():
+        if el.name == 'h1':
             data['hasH1Tag'] = True
-        if elem.name == 'h2':
+        if el.name == 'h2':
             data['hasH2Tag'] = True
-        if elem.name == 'article':
+        if el.name == 'article':
             data['hasArticleTag'] = True
 
-    # remove all elements before the first h1 or h2 tag
+    # 2. remove all text before the first h1 or h2 tag
     if data['hasH1Tag'] or data['hasH2Tag']:
-        for elem in tree.find_all(text=True):
-            if elem.parent.name in ('h1', 'h2'):
+        for el in tree.find_all(text=True):
+            if el.parent.name in ('h1', 'h2'):
                 break
-            text = elem.text.strip()
+            text = el.get_text(strip=True)
             if text:
-                p = parent_with_same_text(elem, text=text)
+                p = parent_with_same_text(el, text=text)
                 p.extract()
+
     data['content'] = str(tree)
     return data
 
 
-def parent_with_same_text(elem, text):
-    if elem.parent and text == elem.parent.text.strip():
-        return parent_with_same_text(elem=elem.parent, text=text)
-    return elem
+def parent_with_same_text(el, text):
+    if el.parent and text == el.parent.get_text(strip=True):
+        return parent_with_same_text(el.parent, text=text)
+    return el

@@ -93,21 +93,21 @@ def parse():
         article['url'] = url
         article['parsed'] = datetime.datetime.utcnow().isoformat()  # ISO 8601 format
         article['resultUri'] = f'{scheme}://{host}/result/{random_uuid}'
-        dump_result(article, name=random_uuid)
+        dump_result(article, filename=random_uuid)
 
     return article, status_code
 
 
-def dump_result(data, name):
-    path = USER_DATA_DIR / name[:2]
+def dump_result(data, filename):
+    path = USER_DATA_DIR / filename[:2]
     if not os.path.exists(path):
         os.makedirs(path, exist_ok=True)
-    with open(path / name, mode='w') as f:
+    with open(path / filename, mode='w') as f:
         json.dump(data, f, ensure_ascii=True)
 
 
-def load_result(name):
-    path = USER_DATA_DIR / name[:2] / name
+def load_result(filename):
+    path = USER_DATA_DIR / filename[:2] / filename
     if not path.exists():
         return None
     with open(path, mode='r') as f:
