@@ -38,7 +38,6 @@
       {{ data.siteName }}: <a target="_blank" href="{{ data.url }}">{{ data.url }}</a>
     </div>
     <article>
-      {% if data.hideTitle is false %}<h1>{{ data.title }}</h1>{% endif %}
       {{ data.content|safe }}
     </article>
     <div class="extra-info">

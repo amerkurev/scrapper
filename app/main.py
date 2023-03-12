@@ -39,7 +39,6 @@ def index():
 def result_html(random_uuid):
     data = load_result(str(random_uuid))
     if data:
-        data['hideTitle'] = data['title'] in data['content']  # if occurs in content, hide it
         return render_template('view.html', data=data)
     return 'Not found', Status.OK
 
