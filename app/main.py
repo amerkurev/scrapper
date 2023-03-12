@@ -1,5 +1,6 @@
 
 import os
+import sys
 import json
 import uuid
 import datetime
@@ -10,8 +11,6 @@ from urllib.parse import urlparse
 
 from flask import Flask, request, render_template
 from playwright.sync_api import sync_playwright
-from .validator import validate_args
-from .inspector import inspect_content
 
 
 IN_DOCKER = os.environ.get('IN_DOCKER')
@@ -19,6 +18,10 @@ BASE_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 APP_HOME = Path(os.environ.get('APP_HOME', BASE_DIR / 'app'))
 STATIC_DIR = Path(os.environ.get('STATIC_DIR', BASE_DIR / 'static'))
 USER_DATA_DIR = Path(os.environ.get('USER_DATA_DIR', BASE_DIR / 'user_data_dir'))
+
+sys.path.append(str(APP_HOME))
+from validator import validate_args
+from inspector import inspect_content
 
 
 with open(APP_HOME / 'scripts' / 'load_script.js', mode='r') as fd:
