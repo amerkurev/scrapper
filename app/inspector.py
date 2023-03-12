@@ -21,21 +21,17 @@ def inspect_content(data):
         if el.name == 'article':
             data['hasArticleTag'] = True
 
-    # 2. remove all text before the first h1 or h2 tag
-    if data['hasH1Tag'] or data['hasH2Tag']:
-        for el in tree.find_all(text=True):
-            if el.parent.name in ('h1', 'h2'):
-                break
-            text = el.get_text(strip=True)
-            if text:
-                p = parent_with_same_text(el, text=text)
-                p.extract()
+    # 2. remove all p and div tags that contain one word or less (or only digits),
+    # and not contain any images (or headers)
+    for el in tree.find_all(['p', 'div']):
+        # skip if the element has any images (or headers)
+        if el.find(['img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']):
+            continue
+        text = el.get_text(strip=True)
+        # remove the element if it contains one word or less (or only digits)
+        words = text.split()
+        if len(words) <= 1 or (''.join(words)).isnumeric():
+            el.decompose()
 
     data['content'] = str(tree)
     return data
-
-
-def parent_with_same_text(el, text):
-    if el.parent and text == el.parent.get_text(strip=True):
-        return parent_with_same_text(el.parent, text=text)
-    return el
