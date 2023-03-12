@@ -1,3 +1,7 @@
+:root:not([data-theme=dark]), [data-theme=light] {
+    --color: hsl(205deg, 20%, 22%);
+}
+
 nav, nav ul {
     display:flex
 }
@@ -322,7 +326,7 @@ details summary:not([role]) {
 }
 
 .article-container  {
-  max-width: 900px !important;
+  max-width: 800px !important;
   padding-top: 0;
 }
 
@@ -340,7 +344,7 @@ details summary:not([role]) {
 
 .article-container article img {
   margin-bottom: 20px;
-  max-width: 100%;
+  width: 100%;
 }
 
 main {
