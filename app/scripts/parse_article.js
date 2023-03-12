@@ -17,7 +17,8 @@
                 }
             }
             // parse the article with Mozilla's Readability.js
-            return new Readability(document).parse();
+            var documentClone = document.cloneNode(true);
+            return new Readability(documentClone).parse();
         } catch(err) {
             return { err: ["Readability couldn't parse the document: " + err.toString()] };
         }
