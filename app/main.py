@@ -39,6 +39,7 @@ def index():
 def result_html(random_uuid):
     data = load_result(str(random_uuid))
     if data:
+        data['articleTagExists'] = '</article>' in data['content']
         return render_template('view.html', data=data)
     return 'Not found', Status.OK
 

@@ -37,9 +37,11 @@
     <div class="extra-info">
       {{ data.siteName }}: <a target="_blank" href="{{ data.url }}">{{ data.url }}</a>
     </div>
-    <article>
+      {% if data.articleTagExists %}
       {{ data.content|safe }}
-    </article>
+      {% else %}
+      <article>{{ data.content|safe }}</article>
+      {% endif %}
     <div class="extra-info">
       The page was parsed at {{ data.parsed }}<br>
       Copy to share: <a href="{{ data.result_url }}">{{ data.resultUri }}</a>
