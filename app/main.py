@@ -56,15 +56,14 @@ def result_json(id):
 
 @app.route('/parse', methods=['GET'])
 def parse():
-    err = validate_args(args=request.args)
+    args, err = validate_args(args=request.args)
     if err:
         return {'err': err}, Status.BAD_REQUEST
 
     _id = hashlib.sha1(request.full_path.encode()).hexdigest()  # unique request id
-    url = request.args.get('url')
 
     # get cache data if exists
-    if 'noCache' not in request.args:
+    if args.no_cache is False:
         data = load_result(_id)
         if data:
             return data
@@ -74,13 +73,14 @@ def parse():
         browser = playwright.firefox.launch(headless=True)
 
         # https://playwright.dev/python/docs/api/class-browser#browser-new-context
-        context = browser.new_context(viewport={'width': 414, 'height': 896}, bypass_csp=True)
+        viewport = {'width': args.viewport_width, 'height': args.viewport_height}
+        context = browser.new_context(viewport=viewport, bypass_csp=True)
         page = context.new_page()
-        page.goto(url)
+        page.goto(args.url)
         page_content = page.content()
 
         # Waits for the given timeout in milliseconds
-        page.wait_for_timeout(1000)
+        page.wait_for_timeout(args.wait_for_timeout)
 
         p = urlparse(request.base_url)
         scheme = p.scheme
@@ -90,8 +90,14 @@ def parse():
 
         # Evaluating JavaScript
         page.evaluate(LOAD_SCRIPT_JS % {'src': readability_src})
-        article = page.evaluate(PARSE_ARTICLE_JS)
+        parser_args = {
+            'maxElemsToParse': args.max_elems_to_parse,
+            'nbTopCandidates': args.nb_top_candidates,
+            'charThreshold': args.char_threshold,
+        }
+        article = page.evaluate(PARSE_ARTICLE_JS % parser_args)
 
+        # release resources
         context.close()
         browser.close()
 
@@ -100,13 +106,13 @@ def parse():
     # Save result to disk
     if status_code == Status.OK:
         article['id'] = _id
-        article['url'] = url
+        article['url'] = args.url
         article['parsed'] = datetime.datetime.utcnow().isoformat()  # ISO 8601 format
         article['resultUri'] = f'{scheme}://{host}/result/{_id}'
 
-        if 'fullContent' in request.args:
+        if args.full_content:
             article['fullContent'] = page_content
-        if 'noCache' not in request.args:
+        if args.no_cache is False:
             dump_result(article, filename=_id)
 
     return article, status_code

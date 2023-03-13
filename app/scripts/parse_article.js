@@ -18,7 +18,13 @@
             }
             // parse the article with Mozilla's Readability.js (https://videoinu.com/blog/firefox-reader-view-heuristics/)
             let documentClone = document.cloneNode(true);
-            return new Readability(documentClone).parse();
+            // https://github.com/mozilla/readability#api-reference
+            let options = {
+              maxElemsToParse: %(maxElemsToParse)s,
+              nbTopCandidates: %(nbTopCandidates)s,
+              charThreshold: %(charThreshold)s,
+            }
+            return new Readability(documentClone, options).parse();
         } catch(err) {
             return { err: ["Readability couldn't parse the document: " + err.toString()] };
         }
