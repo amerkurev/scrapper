@@ -2,7 +2,7 @@
 import os
 import sys
 import json
-import uuid
+import hashlib
 import datetime
 
 from http import HTTPStatus as Status
@@ -39,18 +39,18 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/view/<uuid:random_uuid>', methods=['GET'])
-def result_html(random_uuid):
-    data = load_result(str(random_uuid))
+@app.route('/view/<string:id>', methods=['GET'])
+def result_html(id):
+    data = load_result(id)
     if data:
         data['content'] = improve_content(data)
         return render_template('view.html', data=data)
     return 'Not found', Status.NOT_FOUND
 
 
-@app.route('/result/<uuid:random_uuid>', methods=['GET'])
-def result_json(random_uuid):
-    data = load_result(str(random_uuid))
+@app.route('/result/<string:id>', methods=['GET'])
+def result_json(id):
+    data = load_result(id)
     return data if data else 'Not found', Status.NOT_FOUND
 
 
@@ -60,7 +60,14 @@ def parse():
     if err:
         return {'err': err}, Status.BAD_REQUEST
 
+    _id = hashlib.sha1(request.full_path.encode()).hexdigest()  # unique request id
     url = request.args.get('url')
+
+    # get cache data if exists
+    if 'noCache' not in request.args:
+        data = load_result(_id)
+        if data:
+            return data
 
     with sync_playwright() as playwright:
         # https://playwright.dev/python/docs/api/class-browsertype#browser-type-launch
@@ -70,6 +77,7 @@ def parse():
         context = browser.new_context(viewport={'width': 414, 'height': 896}, bypass_csp=True)
         page = context.new_page()
         page.goto(url)
+        page_content = page.content()
 
         # Waits for the given timeout in milliseconds
         page.wait_for_timeout(1000)
@@ -91,12 +99,15 @@ def parse():
 
     # Save result to disk
     if status_code == Status.OK:
-        random_uuid = str(uuid.uuid4())
-        article['id'] = random_uuid
+        article['id'] = _id
         article['url'] = url
         article['parsed'] = datetime.datetime.utcnow().isoformat()  # ISO 8601 format
-        article['resultUri'] = f'{scheme}://{host}/result/{random_uuid}'
-        dump_result(article, filename=random_uuid)
+        article['resultUri'] = f'{scheme}://{host}/result/{_id}'
+
+        if 'fullContent' in request.args:
+            article['fullContent'] = page_content
+        if 'noCache' not in request.args:
+            dump_result(article, filename=_id)
 
     return article, status_code
 
