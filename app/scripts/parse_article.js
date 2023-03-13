@@ -6,9 +6,9 @@
         }
         try {
             // remove elements that are not visible
-            var elements = document.body.getElementsByTagName("*");
-            for (var i = 0; i < elements.length; i++) {
-                var style = window.getComputedStyle(elements[i]);
+            let elements = document.body.getElementsByTagName("*");
+            for (let i = 0; i < elements.length; i++) {
+                let style = window.getComputedStyle(elements[i]);
                 if (style.display === "none" ||
                     style.visibility === "hidden" ||
                     style.opacity === "0" ||
@@ -16,8 +16,8 @@
                     elements[i].parentNode.removeChild(elements[i]);
                 }
             }
-            // parse the article with Mozilla's Readability.js
-            var documentClone = document.cloneNode(true);
+            // parse the article with Mozilla's Readability.js (https://videoinu.com/blog/firefox-reader-view-heuristics/)
+            let documentClone = document.cloneNode(true);
             return new Readability(documentClone).parse();
         } catch(err) {
             return { err: ["Readability couldn't parse the document: " + err.toString()] };
