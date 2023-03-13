@@ -9,7 +9,7 @@ from http import HTTPStatus as Status
 from pathlib import Path
 from urllib.parse import urlparse
 
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, send_from_directory
 from playwright.sync_api import sync_playwright
 
 
@@ -21,7 +21,7 @@ USER_DATA_DIR = Path(os.environ.get('USER_DATA_DIR', BASE_DIR / 'user_data_dir')
 
 sys.path.append(str(APP_HOME))
 from validator import validate_args
-from inspector import inspect_content
+from htmlutil import improve_content
 
 
 with open(APP_HOME / 'scripts' / 'load_script.js', mode='r') as fd:
@@ -43,7 +43,7 @@ def index():
 def result_html(random_uuid):
     data = load_result(str(random_uuid))
     if data:
-        inspect_content(data)  # data will be modified (will be set a lot of new keys)
+        data['content'] = improve_content(data)
         return render_template('view.html', data=data)
     return 'Not found', Status.NOT_FOUND
 
@@ -99,6 +99,13 @@ def parse():
         dump_result(article, filename=random_uuid)
 
     return article, status_code
+
+
+@app.route('/favicon.ico')
+def favicon():
+    # https://flask.palletsprojects.com/en/1.1.x/patterns/favicon/
+    d = STATIC_DIR / 'icons'
+    return send_from_directory(d, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 def dump_result(data, filename):

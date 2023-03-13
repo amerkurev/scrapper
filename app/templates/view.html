@@ -10,7 +10,10 @@
     />
   <link rel="stylesheet" href="/static/libs/pico/1.5.7/pico.min.css">
   <link rel="stylesheet" href="/static/custom.css">
-  <title>Scrapper</title>
+  <title>Scrapper | {{ data.title }}</title>
+  <link rel="icon" href="/favicon.ico" sizes="any"><!-- 32×32 -->
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png"><!-- 180×180 -->
+  <link rel="manifest" href="/static/icons/site.webmanifest">
 </head>
 <body>
   <nav class="container-fluid">
@@ -18,12 +21,9 @@
       <li>
       </li>
       <li>
-        <strong>Scrapper</strong>
+        <strong><a href="/" class="logo">Scrapper</a></strong>
         <g-emoji class="g-emoji" alias="broom" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f9f9.png">🧹</g-emoji>
       </li>
-    </ul>
-    <ul>
-      <li><a href="/" class="secondary">Try again!</a></li>
     </ul>
     <ul>
       <li>
@@ -37,20 +37,7 @@
     <div class="extra-info">
       {{ data.siteName }}: <a target="_blank" href="{{ data.url }}">{{ data.url }}</a>
     </div>
-
-    {# Title    #}
-    {% if not data.titleInContent and not data.hasH1Tag and not data.hasH2Tag  %}
-    <h1>{{ data.title }}</h1>
-    {% endif %}
-
-    {# Content (article tag in content)    #}
-    {% if data.hasArticleTag %}
     {{ data.content|safe }}
-    {# Content (add external article tag)    #}
-    {% else %}
-    <article>{{ data.content|safe }}</article>
-    {% endif %}
-
     <div class="extra-info">
       The page was parsed at {{ data.parsed }}<br>
       Copy to share: <a href="{{ data.result_url }}">{{ data.resultUri }}</a>

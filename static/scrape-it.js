@@ -29,11 +29,15 @@
                     window.location.href = "/view/" + response.id;
                 } else {
                     // Handle error
-                    let response = JSON.parse(xhr.responseText);
-                    // Print array of errors as li elements
-                    errors.innerHTML = response.err.map((err) => {
-                        return "<li>" + err + "</li>";
-                    });
+                    try {
+                        let response = JSON.parse(xhr.responseText);
+                        // Print array of errors as li elements
+                        errors.innerHTML = response.err.map((err) => {
+                            return "<li>" + err + "</li>";
+                        });
+                    } catch(err) {
+                        errors.innerHTML = "<li>Unknown error. See the server log for more details.</li>";
+                    }
                     errors.style.display = "block";
                 }
                 scrapeIt.innerHTML = "Scrape it!";
