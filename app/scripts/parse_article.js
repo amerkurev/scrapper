@@ -20,9 +20,9 @@
             let documentClone = document.cloneNode(true);
             // https://github.com/mozilla/readability#api-reference
             let options = {
-              maxElemsToParse: %(maxElemsToParse)s,
-              nbTopCandidates: %(nbTopCandidates)s,
-              charThreshold: %(charThreshold)s,
+              maxElemsToParse: %(maxElemsToParse)d,
+              nbTopCandidates: %(nbTopCandidates)d,
+              charThreshold: %(charThreshold)d,
             }
             return new Readability(documentClone, options).parse();
         } catch(err) {
