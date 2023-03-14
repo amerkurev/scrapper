@@ -325,6 +325,10 @@ details summary:not([role]) {
     color: var(--muted-color);
 }
 
+details textarea {
+  font-size: 0.875em;
+}
+
 .article-container  {
   max-width: 800px !important;
   padding-top: 0;
@@ -334,7 +338,7 @@ details summary:not([role]) {
 .article-container h2 {
   line-height: 1.2;
   --font-size: 1.75rem;
-  --typography-spacing-vertical:2.625rem
+  --typography-spacing-vertical: 2.625rem
 }
 
 .article-container article {

@@ -20,7 +20,7 @@ STATIC_DIR = Path(os.environ.get('STATIC_DIR', BASE_DIR / 'static'))
 USER_DATA_DIR = Path(os.environ.get('USER_DATA_DIR', BASE_DIR / 'user_data_dir'))
 
 sys.path.append(str(APP_HOME))
-from validator import validate_args
+from argutil import validate_args
 from htmlutil import improve_content
 
 
@@ -112,8 +112,8 @@ def parse():
 
         if args.full_content:
             article['fullContent'] = page_content
-        if args.no_cache is False:
-            dump_result(article, filename=_id)
+        # result_html and result_json always get data from cache!
+        dump_result(article, filename=_id)
 
     return article, status_code
 
