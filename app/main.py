@@ -106,9 +106,9 @@ def parse():
     # Save result to disk
     if status_code == Status.OK:
         article['id'] = _id
-        article['url'] = args.url
         article['parsed'] = datetime.datetime.utcnow().isoformat()  # ISO 8601 format
         article['resultUri'] = f'{scheme}://{host}/result/{_id}'
+        article['query'] = request.args.to_dict(flat=True)
 
         if args.full_content:
             article['fullContent'] = page_content

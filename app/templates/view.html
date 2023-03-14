@@ -56,10 +56,5 @@
     </div>
   </footer>
   <script src="/static/dark-mode.js"></script>
-  <script>
-    // remove unnecessary empty paragraphs
-    document.querySelectorAll(".article-container p :not(image)")
-      .forEach(el => el.textContent.trim() === "" && el.getElementsByTagName('img').length && el.parentNode.removeChild(el))
-  </script>
 </body>
 </html>
