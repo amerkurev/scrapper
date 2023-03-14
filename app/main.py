@@ -69,12 +69,22 @@ def parse():
             return data
 
     with sync_playwright() as playwright:
-        # https://playwright.dev/python/docs/api/class-browsertype#browser-type-launch
-        browser = playwright.firefox.launch(headless=True)
+        # https://playwright.dev/python/docs/api/class-browsertype
+        browser_args = {
+            'bypass_csp': True,
+            'viewport': {'width': args.viewport_width, 'height': args.viewport_height},
+        }
+        if args.persistent:
+            context = playwright.firefox.launch_persistent_context(
+                headless=True,
+                user_data_dir=USER_DATA_DIR,
+                **browser_args,
+            )
+        else:
+            browser = playwright.firefox.launch(headless=True)
+            context = browser.new_context(**browser_args)
 
-        # https://playwright.dev/python/docs/api/class-browser#browser-new-context
-        viewport = {'width': args.viewport_width, 'height': args.viewport_height}
-        context = browser.new_context(viewport=viewport, bypass_csp=True)
+        # https://playwright.dev/python/docs/api/class-page
         page = context.new_page()
         page.goto(args.url)
         page_content = page.content()
@@ -97,9 +107,11 @@ def parse():
         }
         article = page.evaluate(PARSE_ARTICLE_JS % parser_args)
 
-        # release resources
+        # If it was launched as a persistent context null gets returned.
+        browser = context.browser
         context.close()
-        browser.close()
+        if browser:
+            browser.close()
 
     status_code = Status.INTERNAL_SERVER_ERROR if 'err' in article else Status.OK
 
@@ -112,6 +124,7 @@ def parse():
 
         if args.full_content:
             article['fullContent'] = page_content
+
         # result_html and result_json always get data from cache!
         dump_result(article, filename=_id)
 
@@ -126,7 +139,7 @@ def favicon():
 
 
 def dump_result(data, filename):
-    path = USER_DATA_DIR / filename[:2]
+    path = USER_DATA_DIR / '_res' / filename[:2]
     if not os.path.exists(path):
         os.makedirs(path, exist_ok=True)
     with open(path / filename, mode='w') as f:
@@ -134,7 +147,7 @@ def dump_result(data, filename):
 
 
 def load_result(filename):
-    path = USER_DATA_DIR / filename[:2] / filename
+    path = USER_DATA_DIR / '_res' / filename[:2] / filename
     if not path.exists():
         return None
     with open(path, mode='r') as f:

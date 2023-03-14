@@ -70,12 +70,17 @@ OPTIONS = (
 
     # Page URL. The page should contain the text of the article that needs to be extracted.
     ('url', (is_url,), None),
-    # If the option is present, the cache will be ignored.
+    # All results of the parsing process will be cached in the user_data_dir directory.
+    # If this option is present, the cached result will be ignored and the page will be fetched and parsed again.
     ('noCache', (is_present,), False),
     # If the option is present, the result will have the full HTML contents of the page, including the doctype.
     ('fullContent', (is_present,), False),
 
     # # # Playwright settings:
+
+    # Launches browser that uses persistent storage located at user_data_dir.
+    # User Data Directory stores browser session data like cookies and local storage.
+    ('persistent', (is_present,), False),
 
     # Waits for the given timeout in milliseconds before parsing the article.
     # In many cases, a timeout is not necessary. However, for some websites, it can be quite useful, such as with the Bloomberg site
