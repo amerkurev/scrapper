@@ -80,18 +80,27 @@ OPTIONS = (
 
     # Launches browser that uses persistent storage located at user_data_dir.
     # User Data Directory stores browser session data like cookies and local storage.
-    ('persistent', (is_present,), False),
-
-    # Waits for the given timeout in milliseconds before parsing the article.
-    # In many cases, a timeout is not necessary. However, for some websites, it can be quite useful, such as with the Bloomberg site
-    # where it was necessary to set a timeout of up to 10 seconds. Other waiting mechanisms,
-    # such as network events or waiting for selector visibility, are not currently supported.
+    ('persistentContext', (is_present,), False),
+    # Maximum operation time to navigate to the page in milliseconds; defaults to 30000 (30 seconds). Pass 0 to disable the timeout.
+    ('timeout', (is_number, gte(0)), 30000),
+    # Waits for the given timeout in milliseconds before parsing the article, and after the page has loaded.
+    # In many cases, a sleep timeout is not necessary. However, for some websites, it can be quite useful.
+    # Other waiting mechanisms, such as network events or waiting for selector visibility, are not currently supported.
     # The default value is 300 milliseconds.
-    ('waitForTimeout', (is_number, gte(0)), 300),
-    # The viewport width in pixels. The default value is 414.
+    ('sleep', (is_number, gte(0)), 300),
+    # The viewport width in pixels. The default value is 414 (iPhone 11 Viewport).
     ('viewportWidth', (is_number, gt(0)), 414),
-    # The viewport height in pixels. The default value is 896.
+    # The viewport height in pixels. The default value is 896 (iPhone 11 Viewport).
     ('viewportHeight', (is_number, gt(0)), 896),
+    # Emulates consistent window screen size available inside web page via window.screen. Is only used when the viewport is set.
+    # The page width in pixels. Defaults to 828 (iPhone 11 Resolution).
+    ('screenWidth', (is_number, gt(0)), 828),
+    # The page height in pixels. Defaults to 1792 (iPhone 11 Resolution).
+    ('screenHeight', (is_number, gt(0)), 1792),
+    # Whether to ignore HTTPS errors when sending network requests. Defaults to not ignore.
+    ('ignoreHttpsErrors', (is_present,), False),
+    # Specific user agent. Example: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36
+    ('userAgent', (), None),
 
     # # # Readability settings:
 

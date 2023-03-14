@@ -89,6 +89,8 @@
     }
 
     // code below is executed when the page loads...
+    url.value = localStorage.getItem('url') || "";
+    queryParams.value = localStorage.getItem('queryParams') || "";
     updateSnippet();
 
     // add event listeners to the url and query params fields to update the snippet and save to local storage

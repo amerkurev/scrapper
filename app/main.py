@@ -72,9 +72,18 @@ def parse():
         # https://playwright.dev/python/docs/api/class-browsertype
         browser_args = {
             'bypass_csp': True,
-            'viewport': {'width': args.viewport_width, 'height': args.viewport_height},
+            'viewport': {
+                'width': args.viewport_width,
+                'height': args.viewport_height,
+            },
+            'screen':  {
+                'width': args.screen_width,
+                'height': args.screen_height,
+            },
+            'ignore_https_errors': args.ignore_https_errors,
+            'user_agent': args.user_agent,
         }
-        if args.persistent:
+        if args.persistent_context:
             context = playwright.firefox.launch_persistent_context(
                 headless=True,
                 user_data_dir=USER_DATA_DIR,
@@ -86,11 +95,11 @@ def parse():
 
         # https://playwright.dev/python/docs/api/class-page
         page = context.new_page()
-        page.goto(args.url)
+        page.goto(args.url, timeout=args.timeout)
         page_content = page.content()
 
         # Waits for the given timeout in milliseconds
-        page.wait_for_timeout(args.wait_for_timeout)
+        page.wait_for_timeout(args.sleep)
 
         p = urlparse(request.base_url)
         scheme = p.scheme
