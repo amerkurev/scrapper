@@ -7,9 +7,8 @@ import datetime
 
 from http import HTTPStatus as Status
 from pathlib import Path
-from urllib.parse import urlparse
 
-from flask import Flask, request, render_template, send_from_directory
+from flask import Flask, request, render_template, send_file, send_from_directory
 from playwright.sync_api import sync_playwright
 
 
@@ -18,17 +17,15 @@ BASE_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 APP_HOME = Path(os.environ.get('APP_HOME', BASE_DIR / 'app'))
 STATIC_DIR = Path(os.environ.get('STATIC_DIR', BASE_DIR / 'static'))
 USER_DATA_DIR = Path(os.environ.get('USER_DATA_DIR', BASE_DIR / 'user_data_dir'))
+READABILITY_SCRIPT = APP_HOME / 'scripts' / 'Readability.js'
+STEALTH_SCRIPTS_DIR = APP_HOME / 'scripts' / 'stealth'
+SCREENSHOT_TYPE = 'jpeg'  # png, jpeg
+SCREENSHOT_QUALITY = 80  # 0-100
+
 
 sys.path.append(str(APP_HOME))
-from argutil import validate_args
+from argutil import validate_args, default_args
 from htmlutil import improve_content
-
-
-with open(APP_HOME / 'scripts' / 'load_script.js', mode='r') as fd:
-    LOAD_SCRIPT_JS = fd.read()
-
-with open(APP_HOME / 'scripts' / 'parse_article.js', mode='r') as fd:
-    PARSE_ARTICLE_JS = fd.read()
 
 
 app = Flask(__name__, static_folder=STATIC_DIR)
@@ -36,7 +33,10 @@ app = Flask(__name__, static_folder=STATIC_DIR)
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    args = list(default_args())
+    placeholder = '&#10;'.join((f'{x[0]}={x[1]}' for x in args[:10]))  # max 10 args
+    placeholder = placeholder.replace('=True', '=yes').replace('=False', '=no')
+    return render_template('index.html', context={'placeholder': placeholder})
 
 
 @app.route('/view/<string:id>', methods=['GET'])
@@ -54,6 +54,11 @@ def result_json(id):
     return data if data else 'Not found', Status.NOT_FOUND
 
 
+@app.route('/screenshot/<string:id>', methods=['GET'])
+def result_screenshot(id):
+    return send_file(screenshot_location(id), mimetype=f'image/{SCREENSHOT_TYPE}')
+
+
 @app.route('/parse', methods=['GET'])
 def parse():
     args, err = validate_args(args=request.args)
@@ -63,7 +68,7 @@ def parse():
     _id = hashlib.sha1(request.full_path.encode()).hexdigest()  # unique request id
 
     # get cache data if exists
-    if args.no_cache is False:
+    if args.cache is True:
         data = load_result(_id)
         if data:
             return data
@@ -82,41 +87,59 @@ def parse():
             },
             'ignore_https_errors': args.ignore_https_errors,
             'user_agent': args.user_agent,
+            'locale': args.locale,
+            'timezone_id': args.timezone,
+            'http_credentials': args.http_credentials,
+            'extra_http_headers': args.extra_http_headers,
         }
-        if args.persistent_context:
+        # proxy settings:
+        if args.proxy_server:
+            browser_args['proxy'] = {
+                'server': args.proxy_server,
+                'bypass': args.proxy_bypass,
+                'username': args.proxy_username,
+                'password': args.proxy_password,
+            }
+
+        # create a new browser context
+        if args.incognito:
+            browser = playwright.firefox.launch(headless=True)
+            context = browser.new_context(**browser_args)  # create a new incognito browser context
+        else:
             context = playwright.firefox.launch_persistent_context(
                 headless=True,
                 user_data_dir=USER_DATA_DIR,
                 **browser_args,
             )
-        else:
-            browser = playwright.firefox.launch(headless=True)
-            context = browser.new_context(**browser_args)
 
         # https://playwright.dev/python/docs/api/class-page
         page = context.new_page()
+        if args.stealth:
+            for script in STEALTH_SCRIPTS_DIR.glob('*.js'):
+                page.add_init_script(path=script)
+
+        page.add_init_script(path=READABILITY_SCRIPT)
         page.goto(args.url, timeout=args.timeout)
         page_content = page.content()
 
-        # Waits for the given timeout in milliseconds
+        # waits for the given timeout in milliseconds
         page.wait_for_timeout(args.sleep)
 
-        p = urlparse(request.base_url)
-        scheme = p.scheme
-        host = p.netloc
-        readability_path = '/static/libs/readability/Readability.js'
-        readability_src = f'{scheme}://{host}{readability_path}'
+        # take screenshot if requested
+        screenshot = None
+        if args.screenshot:
+            screenshot = page.screenshot(full_page=True, type=SCREENSHOT_TYPE, quality=SCREENSHOT_QUALITY)
 
-        # Evaluating JavaScript
-        page.evaluate(LOAD_SCRIPT_JS % {'src': readability_src})
+        # evaluating JavaScript: parse DOM and extract article content
         parser_args = {
             'maxElemsToParse': args.max_elems_to_parse,
             'nbTopCandidates': args.nb_top_candidates,
             'charThreshold': args.char_threshold,
         }
-        article = page.evaluate(PARSE_ARTICLE_JS % parser_args)
+        with open(APP_HOME / 'scripts' / 'parse.js') as fd:
+            article = page.evaluate(fd.read() % parser_args)
 
-        # If it was launched as a persistent context null gets returned.
+        # if it was launched as a persistent context null gets returned.
         browser = context.browser
         context.close()
         if browser:
@@ -124,18 +147,19 @@ def parse():
 
     status_code = Status.INTERNAL_SERVER_ERROR if 'err' in article else Status.OK
 
-    # Save result to disk
+    # save result to disk
     if status_code == Status.OK:
         article['id'] = _id
         article['parsed'] = datetime.datetime.utcnow().isoformat()  # ISO 8601 format
-        article['resultUri'] = f'{scheme}://{host}/result/{_id}'
+        article['resultUri'] = f'{request.host_url}result/{_id}'
         article['query'] = request.args.to_dict(flat=True)
 
         if args.full_content:
             article['fullContent'] = page_content
+        if args.screenshot:
+            article['screenshotUri'] = f'{request.host_url}screenshot/{_id}'
 
-        # result_html and result_json always get data from cache!
-        dump_result(article, filename=_id)
+        dump_result(article, filename=_id, screenshot=screenshot)
 
     return article, status_code
 
@@ -147,18 +171,35 @@ def favicon():
     return send_from_directory(d, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
-def dump_result(data, filename):
-    path = USER_DATA_DIR / '_res' / filename[:2]
-    if not os.path.exists(path):
-        os.makedirs(path, exist_ok=True)
-    with open(path / filename, mode='w') as f:
+def dump_result(data, filename, screenshot=None):
+    path = json_location(filename)
+
+    # create dir if not exists
+    d = os.path.dirname(path)
+    if not os.path.exists(d):
+        os.makedirs(d, exist_ok=True)
+
+    # save result as json
+    with open(path, mode='w') as f:
         json.dump(data, f, ensure_ascii=True)
+
+    # save screenshot
+    if screenshot:
+        with open(screenshot_location(filename), mode='wb') as f:
+            f.write(screenshot)
 
 
 def load_result(filename):
-    path = USER_DATA_DIR / '_res' / filename[:2] / filename
+    path = json_location(filename)
     if not path.exists():
         return None
     with open(path, mode='r') as f:
-        data = json.load(f)
-    return data
+        return json.load(f)
+
+
+def json_location(filename):
+    return USER_DATA_DIR / '_res' / filename[:2] / filename
+
+
+def screenshot_location(filename):
+    return str(json_location(filename)) + '.' + SCREENSHOT_TYPE

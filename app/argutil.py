@@ -1,10 +1,9 @@
 
-import re
 import validators
 
 
-# Camel case to snake case
-pattern = re.compile(r'(?<!^)(?=[A-Z])')
+TRUE_VALUES = ('true', '1', 'yes', 'on', 'y')
+FALSE_VALUES = ('false', '0', 'no', 'off', 'n')
 
 
 def is_url(name, val):
@@ -59,8 +58,36 @@ def lt(max_value):
     return f
 
 
-def is_present(name, value):
-    return value is not None, ''
+def is_bool(name, value):
+    if value in TRUE_VALUES:
+        return True, ''
+    if value in FALSE_VALUES:
+        return False, ''
+    return value, f'{name} must be a boolean value: true, 1, yes, on, y, false, 0, no, off, n'
+
+
+def is_credentials(name, val):
+    err = ''
+    parts = val.split(':')
+    if len(parts) == 1:
+        return {'username': parts[0], 'password': ''}, err
+    if len(parts) == 2:
+        return {'username': parts[0], 'password': parts[1]}, err
+    err = f'{name} must be in the format username:password'
+    return val, err
+
+
+def is_dict(name, val):
+    err = ''
+    r = {}
+    parts = val.split(';')
+    for part in parts:
+        if ':' not in part:
+            err = f'{name} must be in the format key:value;key:value'
+            return val, err
+        key, v = part.split(':', 1)  # maxsplit=1
+        r[key] = v
+    return r, err
 
 
 OPTIONS = (
@@ -71,16 +98,21 @@ OPTIONS = (
     # Page URL. The page should contain the text of the article that needs to be extracted.
     ('url', (is_url,), None),
     # All results of the parsing process will be cached in the user_data_dir directory.
-    # If this option is present, the cached result will be ignored and the page will be fetched and parsed again.
-    ('noCache', (is_present,), False),
-    # If the option is present, the result will have the full HTML contents of the page, including the doctype.
-    ('fullContent', (is_present,), False),
+    # Cache can be disabled by setting the cache option to false. In this case, the page will be fetched and parsed every time.
+    # Cache is enabled by default.
+    ('cache', (is_bool,), True),
+    # If this option is set to true, the result will have the full HTML contents of the page (fullContent field in the result).
+    ('full-content', (is_bool,), False),
+    # Stealth mode allows you to bypass anti-scraping techniques. It is disabled by default.
+    # Mostly taken from https://github.com/berstend/puppeteer-extra/tree/master/packages/puppeteer-extra-plugin-stealth/evasions
+    ('stealth', (is_bool,), False),
+    # If this option is set to true, the result will have the link to the screenshot of the page (screenshot field in the result).
+    ('screenshot', (is_bool,), False),
 
     # # # Playwright settings:
 
-    # Launches browser that uses persistent storage located at user_data_dir.
-    # User Data Directory stores browser session data like cookies and local storage.
-    ('persistentContext', (is_present,), False),
+    # Allows creating "incognito" browser contexts. "Incognito" browser contexts don't write any browsing data to disk.
+    ('incognito', (is_bool,), True),
     # Maximum operation time to navigate to the page in milliseconds; defaults to 30000 (30 seconds). Pass 0 to disable the timeout.
     ('timeout', (is_number, gte(0)), 30000),
     # Waits for the given timeout in milliseconds before parsing the article, and after the page has loaded.
@@ -89,31 +121,49 @@ OPTIONS = (
     # The default value is 300 milliseconds.
     ('sleep', (is_number, gte(0)), 300),
     # The viewport width in pixels. The default value is 414 (iPhone 11 Viewport).
-    ('viewportWidth', (is_number, gt(0)), 414),
+    ('viewport-width', (is_number, gt(0)), 414),
     # The viewport height in pixels. The default value is 896 (iPhone 11 Viewport).
-    ('viewportHeight', (is_number, gt(0)), 896),
+    ('viewport-height', (is_number, gt(0)), 896),
     # Emulates consistent window screen size available inside web page via window.screen. Is only used when the viewport is set.
     # The page width in pixels. Defaults to 828 (iPhone 11 Resolution).
-    ('screenWidth', (is_number, gt(0)), 828),
+    ('screen-width', (is_number, gt(0)), 828),
     # The page height in pixels. Defaults to 1792 (iPhone 11 Resolution).
-    ('screenHeight', (is_number, gt(0)), 1792),
+    ('screen-height', (is_number, gt(0)), 1792),
     # Whether to ignore HTTPS errors when sending network requests. Defaults to not ignore.
-    ('ignoreHttpsErrors', (is_present,), False),
-    # Specific user agent. Example: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36
-    ('userAgent', (), None),
+    ('ignore-https-errors', (is_bool,), False),
+    # Specific user agent.
+    ('user-agent', (), None),
+    # Specify user locale, for example en-GB, de-DE, etc.
+    # Locale will affect navigator.language value, Accept-Language request header value as well as number and date formatting rules.
+    ('locale', (), None),
+    # Changes the timezone of the context. See ICU's metaZones.txt for a list of supported timezone IDs.
+    ('timezone', (), None),
+    # Credentials for HTTP authentication (string containing username and password separated by a colon, e.g. "username:password").
+    ('http-credentials', (is_credentials,), None),
+    # Contains additional HTTP headers to be sent with every request. Example: "X-API-Key:123456;X-Auth-Token:abcdef".
+    ('extra-http-headers', (is_dict,), None),
+
+    # # # Network proxy settings:
+    # Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example http://myproxy.com:3128 or socks5://myproxy.com:3128.
+    # Short form myproxy.com:3128 is considered an HTTP proxy.
+    ('proxy-server', (), None),
+    # Optional comma-separated domains to bypass proxy, for example ".com, chromium.org, .domain.com".
+    ('proxy-bypass', (), ''),
+    # Optional username to use if HTTP proxy requires authentication.
+    ('proxy-username', (), ''),
+    # Optional password to use if HTTP proxy requires authentication.
+    ('proxy-password', (), ''),
 
     # # # Readability settings:
 
     # The maximum number of elements to parse. The default value is 0, which means no limit.
-    ('maxElemsToParse', (is_number, gte(0)), 0),
-
+    ('max-elems-to-parse', (is_number, gte(0)), 0),
     # The number of top candidates to consider when analysing how tight the competition is among candidates.
     # The default value is 5.
-    ('nbTopCandidates', (is_number, gt(0)), 5),
-
+    ('nb-top-candidates', (is_number, gt(0)), 5),
     # The number of characters an article must have in order to return a result.
     # The default value is 500.
-    ('charThreshold', (is_number, gt(0)), 500),
+    ('char-threshold', (is_number, gt(0)), 500),
 )
 
 REQUIRED = ('url',)
@@ -143,6 +193,10 @@ def validate_args(args):
                     break
 
         # Camel case to snake case
-        setattr(opt, pattern.sub('_', name).lower(), value)
+        setattr(opt, name.replace('-', '_'), value)
 
     return opt, errs
+
+
+def default_args():
+    return ((x[0], x[2]) for x in OPTIONS if x[2] is not None)

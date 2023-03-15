@@ -48,7 +48,7 @@
                         // Print array of errors as li elements
                         errors.innerHTML = response.err.map((err) => {
                             return "<li>" + err + "</li>";
-                        });
+                        }).join("");
                     } catch(err) {
                         errors.innerHTML = "<li>Unknown error. See the server log for more details.</li>";
                     }

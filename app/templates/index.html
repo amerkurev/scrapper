@@ -8,7 +8,7 @@
       name="description"
       content="A Web scraper with a simple REST API living in Docker and using a Headless browser and Readability.js for parsing."
     />
-  <link rel="stylesheet" href="/static/libs/pico/1.5.7/pico.min.css">
+  <link rel="stylesheet" href="/static/pico/1.5.7/pico.min.css">
   <link rel="stylesheet" href="/static/custom.css">
   <title>Scrapper</title>
   <link rel="icon" href="/favicon.ico" sizes="any"><!-- 32×32 -->
@@ -49,8 +49,8 @@
         <br>
         <div>
           <details id="query-params-details">
-            <summary><small>Extra query parameters (<a href="https://github.com/amerkurev/scrapper" target="_blank">Docs</a>)</small></summary>
-            <textarea id="query-params" rows="10" cols="50" placeholder="noCache&#10;persistentContext&#10;viewportWidth=414&#10;viewportHeight=896&#10;sleep=300"></textarea>
+            <summary><small>Request Parameters (<a href="https://github.com/amerkurev/scrapper" target="_blank">Docs</a>)</small></summary>
+            <textarea id="query-params" rows="10" cols="50" placeholder="{{ context.placeholder|safe }}"></textarea>
           </details>
         </div>
         <br>
@@ -75,6 +75,6 @@
     </div>
   </footer>
   <script src="/static/dark-mode.js"></script>
-  <script src="/static/scrape-it.js"></script>
+  <script src="/static/query.js"></script>
 </body>
 </html>
