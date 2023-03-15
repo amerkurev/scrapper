@@ -17,6 +17,7 @@ BASE_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 APP_HOME = Path(os.environ.get('APP_HOME', BASE_DIR / 'app'))
 STATIC_DIR = Path(os.environ.get('STATIC_DIR', BASE_DIR / 'static'))
 USER_DATA_DIR = Path(os.environ.get('USER_DATA_DIR', BASE_DIR / 'user_data_dir'))
+USER_SCRIPTS = Path(os.environ.get('USER_SCRIPTS', BASE_DIR / 'user_scripts'))
 READABILITY_SCRIPT = APP_HOME / 'scripts' / 'Readability.js'
 STEALTH_SCRIPTS_DIR = APP_HOME / 'scripts' / 'stealth'
 SCREENSHOT_TYPE = 'jpeg'  # png, jpeg
@@ -89,17 +90,19 @@ def parse():
             )
 
         page = context.new_page()
-        # stealth mode
+
         if args.stealth:
-            for script in STEALTH_SCRIPTS_DIR.glob('*.js'):
-                page.add_init_script(path=script)
+            use_stealth_mode(page)
 
         page.add_init_script(path=READABILITY_SCRIPT)
         page.goto(args.url, timeout=args.timeout)
         page_content = page.content()
 
+        # page.add_script_tag(path=USER_SCRIPTS / 'user-script.js')
+
         # waits for the given timeout in milliseconds
-        page.wait_for_timeout(args.sleep)
+        if args.sleep:
+            page.wait_for_timeout(args.sleep)
 
         # take screenshot if requested
         screenshot = None
@@ -108,7 +111,7 @@ def parse():
 
         # evaluating JavaScript: parse DOM and extract article content
         with open(APP_HOME / 'scripts' / 'parse.js') as fd:
-            article = page.evaluate(fd.read() % get_parser_args())
+            article = page.evaluate(fd.read() % get_parser_args(args))
 
         # if it was launched as a persistent context null gets returned.
         browser = context.browser
@@ -174,3 +177,8 @@ def json_location(filename):
 
 def screenshot_location(filename):
     return str(json_location(filename)) + '.' + SCREENSHOT_TYPE
+
+
+def use_stealth_mode(page):
+    for script in STEALTH_SCRIPTS_DIR.glob('*.js'):
+        page.add_init_script(path=script)

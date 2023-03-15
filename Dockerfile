@@ -12,6 +12,7 @@ ENV \
     APP_HOME=/home/user/app \
     STATIC_DIR=/home/user/static \
     USER_DATA_DIR=/home/user/user_data_dir
+    USER_SCRIPTS=/home/user/user_scripts
 
 RUN adduser -u $APP_UID $APP_USER
 
