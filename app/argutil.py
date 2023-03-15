@@ -200,3 +200,41 @@ def validate_args(args):
 
 def default_args():
     return ((x[0], x[2]) for x in OPTIONS if x[2] is not None)
+
+
+def get_browser_args(args):
+    browser_args = {
+        'bypass_csp': True,
+        'viewport': {
+            'width': args.viewport_width,
+            'height': args.viewport_height,
+        },
+        'screen': {
+            'width': args.screen_width,
+            'height': args.screen_height,
+        },
+        'ignore_https_errors': args.ignore_https_errors,
+        'user_agent': args.user_agent,
+        'locale': args.locale,
+        'timezone_id': args.timezone,
+        'http_credentials': args.http_credentials,
+        'extra_http_headers': args.extra_http_headers,
+    }
+    # proxy settings:
+    if args.proxy_server:
+        browser_args['proxy'] = {
+            'server': args.proxy_server,
+            'bypass': args.proxy_bypass,
+            'username': args.proxy_username,
+            'password': args.proxy_password,
+        }
+    return browser_args
+
+
+def get_parser_args(args):
+    parser_args = {
+        'maxElemsToParse': args.max_elems_to_parse,
+        'nbTopCandidates': args.nb_top_candidates,
+        'charThreshold': args.char_threshold,
+    }
+    return parser_args

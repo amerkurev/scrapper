@@ -24,7 +24,7 @@ SCREENSHOT_QUALITY = 80  # 0-100
 
 
 sys.path.append(str(APP_HOME))
-from argutil import validate_args, default_args
+from argutil import validate_args, default_args, get_browser_args, get_parser_args
 from htmlutil import improve_content
 
 
@@ -75,37 +75,13 @@ def parse():
 
     with sync_playwright() as playwright:
         # https://playwright.dev/python/docs/api/class-browsertype
-        browser_args = {
-            'bypass_csp': True,
-            'viewport': {
-                'width': args.viewport_width,
-                'height': args.viewport_height,
-            },
-            'screen':  {
-                'width': args.screen_width,
-                'height': args.screen_height,
-            },
-            'ignore_https_errors': args.ignore_https_errors,
-            'user_agent': args.user_agent,
-            'locale': args.locale,
-            'timezone_id': args.timezone,
-            'http_credentials': args.http_credentials,
-            'extra_http_headers': args.extra_http_headers,
-        }
-        # proxy settings:
-        if args.proxy_server:
-            browser_args['proxy'] = {
-                'server': args.proxy_server,
-                'bypass': args.proxy_bypass,
-                'username': args.proxy_username,
-                'password': args.proxy_password,
-            }
-
-        # create a new browser context
+        browser_args = get_browser_args(args)
         if args.incognito:
+            # create a new incognito browser context
             browser = playwright.firefox.launch(headless=True)
-            context = browser.new_context(**browser_args)  # create a new incognito browser context
+            context = browser.new_context(**browser_args)
         else:
+            # create a persistent browser context
             context = playwright.firefox.launch_persistent_context(
                 headless=True,
                 user_data_dir=USER_DATA_DIR,
@@ -131,13 +107,8 @@ def parse():
             screenshot = page.screenshot(full_page=True, type=SCREENSHOT_TYPE, quality=SCREENSHOT_QUALITY)
 
         # evaluating JavaScript: parse DOM and extract article content
-        parser_args = {
-            'maxElemsToParse': args.max_elems_to_parse,
-            'nbTopCandidates': args.nb_top_candidates,
-            'charThreshold': args.char_threshold,
-        }
         with open(APP_HOME / 'scripts' / 'parse.js') as fd:
-            article = page.evaluate(fd.read() % parser_args)
+            article = page.evaluate(fd.read() % get_parser_args())
 
         # if it was launched as a persistent context null gets returned.
         browser = context.browser
