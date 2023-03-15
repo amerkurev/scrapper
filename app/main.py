@@ -112,8 +112,8 @@ def parse():
                 **browser_args,
             )
 
-        # https://playwright.dev/python/docs/api/class-page
         page = context.new_page()
+        # stealth mode
         if args.stealth:
             for script in STEALTH_SCRIPTS_DIR.glob('*.js'):
                 page.add_init_script(path=script)
