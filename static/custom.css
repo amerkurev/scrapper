@@ -334,6 +334,10 @@ details textarea {
   padding-top: 0;
 }
 
+.article-container header {
+  padding-top: 0;
+}
+
 .article-container h1,
 .article-container h2 {
   line-height: 1.2;

@@ -11,7 +11,7 @@ ENV \
     APP_UID=1001 \
     APP_HOME=/home/user/app \
     STATIC_DIR=/home/user/static \
-    USER_DATA_DIR=/home/user/user_data_dir
+    USER_DATA_DIR=/home/user/user_data_dir \
     USER_SCRIPTS=/home/user/user_scripts
 
 RUN adduser -u $APP_UID $APP_USER
@@ -19,6 +19,7 @@ RUN adduser -u $APP_UID $APP_USER
 USER user
 COPY app $APP_HOME
 COPY static $STATIC_DIR
+RUN mkdir -p $USER_DATA_DIR $USER_SCRIPTS
 
 WORKDIR $APP_HOME
 CMD waitress-serve --host 0.0.0.0 --port=3000 main:app

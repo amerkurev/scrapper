@@ -9,7 +9,7 @@ from http import HTTPStatus as Status
 from pathlib import Path
 
 from flask import Flask, request, render_template, send_file, send_from_directory
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, TimeoutError
 
 
 IN_DOCKER = os.environ.get('IN_DOCKER')
@@ -25,7 +25,7 @@ SCREENSHOT_QUALITY = 80  # 0-100
 
 
 sys.path.append(str(APP_HOME))
-from argutil import validate_args, default_args, get_browser_args, get_parser_args
+from argutil import validate_args, check_user_scrips, default_args, get_browser_args, get_parser_args
 from htmlutil import improve_content
 
 
@@ -63,6 +63,7 @@ def result_screenshot(id):
 @app.route('/parse', methods=['GET'])
 def parse():
     args, err = validate_args(args=request.args)
+    check_user_scrips(args=args, user_scripts_dir=USER_SCRIPTS, err=err)
     if err:
         return {'err': err}, Status.BAD_REQUEST
 
@@ -94,15 +95,21 @@ def parse():
         if args.stealth:
             use_stealth_mode(page)
 
-        page.add_init_script(path=READABILITY_SCRIPT)
-        page.goto(args.url, timeout=args.timeout)
-        page_content = page.content()
-
-        # page.add_script_tag(path=USER_SCRIPTS / 'user-script.js')
+        try:
+            page.add_init_script(path=READABILITY_SCRIPT)
+            page.goto(args.url, timeout=args.timeout, wait_until=args.wait_until)
+            page_content = page.content()
+        except TimeoutError:
+            return {'err': [f'TimeoutError: timeout {args.timeout}ms exceeded.']}, Status.BAD_REQUEST
 
         # waits for the given timeout in milliseconds
         if args.sleep:
             page.wait_for_timeout(args.sleep)
+
+        # add user scripts for DOM manipulation
+        if args.user_scripts:
+            for script_name in args.user_scripts:
+                page.add_script_tag(path=USER_SCRIPTS / script_name)
 
         # take screenshot if requested
         screenshot = None

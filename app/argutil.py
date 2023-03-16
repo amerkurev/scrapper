@@ -1,5 +1,6 @@
 
 import validators
+from operator import methodcaller
 
 
 TRUE_VALUES = ('true', '1', 'yes', 'on', 'y')
@@ -77,6 +78,11 @@ def is_credentials(name, val):
     return val, err
 
 
+def is_list(name, val):
+    err = ''
+    return list(filter(None, map(methodcaller('strip'), val.split(',')))), err
+
+
 def is_dict(name, val):
     err = ''
     r = {}
@@ -88,6 +94,15 @@ def is_dict(name, val):
         key, v = part.split(':', 1)  # maxsplit=1
         r[key] = v
     return r, err
+
+
+def is_enum(choices):
+    def f(name, val):
+        err = ''
+        if val not in choices:
+            err = f'{name} must be one of {choices}'
+        return val, err
+    return f
 
 
 OPTIONS = (
@@ -108,6 +123,11 @@ OPTIONS = (
     ('stealth', (is_bool,), False),
     # If this option is set to true, the result will have the link to the screenshot of the page (screenshot field in the result).
     ('screenshot', (is_bool,), False),
+    # To use your JavaScript scripts on the page, add script files to the "user_scripts" directory,
+    # and list the required ones (separated by commas) in the "user-scripts" parameter. These scripts will execute after the page loads
+    # but before the article parser runs. This allows you to help parse the article in a variety of ways,
+    # such as removing markup, ad blocks, or anything else. For example: user-scripts=remove_ads.js, click_cookie_accept_button.js
+    ('user-scripts', (is_list,), None),
 
     # # # Playwright settings:
 
@@ -115,6 +135,12 @@ OPTIONS = (
     ('incognito', (is_bool,), True),
     # Maximum operation time to navigate to the page in milliseconds; defaults to 30000 (30 seconds). Pass 0 to disable the timeout.
     ('timeout', (is_number, gte(0)), 30000),
+    # When to consider navigation succeeded, defaults to "domcontentloaded". Events can be either:
+    # - load - consider operation to be finished when the "load" event is fired.
+    # - domcontentloaded - consider operation to be finished when the DOMContentLoaded event is fired.
+    # - networkidle -  consider operation to be finished when there are no network connections for at least 500 ms.
+    # - commit - consider operation to be finished when network response is received and the document started loading.
+    ('wait_until', (is_enum(('domcontentloaded', 'load', 'networkidle', 'commit')),), 'domcontentloaded'),
     # Waits for the given timeout in milliseconds before parsing the article, and after the page has loaded.
     # In many cases, a sleep timeout is not necessary. However, for some websites, it can be quite useful.
     # Other waiting mechanisms, such as network events or waiting for selector visibility, are not currently supported.
@@ -144,6 +170,7 @@ OPTIONS = (
     ('extra-http-headers', (is_dict,), None),
 
     # # # Network proxy settings:
+
     # Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example http://myproxy.com:3128 or socks5://myproxy.com:3128.
     # Short form myproxy.com:3128 is considered an HTTP proxy.
     ('proxy-server', (), None),
@@ -196,6 +223,15 @@ def validate_args(args):
         setattr(opt, name.replace('-', '_'), value)
 
     return opt, errs
+
+
+def check_user_scrips(args, user_scripts_dir, err):
+    if not args.user_scripts:
+        return
+
+    for script_name in args.user_scripts:
+        if not (user_scripts_dir / script_name).exists():
+            err.append(f'User script "{script_name}" not found')
 
 
 def default_args():

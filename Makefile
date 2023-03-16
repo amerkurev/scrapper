@@ -27,6 +27,7 @@ docker:
 	docker build -t amerkurev/$(BIN):master --progress=plain .
 
 docker-run: docker
-	docker run -d --rm --ipc=host -p 3000:3000 -v $(PWD)/user_data_dir:/home/user/user_data_dir --name $(BIN) amerkurev/$(BIN):master
+	# Using --ipc=host is recommended when using Chrome. Chrome can run out of memory without this flag.
+	docker run -d --rm -p 3000:3000 -v $(PWD)/user_data_dir:/home/user/user_data_dir -v $(PWD)/user_scripts:/home/user/user_scripts --name $(BIN) amerkurev/$(BIN):master
 
 .PHONY: info build run clean test docker dist
