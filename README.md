@@ -9,11 +9,11 @@ Yes, of course, you can use commercial services for your tasks, but Scrapper has
 
 Start a scrapper instance:
 ```console
-docker run -p 3000:3000 --name scrapper amerkurev/scrapper:master
+docker run -d -p 3000:3000 --name scrapper amerkurev/scrapper:master
 ```
 Or start with persistent user data and cached files:
 ```console
-docker run -p 3000:3000 -v $(PWD)/user_data_dir:/home/user/user_data_dir --name scrapper amerkurev/scrapper:master
+docker run -d -p 3000:3000 -v $(PWD)/user_data_dir:/home/user/user_data_dir --name scrapper amerkurev/scrapper:master
 ```
 Scapper will be available at http://localhost:3000/. For more details, see [Usage](#usage)
 </details>
@@ -44,16 +44,15 @@ And many other features:
 ## Usage
 ### Getting Scrapper
 The Scrapper Docker image is based on the Playwright image, which includes all the dependencies needed to run a browser in Docker and also includes the browsers themselves. As a result, the image size is quite large, around 2 GB. Make sure you have enough free disk space, especially if you plan to take and store screenshots frequently. To get the latest version of Scrapper, run:
-```
+```console
 docker pull amerkurev/scrapper:latest
 ```
 
 ### Using Scrapper
 Scrapper uses two directories on the disk. The first one is the `user_data_dir` directory. This directory contains browser session data such as cookies and local storage. Additionally, the cache of Scrapper's own results (including screenshots) is stored in this directory. The second directory is `user_scripts`. In this directory, you can place your own JavaScript scripts, which you can then embed on pages through the Scrapper API. For example, to remove ads blocks or click the "Accept Cookies" button (see the `user_scripts` parameter in the [API Reference](#api-reference) section for more information). Therefore, it is recommended to immediately mount the corresponding directories from the host and run Scrapper like this:
-```
+```console
 mkdir -p user_data_dir user_scripts
-
-docker run -p 3000:3000 -v $(PWD)/user_data_dir:/home/user/user_data_dir -v $(PWD)/user_scripts:/home/user/user_scripts --name scrapper amerkurev/scrapper:master
+docker run -d -p 3000:3000 -v $(PWD)/user_data_dir:/home/user/user_data_dir -v $(PWD)/user_scripts:/home/user/user_scripts --name scrapper amerkurev/scrapper:master
 ```
 The Scrapper web interface should now be available at http://localhost:3000/. Use any modern browser to access it.
 
@@ -61,7 +60,7 @@ The Scrapper web interface should now be available at http://localhost:3000/. Us
 ### GET /parse?url=...
 The Scrapper API is very simple. Essentially, it is just one call that can easily be demonstrated using the cURL:
 
-```
+```console
 curl -X GET "localhost:3000/parse?url=https://en.wikipedia.org/wiki/web_scraping"
 ```
 
