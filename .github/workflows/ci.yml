@@ -50,5 +50,5 @@ jobs:
           docker buildx build --push \
               --build-arg CI=github --build-arg GITHUB_SHA=${GITHUB_SHA} --build-arg GIT_BRANCH=${ref} \
               --platform linux/amd64,linux/arm64 \
-              -t ghcr.io/${USERNAME}/doku:${ref} -t ghcr.io/${USERNAME}/doku:latest \
-              -t ${USERNAME}/doku:${ref} -t ${USERNAME}/doku:latest .
+              -t ghcr.io/${USERNAME}/scrapper:${ref} -t ghcr.io/${USERNAME}/scrapper:latest \
+              -t ${USERNAME}/scrapper:${ref} -t ${USERNAME}/scrapper:latest .
