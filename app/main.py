@@ -25,7 +25,14 @@ SCREENSHOT_QUALITY = 80  # 0-100
 
 
 sys.path.append(str(APP_HOME))
-from argutil import validate_args, check_user_scrips, default_args, get_browser_args, get_parser_args
+from argutil import (
+    validate_args,
+    default_args,
+    get_browser_args,
+    get_parser_args,
+    check_user_scrips,
+    check_article_fields,
+)
 from htmlutil import improve_content
 
 
@@ -141,6 +148,10 @@ def parse():
             article['screenshotUri'] = f'{request.host_url}screenshot/{_id}'
 
         dump_result(article, filename=_id, screenshot=screenshot)
+
+        # self-check for development
+        if not IN_DOCKER:
+            check_article_fields(article, args=args)
 
     return article, status_code
 

@@ -112,34 +112,34 @@ OPTIONS = (
 
     # Page URL. The page should contain the text of the article that needs to be extracted.
     ('url', (is_url,), None),
-    # All results of the parsing process will be cached in the user_data_dir directory.
+    # All results of the parsing process will be cached in the `user_data_dir` directory.
     # Cache can be disabled by setting the cache option to false. In this case, the page will be fetched and parsed every time.
     # Cache is enabled by default.
     ('cache', (is_bool,), True),
-    # If this option is set to true, the result will have the full HTML contents of the page (fullContent field in the result).
+    # If this option is set to true, the result will have the full HTML contents of the page (`fullContent` field in the result).
     ('full-content', (is_bool,), False),
     # Stealth mode allows you to bypass anti-scraping techniques. It is disabled by default.
     # Mostly taken from https://github.com/berstend/puppeteer-extra/tree/master/packages/puppeteer-extra-plugin-stealth/evasions
     ('stealth', (is_bool,), False),
-    # If this option is set to true, the result will have the link to the screenshot of the page (screenshot field in the result).
+    # If this option is set to true, the result will have the link to the screenshot of the page (`screenshot` field in the result).
     ('screenshot', (is_bool,), False),
-    # To use your JavaScript scripts on the page, add script files to the "user_scripts" directory,
-    # and list the required ones (separated by commas) in the "user-scripts" parameter. These scripts will execute after the page loads
+    # To use your JavaScript scripts on the page, add script files to the `user_scripts` directory,
+    # and list the required ones (separated by commas) in the `user-scripts` parameter. These scripts will execute after the page loads
     # but before the article parser runs. This allows you to help parse the article in a variety of ways,
     # such as removing markup, ad blocks, or anything else. For example: user-scripts=remove_ads.js, click_cookie_accept_button.js
     ('user-scripts', (is_list,), None),
 
     # # # Playwright settings:
 
-    # Allows creating "incognito" browser contexts. "Incognito" browser contexts don't write any browsing data to disk.
+    # Allows creating `incognito` browser contexts. Incognito browser contexts don't write any browsing data to disk.
     ('incognito', (is_bool,), True),
     # Maximum operation time to navigate to the page in milliseconds; defaults to 30000 (30 seconds). Pass 0 to disable the timeout.
     ('timeout', (is_number, gte(0)), 30000),
-    # When to consider navigation succeeded, defaults to "domcontentloaded". Events can be either:
-    # - load - consider operation to be finished when the "load" event is fired.
-    # - domcontentloaded - consider operation to be finished when the DOMContentLoaded event is fired.
-    # - networkidle -  consider operation to be finished when there are no network connections for at least 500 ms.
-    # - commit - consider operation to be finished when network response is received and the document started loading.
+    # When to consider navigation succeeded, defaults to `domcontentloaded`. Events can be either:
+    # `load` - consider operation to be finished when the `load` event is fired.
+    # `domcontentloaded` - consider operation to be finished when the DOMContentLoaded event is fired.
+    # `networkidle` -  consider operation to be finished when there are no network connections for at least 500 ms.
+    # `commit` - consider operation to be finished when network response is received and the document started loading.
     ('wait_until', (is_enum(('domcontentloaded', 'load', 'networkidle', 'commit')),), 'domcontentloaded'),
     # Waits for the given timeout in milliseconds before parsing the article, and after the page has loaded.
     # In many cases, a sleep timeout is not necessary. However, for some websites, it can be quite useful.
@@ -164,9 +164,9 @@ OPTIONS = (
     ('locale', (), None),
     # Changes the timezone of the context. See ICU's metaZones.txt for a list of supported timezone IDs.
     ('timezone', (), None),
-    # Credentials for HTTP authentication (string containing username and password separated by a colon, e.g. "username:password").
+    # Credentials for HTTP authentication (string containing username and password separated by a colon, e.g. `username:password`).
     ('http-credentials', (is_credentials,), None),
-    # Contains additional HTTP headers to be sent with every request. Example: "X-API-Key:123456;X-Auth-Token:abcdef".
+    # Contains additional HTTP headers to be sent with every request. Example: `X-API-Key:123456;X-Auth-Token:abcdef`.
     ('extra-http-headers', (is_dict,), None),
 
     # # # Network proxy settings:
@@ -174,7 +174,7 @@ OPTIONS = (
     # Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example http://myproxy.com:3128 or socks5://myproxy.com:3128.
     # Short form myproxy.com:3128 is considered an HTTP proxy.
     ('proxy-server', (), None),
-    # Optional comma-separated domains to bypass proxy, for example ".com, chromium.org, .domain.com".
+    # Optional comma-separated domains to bypass proxy, for example `.com, chromium.org, .domain.com`.
     ('proxy-bypass', (), ''),
     # Optional username to use if HTTP proxy requires authentication.
     ('proxy-username', (), ''),
@@ -225,15 +225,6 @@ def validate_args(args):
     return opt, errs
 
 
-def check_user_scrips(args, user_scripts_dir, err):
-    if not args.user_scripts:
-        return
-
-    for script_name in args.user_scripts:
-        if not (user_scripts_dir / script_name).exists():
-            err.append(f'User script "{script_name}" not found')
-
-
 def default_args():
     return ((x[0], x[2]) for x in OPTIONS if x[2] is not None)
 
@@ -274,3 +265,56 @@ def get_parser_args(args):
         'charThreshold': args.char_threshold,
     }
     return parser_args
+
+
+def check_user_scrips(args, user_scripts_dir, err):
+    if not args.user_scripts:
+        return
+
+    for script_name in args.user_scripts:
+        if not (user_scripts_dir / script_name).exists():
+            err.append(f'User script {script_name} not found')
+
+
+NoneType = type(None)
+ARTICLE_FIELDS = (
+    # (name, types, condition)
+
+    # author metadata
+    ('byline', (NoneType, str), None),
+    # HTML string of processed article content
+    ('content', (NoneType, str), None),
+    # content direction
+    ('dir', (NoneType, str), None),
+    # article description, or short excerpt from the content
+    ('excerpt', (NoneType, str), None),
+    # full HTML contents of the page
+    ('fullContent', str, lambda args: args.full_content),
+    # unique request ID
+    ('id', str, None),
+    # content language
+    ('lang', (NoneType, str), None),
+    # length of an article, in characters
+    ('length', (NoneType, int), None),
+    # date of extracted article
+    ('parsed', str, None),
+    # request parameters
+    ('query', dict, None),
+    # URL of the current result, the data here is always taken from cache
+    ('resultUri', str, None),
+    # URL of the screenshot of the page
+    ('screenshotUri', str, lambda args: args.screenshot),
+    # name of the site
+    ('siteName', (NoneType, str), None),
+    # text content of the article, with all the HTML tags removed
+    ('textContent', (NoneType, str), None),
+    # article title
+    ('title', (NoneType, str), None),
+)
+
+
+def check_article_fields(article, args):
+    for (name, types, condition) in ARTICLE_FIELDS:
+        if condition is None or condition(args):
+            assert name in article, f'Missing {name}'
+            assert isinstance(article[name], types), f'Invalid {name}'
