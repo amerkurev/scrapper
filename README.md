@@ -48,7 +48,7 @@ docker pull amerkurev/scrapper:latest
 ### Creating directories
 Scrapper uses two directories on the disk. The first one is the `user_data_dir` directory. This directory contains browser session data such as cookies and local storage. Additionally, the cache of Scrapper's own results (including screenshots) is stored in this directory.
 
-The second directory is `user_scripts`. In this directory, you can place your own JavaScript scripts, which you can then embed on pages through the Scrapper API. For example, to remove ads blocks or click the "Accept Cookies" button (see the `user_scripts` parameter in the [API Reference](#api-reference) section for more information).
+The second directory is `user_scripts`. In this directory, you can place your own JavaScript scripts, which you can then embed on pages through the Scrapper API. For example, to remove ads blocks or click the "Accept Cookies" button (see the `user-scripts` parameter in the [API Reference](#api-reference) section for more information).
 
 **Scrapper does not work from the root** user inside the container. Instead, it uses a user with UID `1001`. Since you will be mounting the `user_data_dir` and `user_scripts` directories from the host using [Bind Mount](https://docs.docker.com/storage/bind-mounts/), you will need to set write permissions for UID `1001` on these directories on the host. 
 
