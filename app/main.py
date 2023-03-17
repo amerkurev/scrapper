@@ -5,6 +5,7 @@ import json
 import hashlib
 import datetime
 
+from functools import partial
 from http import HTTPStatus as Status
 from pathlib import Path
 
@@ -130,9 +131,7 @@ def parse():
                 page.add_script_tag(path=USER_SCRIPTS / script_name)
 
         # take screenshot if requested
-        screenshot = None
-        if args.screenshot:
-            screenshot = page.screenshot(full_page=True, type=SCREENSHOT_TYPE, quality=SCREENSHOT_QUALITY)
+        screenshot = get_screenshot(page) if args.screenshot else None
 
         # evaluating JavaScript: parse DOM and extract article content
         with open(APP_HOME / 'scripts' / 'parse.js') as fd:
@@ -206,6 +205,20 @@ def json_location(filename):
 
 def screenshot_location(filename):
     return str(json_location(filename)) + '.' + SCREENSHOT_TYPE
+
+
+def get_screenshot(page):
+    # First try to take a screenshot of the full scrollable page,
+    # if it fails, take a screenshot of the currently visible viewport.
+    f = partial(page.screenshot, type=SCREENSHOT_TYPE, quality=SCREENSHOT_QUALITY)
+    try:
+        # try to take a full page screenshot
+        return f(full_page=True)
+    except PlaywrightError as err:
+        # if the page is too large, take a screenshot of the currently visible viewport
+        if 'Cannot take screenshot larger than ' in err.message:
+            return f(full_page=False)
+        raise err
 
 
 def use_stealth_mode(page):

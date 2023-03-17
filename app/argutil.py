@@ -122,6 +122,8 @@ OPTIONS = (
     # Mostly taken from https://github.com/berstend/puppeteer-extra/tree/master/packages/puppeteer-extra-plugin-stealth/evasions
     ('stealth', (is_bool,), False),
     # If this option is set to true, the result will have the link to the screenshot of the page (`screenshot` field in the result).
+    # Important implementation details: Initially, Scrapper attempts to take a screenshot of the entire scrollable page.
+    # If it fails because the image is too large, it will only capture the currently visible viewport.
     ('screenshot', (is_bool,), False),
     # To use your JavaScript scripts on the page, add script files to the `user_scripts` directory,
     # and list the required ones (separated by commas) in the `user-scripts` parameter. These scripts will execute after the page loads
