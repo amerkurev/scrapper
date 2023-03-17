@@ -25,10 +25,10 @@ Scapper will be available at http://localhost:3000/. For more details, see [Usag
 
 ## Features
 The main features of Scrapper are:
-- **The headless browser is already built-in.** Modern websites actively use JavaScript on their pages, fight against crawlers, and sometimes require user actions, such as agreeing to the use of cookies on the site. All of these tasks are solved by the Scrapper using the excellent Playwright project. The Scrapper container image is based on the Playwright image, which already includes all modern browsers.
-- **The Read mode in the browser is used for parsing.** Millions of people use the "Read" mode in the browser to display only the text of the article on the screen while hiding the other elements of the page. Scrapper follows the same path by using the excellent Readability.js library from Mozilla. The parsing result will be the same as in the "Read" mode of your favorite browser.
-- **A simple and beautiful web interface.** Working with Scrapper is easy and enjoyable because you can do it right in your browser. The simple web interface allows you to debug your query, experiment with each parameter in the API, and see the result in HTML, JSON, or a screenshot. The beautiful design helps achieve an excellent Pico project. A dark theme for comfortable reading is also available.
-- **The Scrapper REST API is incredibly simple** to use as it only requires a single call and just a few parameters making it easy to integrate into any project. Furthermore, the web interface offers a visual query-builder that simplifies the learning process for the user.
+- **The headless browser is already built-in.** Modern websites actively use JavaScript on their pages, fight against crawlers, and sometimes require user actions, such as agreeing to the use of cookies on the site. All of these tasks are solved by the Scrapper using the excellent [Playwright](https://github.com/microsoft/playwright) project. The Scrapper container image is based on the Playwright image, which already includes all modern browsers.
+- **The Read mode in the browser is used for parsing.** Millions of people use the "Read" mode in the browser to display only the text of the article on the screen while hiding the other elements of the page. Scrapper follows the same path by using the excellent [Readability.js](https://github.com/mozilla/readability) library from Mozilla. The parsing result will be the same as in the "Read" mode of your favorite browser.
+- **A simple and beautiful web interface.** Working with Scrapper is easy and enjoyable because you can do it right in your browser. The simple web interface allows you to debug your query, experiment with each parameter in the API, and see the result in HTML, JSON, or a screenshot. The beautiful design helps achieve an excellent [Pico](https://github.com/picocss/pico) project. A dark theme for comfortable reading is also available.
+- **The Scrapper REST API is incredibly simple** to use as it only requires a [single call](#api-reference) and just a few parameters making it easy to integrate into any project. Furthermore, the web interface offers a visual query-builder that simplifies the learning process for the user.
 
 And many other features:
 - **Stealth mode.** Various methods are used to make it difficult for websites to detect a Headless browser and bypass web scraping protection.
@@ -142,6 +142,10 @@ If an error (or multiple errors) occurs during the execution of a request, the r
 }
 ```
 Some errors do not have a detailed description in the response to the request. In this case, you should refer to the log of the Docker container to investigate the cause of the error.
+
+## Supported architectures
+- linux/amd64
+- linux/arm64
 
 ## License
 [Apache-2.0](LICENSE)
