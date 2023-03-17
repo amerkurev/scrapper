@@ -18,7 +18,7 @@ docker run -d -p 3000:3000 -v $(PWD)/user_data_dir:/home/user/user_data_dir --na
 Scapper will be available at http://localhost:3000/. For more details, see [Usage](#usage)
 </details>
 
-# Demo
+## Demo
 Watch a 30-second demo reel showcasing the web interface of Scrapper.
 
 https://user-images.githubusercontent.com/28217522/225941167-633576fa-c9e2-4c63-b1fd-879be2d137fa.mp4
