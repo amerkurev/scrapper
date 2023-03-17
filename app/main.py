@@ -9,7 +9,7 @@ from http import HTTPStatus as Status
 from pathlib import Path
 
 from flask import Flask, request, render_template, send_file, send_from_directory
-from playwright.sync_api import sync_playwright, TimeoutError
+from playwright.sync_api import sync_playwright, TimeoutError, Error as PlaywrightError
 
 
 IN_DOCKER = os.environ.get('IN_DOCKER')
@@ -67,7 +67,18 @@ def result_screenshot(id):
     return send_file(screenshot_location(id), mimetype=f'image/{SCREENSHOT_TYPE}')
 
 
+def playwright_error(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except PlaywrightError as err:
+            message = err.message.splitlines()[0]
+            return {'err': [f'Playwright: {message}']}, Status.BAD_REQUEST
+    return wrapper
+
+
 @app.route('/parse', methods=['GET'])
+@playwright_error
 def parse():
     args, err = validate_args(args=request.args)
     check_user_scrips(args=args, user_scripts_dir=USER_SCRIPTS, err=err)
