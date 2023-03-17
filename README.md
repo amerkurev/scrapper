@@ -20,7 +20,7 @@ Scapper will be available at http://localhost:3000/. For more details, see [Usag
 
 
 ## Demo
-https://user-images.githubusercontent.com/28217522/225897659-97b4ebcf-e494-4de1-8b0a-b11261f05316.mp4
+https://user-images.githubusercontent.com/28217522/225935885-43ee77e2-edd8-4686-b1f6-0b64c13447bd.mp4
 
 
 ## Features
