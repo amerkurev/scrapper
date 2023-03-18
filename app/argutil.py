@@ -157,8 +157,8 @@ OPTIONS = (
     ('screen-width', (is_number, gt(0)), 828),
     # The page height in pixels. Defaults to 1792 (iPhone 11 Resolution).
     ('screen-height', (is_number, gt(0)), 1792),
-    # Whether to ignore HTTPS errors when sending network requests. Defaults to not ignore.
-    ('ignore-https-errors', (is_bool,), False),
+    # Whether to ignore HTTPS errors when sending network requests. The default setting is to ignore HTTPS errors.
+    ('ignore-https-errors', (is_bool,), True),
     # Specific user agent.
     ('user-agent', (), None),
     # Specify user locale, for example en-GB, de-DE, etc.
