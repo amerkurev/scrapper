@@ -145,9 +145,9 @@ OPTIONS = (
     ('wait-until', (is_enum(('domcontentloaded', 'load', 'networkidle', 'commit')),), 'domcontentloaded'),
     # Waits for the given timeout in milliseconds before parsing the article, and after the page has loaded.
     # In many cases, a sleep timeout is not necessary. However, for some websites, it can be quite useful.
-    # Other waiting mechanisms, such as network events or waiting for selector visibility, are not currently supported.
-    # The default value is 300 milliseconds.
-    ('sleep', (is_number, gte(0)), 300),
+    # Other waiting mechanisms, such as waiting for selector visibility, are not currently supported.
+    # The default value is 0, which means no sleep.
+    ('sleep', (is_number, gte(0)), 0),
     # The viewport width in pixels. The default value is 414 (iPhone 11 Viewport).
     ('viewport-width', (is_number, gt(0)), 414),
     # The viewport height in pixels. The default value is 896 (iPhone 11 Viewport).
