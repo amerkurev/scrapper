@@ -142,7 +142,7 @@ OPTIONS = (
     # `domcontentloaded` - consider operation to be finished when the DOMContentLoaded event is fired.
     # `networkidle` -  consider operation to be finished when there are no network connections for at least 500 ms.
     # `commit` - consider operation to be finished when network response is received and the document started loading.
-    ('wait_until', (is_enum(('domcontentloaded', 'load', 'networkidle', 'commit')),), 'domcontentloaded'),
+    ('wait-until', (is_enum(('domcontentloaded', 'load', 'networkidle', 'commit')),), 'domcontentloaded'),
     # Waits for the given timeout in milliseconds before parsing the article, and after the page has loaded.
     # In many cases, a sleep timeout is not necessary. However, for some websites, it can be quite useful.
     # Other waiting mechanisms, such as network events or waiting for selector visibility, are not currently supported.
