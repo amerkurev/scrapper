@@ -1,6 +1,5 @@
 
 import os
-import sys
 import json
 import hashlib
 import datetime
@@ -15,18 +14,19 @@ from playwright.sync_api import sync_playwright, TimeoutError, Error as Playwrig
 
 IN_DOCKER = os.environ.get('IN_DOCKER')
 BASE_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-APP_HOME = Path(os.environ.get('APP_HOME', BASE_DIR / 'app'))
-STATIC_DIR = Path(os.environ.get('STATIC_DIR', BASE_DIR / 'static'))
 USER_DATA_DIR = Path(os.environ.get('USER_DATA_DIR', BASE_DIR / 'user_data_dir'))
 USER_SCRIPTS = Path(os.environ.get('USER_SCRIPTS', BASE_DIR / 'user_scripts'))
-READABILITY_SCRIPT = APP_HOME / 'scripts' / 'Readability.js'
-STEALTH_SCRIPTS_DIR = APP_HOME / 'scripts' / 'stealth'
+APP_HOME = BASE_DIR / 'scrapper'
+STATIC_DIR = APP_HOME / 'static'
+SCRIPTS_DIR = APP_HOME / 'scripts'
+READABILITY_SCRIPT = SCRIPTS_DIR / 'Readability.js'
+PARSE_SCRIPT = SCRIPTS_DIR / 'parse.js'
+STEALTH_SCRIPTS_DIR = SCRIPTS_DIR / 'stealth'
 SCREENSHOT_TYPE = 'jpeg'  # png, jpeg
 SCREENSHOT_QUALITY = 80  # 0-100
 
 
-sys.path.append(str(APP_HOME))
-from argutil import (
+from scrapper.util.argutil import (
     validate_args,
     default_args,
     get_browser_args,
@@ -34,7 +34,7 @@ from argutil import (
     check_user_scrips,
     check_article_fields,
 )
-from htmlutil import improve_content
+from scrapper.util.htmlutil import improve_content
 
 
 app = Flask(__name__, static_folder=STATIC_DIR)
@@ -143,7 +143,7 @@ def parse():
         screenshot = get_screenshot(page) if args.screenshot else None
 
         # evaluating JavaScript: parse DOM and extract article content
-        with open(APP_HOME / 'scripts' / 'parse.js') as fd:
+        with open(PARSE_SCRIPT) as fd:
             article = page.evaluate(fd.read() % get_parser_args(args))
 
         # if it was launched as a persistent context null gets returned.

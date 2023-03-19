@@ -29,6 +29,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 .python-version
+scrapper.egg-info/
 
 # Playwright
 user_data_dir

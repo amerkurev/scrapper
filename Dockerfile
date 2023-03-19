@@ -7,19 +7,21 @@ RUN pip install --no-cache-dir -r ./requirements.txt
 ENV \
 	IN_DOCKER=1 \
 	# Docker user
-    APP_USER=user \
-    APP_UID=1001 \
-    APP_HOME=/home/user/app \
-    STATIC_DIR=/home/user/static \
-    USER_DATA_DIR=/home/user/user_data_dir \
-    USER_SCRIPTS=/home/user/user_scripts
+	USER=user \
+	USER_UID=1001 \
+	USER_HOME=/home/user \
+	USER_DATA_DIR=/home/user/user_data_dir \
+	USER_SCRIPTS=/home/user/user_scripts
 
-RUN adduser -u $APP_UID $APP_USER
-
+RUN useradd -s /bin/bash -m -d $USER_HOME -u $USER_UID $USER
 USER user
-COPY app $APP_HOME
-COPY static $STATIC_DIR
+
 RUN mkdir -p $USER_DATA_DIR $USER_SCRIPTS
 
-WORKDIR $APP_HOME
-CMD waitress-serve --host 0.0.0.0 --port=3000 main:app
+# install scrapper package
+WORKDIR $USER_HOME
+COPY scrapper $USER_HOME/scrapper
+COPY setup.py $USER_HOME/setup.py
+RUN pip install -e .
+
+CMD waitress-serve --host 0.0.0.0 --port=3000 scrapper:app
