@@ -172,4 +172,4 @@ Some errors do not have a detailed description in the response to the request. I
 - linux/arm64
 
 ## License
-[Apache-2.0](LICENSE)
+[Apache-2.0 license](LICENSE)
