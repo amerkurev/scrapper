@@ -96,11 +96,11 @@ def is_dict(name, val):
     return r, err
 
 
-def is_enum(choices):
+def is_enum(*args):
     def f(name, val):
         err = ''
-        if val not in choices:
-            err = f'{name} must be one of {choices}'
+        if val not in args:
+            err = f'{name} must be one of {args}'
         return val, err
     return f
 
@@ -142,12 +142,15 @@ OPTIONS = (
     # `domcontentloaded` - consider operation to be finished when the DOMContentLoaded event is fired.
     # `networkidle` -  consider operation to be finished when there are no network connections for at least 500 ms.
     # `commit` - consider operation to be finished when network response is received and the document started loading.
-    ('wait-until', (is_enum(('domcontentloaded', 'load', 'networkidle', 'commit')),), 'domcontentloaded'),
+    ('wait-until', (is_enum('domcontentloaded', 'load', 'networkidle', 'commit'),), 'domcontentloaded'),
     # Waits for the given timeout in milliseconds before parsing the article, and after the page has loaded.
     # In many cases, a sleep timeout is not necessary. However, for some websites, it can be quite useful.
     # Other waiting mechanisms, such as waiting for selector visibility, are not currently supported.
     # The default value is 0, which means no sleep.
     ('sleep', (is_number, gte(0)), 0),
+    # List of resource types allowed to be loaded on the page. All other resources will not be allowed, and their network requests will be aborted.
+    # By default, all resource types are allowed. The following resource types are supported: document, stylesheet, image, media, font, script, texttrack, xhr, fetch, eventsource, websocket, manifest, other.
+    ('resource', (is_list,), None),
     # The viewport width in pixels. The default value is 414 (iPhone 11 Viewport).
     ('viewport-width', (is_number, gt(0)), 414),
     # The viewport height in pixels. The default value is 896 (iPhone 11 Viewport).

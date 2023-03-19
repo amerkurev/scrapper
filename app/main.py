@@ -111,14 +111,23 @@ def parse():
 
         page = context.new_page()
 
+        # add stealth scripts for bypassing anti-scraping mechanisms
         if args.stealth:
             use_stealth_mode(page)
 
+        # add Readability.js script
+        page.add_init_script(path=READABILITY_SCRIPT)
+
+        # block by resource types
+        if args.resource:
+            page.route('**/*', resource_blocker(whitelist=args.resource))
+
         try:
-            page.add_init_script(path=READABILITY_SCRIPT)
+            # navigate to the given url
             page.goto(args.url, timeout=args.timeout, wait_until=args.wait_until)
             page_content = page.content()
         except TimeoutError:
+            # special handling for timeout error
             return {'err': [f'TimeoutError: timeout {args.timeout}ms exceeded.']}, Status.BAD_REQUEST
 
         # waits for the given timeout in milliseconds
@@ -224,3 +233,12 @@ def get_screenshot(page):
 def use_stealth_mode(page):
     for script in STEALTH_SCRIPTS_DIR.glob('*.js'):
         page.add_init_script(path=script)
+
+
+def resource_blocker(whitelist):  # list of resource types to allow
+    def block(route):
+        if route.request.resource_type in whitelist:
+            route.continue_()
+        else:
+            route.abort()
+    return block
