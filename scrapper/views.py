@@ -1,15 +1,29 @@
 
+import hashlib
+
 from http import HTTPStatus as Status
 from flask import request, render_template, send_file, send_from_directory
 # noinspection PyPackageRequirements
 from playwright.sync_api import Error as PlaywrightError
 
 from scrapper import app
-from scrapper.settings import STATIC_DIR, SCREENSHOT_TYPE
+from scrapper.settings import USER_SCRIPTS, STATIC_DIR, SCREENSHOT_TYPE
 from scrapper.cache import load_result, screenshot_location
-from scrapper.util.argutil import default_args
+from scrapper.util.argutil import default_args, validate_args, check_user_scrips
 from scrapper.util.htmlutil import improve_content
-from scrapper.parsers.article import parse as parse_article
+from scrapper.parser.article import parse as parse_article, ReadabilityError
+
+
+def api_error(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except PlaywrightError as err:
+            message = err.message.splitlines()[0]
+            return {'err': [f'Playwright: {message}']}, Status.INTERNAL_SERVER_ERROR
+        except ReadabilityError as err:
+            return err.err, Status.INTERNAL_SERVER_ERROR
+    return wrapper
 
 
 @app.route('/', methods=['GET'])
@@ -18,6 +32,13 @@ def index():
     placeholder = '&#10;'.join((f'{x[0]}={x[1]}' for x in args[:10]))  # max 10 args
     placeholder = placeholder.replace('=True', '=yes').replace('=False', '=no')
     return render_template('index.html', context={'placeholder': placeholder})
+
+
+@app.route('/favicon.ico')
+def favicon():
+    # https://flask.palletsprojects.com/en/1.1.x/patterns/favicon/
+    d = STATIC_DIR / 'icons'
+    return send_from_directory(d, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 @app.route('/view/<string:id>', methods=['GET'])
@@ -41,19 +62,22 @@ def result_screenshot(id):
 
 
 @app.route('/parse', methods=['GET'])
+@api_error
 def parse():
-    try:
-        return parse_article(request=request)
-    except PlaywrightError as err:
-        message = err.message.splitlines()[0]
-        return {'err': [f'Playwright: {message}']}, Status.BAD_REQUEST
+    args, err = validate_args(args=request.args)
+    check_user_scrips(args=args, user_scripts_dir=USER_SCRIPTS, err=err)
+    if err:
+        return {'err': err}, Status.BAD_REQUEST
 
+    _id = hashlib.sha1(request.full_path.encode()).hexdigest()  # unique request id
 
-@app.route('/favicon.ico')
-def favicon():
-    # https://flask.palletsprojects.com/en/1.1.x/patterns/favicon/
-    d = STATIC_DIR / 'icons'
-    return send_from_directory(d, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+    # get cache data if exists
+    if args.cache is True:
+        data = load_result(_id)
+        if data:
+            return data
+
+    return parse_article(request=request, args=args, _id=_id)
 
 
 def startup():

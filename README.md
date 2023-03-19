@@ -150,7 +150,7 @@ The response to the `/parse` request returns a JSON object that contains fields,
 | `id`            | unique request ID                                                   | str           |
 | `lang`          | content language                                                    | null or str   |
 | `length`        | length of an article, in characters                                 | null or int   |
-| `parsed`        | date of extracted article                                           | str           |
+| `date`          | date of extracted article in ISO 8601 format                        | str           |
 | `query`         | request parameters                                                  | object        |
 | `resultUri`     | URL of the current result, the data here is always taken from cache | str           |
 | `screenshotUri` | URL of the screenshot of the page                                   | str           |
