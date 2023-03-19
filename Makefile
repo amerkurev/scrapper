@@ -20,7 +20,8 @@ info:
 # flask
 # before run: install python packages from requirements.txt
 debug-server:
-	- @flask --app app/main.py run --port 3000 --debug
+	- @pip install -e .
+	- @flask --app scrapper run --port 3000 --debug
 
 ## Docker ##
 docker:
