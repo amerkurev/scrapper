@@ -7,6 +7,7 @@ from playwright.sync_api import sync_playwright
 from scrapper.cache import dump_result
 from scrapper.settings import IN_DOCKER, PARSE_SCRIPT
 from scrapper.parser import new_context, close_context, page_processing
+from scrapper.util import check_fields
 from scrapper.util.argutil import get_parser_args
 
 
@@ -48,7 +49,7 @@ def parse(request, args, _id):
 
     # self-check for development
     if not IN_DOCKER:
-        check_article_fields(article, args=args)
+        check_fields(article, args=args, fields=ARTICLE_FIELDS)
     return article
 
 
@@ -87,10 +88,3 @@ ARTICLE_FIELDS = (
     # article title
     ('title', (NoneType, str), None),
 )
-
-
-def check_article_fields(article, args):
-    for (name, types, condition) in ARTICLE_FIELDS:
-        if condition is None or condition(args):
-            assert name in article, f'Missing {name}'
-            assert isinstance(article[name], types), f'Invalid {name}'

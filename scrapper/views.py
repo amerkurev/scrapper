@@ -14,7 +14,7 @@ from scrapper.util.htmlutil import improve_content
 from scrapper.parser.article import parse as parse_article, ReadabilityError
 
 
-def api_error(func):
+def exception_handler(func):
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -23,6 +23,7 @@ def api_error(func):
             return {'err': [f'Playwright: {message}']}, Status.INTERNAL_SERVER_ERROR
         except ReadabilityError as err:
             return err.err, Status.INTERNAL_SERVER_ERROR
+    wrapper.__name__ = func.__name__
     return wrapper
 
 
@@ -62,7 +63,7 @@ def result_screenshot(id):
 
 
 @app.route('/parse', methods=['GET'])
-@api_error
+@exception_handler
 def parse():
     args, err = validate_args(args=request.args)
     check_user_scrips(args=args, user_scripts_dir=USER_SCRIPTS, err=err)
