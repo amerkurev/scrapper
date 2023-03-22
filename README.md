@@ -1,6 +1,6 @@
 # Scrapper 🧹
 
-If you were looking for a web scraper that actually works, you just found it. It's called Scapper! Downloading a page from the Internet and then extracting an article from it in a structured format is not as easy as it may seem at first glance. Sometimes it can be damn hard. But Scapper will help you with this, I hope :) To do this, Scapper has plenty of features.
+If you were looking for a web scraper that actually works, you just found it. It's called Scrapper! Downloading a page from the Internet and then extracting an article from it in a structured format is not as easy as it may seem at first glance. Sometimes it can be damn hard. But Scrapper will help you with this, I hope :) To do this, Scrapper has plenty of features.
 
 Yes, of course, you can use commercial services for your tasks, but Scrapper has been and will always be completely free for you. Scrapper has combined all the power and experience of related Open Source projects, so first, try it out.
 
@@ -11,7 +11,7 @@ Quick start a scrapper instance:
 ```console
 docker run -d -p 3000:3000 --name scrapper amerkurev/scrapper:latest
 ```
-Scapper will be available at http://localhost:3000/. For more details, see [Usage](#usage)
+Scrapper will be available at http://localhost:3000/. For more details, see [Usage](#usage)
 </details>
 
 ## Demo
