@@ -91,6 +91,7 @@ def rss():
     if err:
         return {'err': err}, Status.BAD_REQUEST
 
+    # never cached because it's a dynamic content
     return parse_links(request=request, args=args)
 
 
