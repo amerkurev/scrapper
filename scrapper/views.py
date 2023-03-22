@@ -11,7 +11,9 @@ from scrapper.settings import USER_SCRIPTS, STATIC_DIR, SCREENSHOT_TYPE
 from scrapper.cache import load_result, screenshot_location
 from scrapper.util.argutil import default_args, validate_args, check_user_scrips
 from scrapper.util.htmlutil import improve_content
-from scrapper.parser.article import parse as parse_article, ReadabilityError
+from scrapper.parser import ParserError
+from scrapper.parser.article import parse as parse_article
+from scrapper.parser.links import parse as parse_links
 
 
 def exception_handler(func):
@@ -21,7 +23,7 @@ def exception_handler(func):
         except PlaywrightError as err:
             message = err.message.splitlines()[0]
             return {'err': [f'Playwright: {message}']}, Status.INTERNAL_SERVER_ERROR
-        except ReadabilityError as err:
+        except ParserError as err:
             return err.err, Status.INTERNAL_SERVER_ERROR
     wrapper.__name__ = func.__name__
     return wrapper
@@ -79,6 +81,17 @@ def parse():
             return data
 
     return parse_article(request=request, args=args, _id=_id)
+
+
+@app.route('/rss', methods=['GET'])
+@exception_handler
+def rss():
+    args, err = validate_args(args=request.args)
+    check_user_scrips(args=args, user_scripts_dir=USER_SCRIPTS, err=err)
+    if err:
+        return {'err': err}, Status.BAD_REQUEST
+
+    return parse_links(request=request, args=args)
 
 
 def startup():

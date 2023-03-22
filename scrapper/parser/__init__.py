@@ -7,7 +7,6 @@ from scrapper.util.argutil import get_browser_args
 from scrapper.settings import (
     USER_DATA_DIR,
     USER_SCRIPTS,
-    READABILITY_SCRIPT,
     STEALTH_SCRIPTS_DIR,
     SCREENSHOT_TYPE,
     SCREENSHOT_QUALITY,
@@ -39,13 +38,14 @@ def close_context(context):
         browser.close()
 
 
-def page_processing(page, args):
+def page_processing(page, args, init_scripts):
     # add stealth scripts for bypassing anti-scraping mechanisms
     if args.stealth:
         use_stealth_mode(page)
 
-    # add Readability.js script
-    page.add_init_script(path=READABILITY_SCRIPT)
+    # add extra init scripts
+    for path in init_scripts:
+        page.add_init_script(path=path)
 
     # block by resource types
     if args.resource:
@@ -94,3 +94,10 @@ def get_screenshot(page):
         if 'Cannot take screenshot larger than ' in err.message:
             return f(full_page=False)
         raise err
+
+
+class ParserError(Exception):
+
+    def __init__(self, err):
+        super().__init__('Parser error')
+        self.err = err

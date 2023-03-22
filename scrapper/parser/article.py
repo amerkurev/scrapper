@@ -5,33 +5,32 @@ import datetime
 from playwright.sync_api import sync_playwright
 
 from scrapper.cache import dump_result
-from scrapper.settings import IN_DOCKER, PARSE_SCRIPT
+from scrapper.settings import IN_DOCKER, READABILITY_SCRIPT, PARSER_SCRIPTS_DIR
 from scrapper.parser import new_context, close_context, page_processing
 from scrapper.util import check_fields
-from scrapper.util.argutil import get_parser_args
-
-
-class ReadabilityError(Exception):
-
-    def __init__(self, err):
-        super().__init__('Readability error')
-        self.err = err
+from scrapper.parser import ParserError
 
 
 def parse(request, args, _id):
     with sync_playwright() as playwright:
         context = new_context(playwright, args)
         page = context.new_page()
-        page_content, screenshot = page_processing(page, args)
+        page_content, screenshot = page_processing(page, args=args, init_scripts=[READABILITY_SCRIPT])
 
         # evaluating JavaScript: parse DOM and extract article content
-        with open(PARSE_SCRIPT) as fd:
-            article = page.evaluate(fd.read() % get_parser_args(args))
+        parser_args = {
+            # Readability options:
+            'maxElemsToParse': args.max_elems_to_parse,
+            'nbTopCandidates': args.nb_top_candidates,
+            'charThreshold': args.char_threshold,
+        }
+        with open(PARSER_SCRIPTS_DIR / 'article.js') as fd:
+            article = page.evaluate(fd.read() % parser_args)
         close_context(context)
 
-    # readability error, article is not extracted and has 'err' field
+    # parser error: article is not extracted, result has 'err' field
     if 'err' in article:
-        raise ReadabilityError(article)
+        raise ParserError(article)
 
     # set common fields
     article['id'] = _id

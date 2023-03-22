@@ -263,15 +263,6 @@ def get_browser_args(args):
     return browser_args
 
 
-def get_parser_args(args):
-    parser_args = {
-        'maxElemsToParse': args.max_elems_to_parse,
-        'nbTopCandidates': args.nb_top_candidates,
-        'charThreshold': args.char_threshold,
-    }
-    return parser_args
-
-
 def check_user_scrips(args, user_scripts_dir, err):
     if not args.user_scripts:
         return
