@@ -64,8 +64,6 @@ ARTICLE_FIELDS = (
     ('dir', (NoneType, str), None),
     # article description, or short excerpt from the content
     ('excerpt', (NoneType, str), None),
-    # full HTML contents of the page
-    ('fullContent', str, lambda args: args.full_content),
     # unique request ID
     ('id', str, None),
     # content language
@@ -78,6 +76,8 @@ ARTICLE_FIELDS = (
     ('query', dict, None),
     # URL of the current result, the data here is always taken from cache
     ('resultUri', str, None),
+    # full HTML contents of the page
+    ('fullContent', str, lambda args: args.full_content),
     # URL of the screenshot of the page
     ('screenshotUri', str, lambda args: args.screenshot),
     # name of the site

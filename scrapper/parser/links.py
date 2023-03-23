@@ -1,7 +1,7 @@
 
 import hashlib
+import datetime
 import tldextract
-import unicodedata
 
 from statistics import median
 from operator import itemgetter
@@ -9,21 +9,25 @@ from operator import itemgetter
 # noinspection PyPackageRequirements
 from playwright.sync_api import sync_playwright
 
-from scrapper.settings import PARSER_SCRIPTS_DIR
+from scrapper.cache import dump_result
+from scrapper.settings import IN_DOCKER, PARSER_SCRIPTS_DIR
 from scrapper.parser import new_context, close_context, page_processing
+from scrapper.util import check_fields
 from scrapper.parser import ParserError
 
 
-def parse(request, args):
+def parse(request, args, _id):
     with sync_playwright() as playwright:
         context = new_context(playwright, args)
         page = context.new_page()
-        page_processing(page, args=args, init_scripts=[])
+        page_content, screenshot = page_processing(page, args=args, init_scripts=[])
 
         # evaluating JavaScript: parse DOM and extract links of articles
         parser_args = {}
         with open(PARSER_SCRIPTS_DIR / 'links.js') as fd:
             links = page.evaluate(fd.read() % parser_args)
+
+        title = page.title()
         close_context(context)
 
     # parser error: links are not extracted, result has 'err' field
@@ -34,36 +38,53 @@ def parse(request, args):
     domain = tldextract.extract(args.url).domain
     links = [x for x in links if allowed_domain(x['href'], domain)]
 
-    # split text of link to words
-    for link in links:
-        # remove newlines from text
-        link['text'] = unicodedata.normalize('NFKD', link['text'])  # remove \xa0
-        s = ' '.join(link['text'].splitlines())
-        link['words'] = list(filter(None, s.split()))
+    links_dict = group_links(links)
 
-    # transform links to dict where key is 'cssSel' field and value is list of links for this selector
+    # get stat for groups of links and filter groups with
+    # median length of text and words more than 40 and 3
+    links = []
+    for key, group in links_dict.items():
+        stat = get_stat(group)
+        if stat['approved']:
+            links.extend(group)
+
+    # sort filtered links by 'pos' field. pos is position of link in DOM
+    links.sort(key=itemgetter('pos'))
+    links = list(map(link_to_json, links))
+
+    # set common fields
+    newsfeed = {
+        'id': _id,
+        'date': datetime.datetime.utcnow().isoformat(),
+        'resultUri': f'{request.host_url}result/{_id}',
+        'query': request.args.to_dict(flat=True),
+        'links': links,
+        'title': title,
+    }
+
+    if args.full_content:
+        newsfeed['fullContent'] = page_content
+    if args.screenshot:
+        newsfeed['screenshotUri'] = f'{request.host_url}screenshot/{_id}'
+
+    # save result to disk
+    dump_result(newsfeed, filename=_id, screenshot=screenshot)
+
+    # self-check for development
+    if not IN_DOCKER:
+        check_fields(newsfeed, args=args, fields=NEWSFEED_FIELDS)
+    return newsfeed
+
+
+def group_links(links):
+    # Group links by 'CSS selector', 'color', 'font', 'parent padding', 'parent margin' and 'parent background color' properties
     links_dict = {}
     for link in links:
         key = make_key(link)
         if key not in links_dict:
             links_dict[key] = []
         links_dict[key].append(link)
-
-    # get stat for groups of links and filter groups with median length of text and words more than 40 and 3
-    filtered_links = []
-    stats = {}
-    for key, group in links_dict.items():
-        stat = get_stat(group)
-        stats[key] = stat
-        if stat['text']['median_len'] > 40 and stat['words']['median_len'] > 3:
-            filtered_links.extend(links_dict[key])
-
-    import pprint
-    pprint.pprint(links)
-
-    # sort filtered links by 'pos' field. pos is position of link in DOM
-    filtered_links.sort(key=itemgetter('pos'))
-    return [x['text'] for x in filtered_links]
+    return links_dict
 
 
 def make_key(link):
@@ -75,15 +96,14 @@ def make_key(link):
 
 def get_stat(links):
     # Get stat for group of links
+    median_text_len = median([len(x['text']) for x in links])
+    median_words_count = median([len(x['words']) for x in links])
+    approved = median_text_len > 40 and median_words_count > 3
     return {
         'count': len(links),
-        'text': {
-            'median_len': median([len(x['text']) for x in links]),
-        },
-        'words': {
-            'median_len': median([len(x['words']) for x in links]),
-        },
-        'sample': links[0]['text'],
+        'median_text_len': median_text_len,
+        'median_words_count': median_words_count,
+        'approved': approved,
     }
 
 
@@ -93,3 +113,33 @@ def allowed_domain(href, domain):
         # absolute link
         return tldextract.extract(href).domain == domain
     return True  # relative link
+
+
+def link_to_json(link):
+    return {
+        'url': link['url'],
+        'text': link['text'],
+    }
+
+
+NoneType = type(None)
+NEWSFEED_FIELDS = (
+    # (name, types, condition)
+
+    # unique request ID
+    ('id', str, None),
+    # date of extracted article in ISO 8601 format
+    ('date', str, None),
+    # request parameters
+    ('query', dict, None),
+    # URL of the current result, the data here is always taken from cache
+    ('resultUri', str, None),
+    # full HTML contents of the page
+    ('fullContent', str, lambda args: args.full_content),
+    # URL of the screenshot of the page
+    ('screenshotUri', str, lambda args: args.screenshot),
+    # list of links
+    ('links', list, None),
+    # the page's title
+    ('title', (NoneType, str), None),
+)

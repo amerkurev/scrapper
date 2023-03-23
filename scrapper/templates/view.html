@@ -10,7 +10,7 @@
     />
   <link rel="stylesheet" href="/static/pico/1.5.7/pico.min.css">
   <link rel="stylesheet" href="/static/custom.css">
-  <title>Scrapper | {{ data.title }}</title>
+  <title>Scrapper{% if data.title %} | {{ data.title }}{% endif %}</title>
   <link rel="icon" href="/favicon.ico" sizes="any"><!-- 32×32 -->
   <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png"><!-- 180×180 -->
   <link rel="manifest" href="/static/icons/site.webmanifest">
@@ -21,7 +21,11 @@
       <li>
       </li>
       <li>
+        {% if data.links %}
+        <strong><a href="/newsfeed-parser" class="logo">Scrapper</a></strong>
+        {% else %}
         <strong><a href="/" class="logo">Scrapper</a></strong>
+        {% endif %}
         <g-emoji class="g-emoji" alias="broom" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f9f9.png">🧹</g-emoji>
       </li>
     </ul>
@@ -37,9 +41,28 @@
   </nav>
   <main class="container article-container">
     <div class="extra-info">
-      {{ data.siteName }}: <a target="_blank" href="{{ data.query.url }}">{{ data.query.url }}</a>
+      {% if data.siteName %}
+        {{ data.siteName }}:
+      {% elif data.title %}
+        {{ data.title }}:
+      {% endif %}
+      <a target="_blank" href="{{ data.query.url }}">{{ data.query.url }}</a>
     </div>
+    <!-- article -->
+    {% if data.content %}
     {{ data.content|safe }}
+    {% endif %}
+    <!-- newsfeed -->
+    {% if data.links %}
+    <article class="newsfeed">
+      <h1>Newsfeed</h1>
+      <ol>
+      {% for link in data.links %}
+        <li><a href="{{ link.url }}" target="_blank">{{ link.text|safe }}</a></li>
+      {% endfor %}
+      </ol>
+    </article>
+    {% endif %}
     <div class="extra-info">
       The page was parsed at {{ data.date }}
     </div>

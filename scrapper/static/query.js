@@ -28,13 +28,14 @@
             .join("&");
     };
 
+    let parserMode = document.getElementById("parser-mode");
     let scrapeIt = document.getElementById("scrape-it");
     scrapeIt.addEventListener("click", (e) => {
         e.preventDefault();
         let errors = document.getElementById("errors");
         let params = formatParams();
         let xhr = new XMLHttpRequest();
-        xhr.open("GET", "/parse" + params, true);
+        xhr.open("GET", apiEndpoint + params, true);  // the apiEndpoint variable is defined in the index.html
         xhr.send();
         xhr.onreadystatechange = (e) => {
             if (xhr.readyState == 4) { // DONE: The operation is complete.
@@ -56,10 +57,12 @@
                 }
                 scrapeIt.innerHTML = "Scrape it!";
                 scrapeIt.removeAttribute("aria-busy");
+                parserMode.style.visibility = "visible";
             }
         };
         scrapeIt.innerHTML = "Please wait…";
         scrapeIt.setAttribute("aria-busy", "true");
+        parserMode.style.visibility = "hidden";
     });
 
     var url = document.getElementById("url");
@@ -77,20 +80,20 @@
             snippet.style.display = "none";
         } else {
             let hostname = window.location.protocol + "//" + window.location.host;
-            snippetLink.innerHTML = hostname + "/parse" + params;
-            snippetLink.setAttribute("href", "/parse" + params);
+            snippetLink.innerHTML = hostname + apiEndpoint + params;
+            snippetLink.setAttribute("href", apiEndpoint + params);
             snippetLabel.innerHTML = "Request URL:"
             snippet.style.display = "block";
         }
 
         // save the query params to local storage
-        localStorage.setItem('url', url.value);
-        localStorage.setItem('queryParams', queryParams.value);
+        localStorage.setItem("url", url.value);
+        localStorage.setItem("queryParams", queryParams.value);
     }
 
     // code below is executed when the page loads...
-    url.value = localStorage.getItem('url') || "";
-    queryParams.value = localStorage.getItem('queryParams') || "";
+    url.value = localStorage.getItem("url") || "";
+    queryParams.value = localStorage.getItem("queryParams") || "";
     updateSnippet();
 
     // add event listeners to the url and query params fields to update the snippet and save to local storage

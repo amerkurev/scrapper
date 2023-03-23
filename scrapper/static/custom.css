@@ -386,3 +386,12 @@ code {
 a.logo, a.logo:hover, a.logo:focus, a.logo:active {
   color: var(--h1-color);
 }
+
+a[role=button] {
+  margin-right: 10px;
+  min-width: 8rem;
+}
+
+article.newsfeed ol li {
+  font-size: .75rem;
+}

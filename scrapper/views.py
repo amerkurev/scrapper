@@ -10,7 +10,7 @@ from scrapper import app
 from scrapper.settings import USER_SCRIPTS, STATIC_DIR, SCREENSHOT_TYPE
 from scrapper.cache import load_result, screenshot_location
 from scrapper.util.argutil import default_args, validate_args, check_user_scrips
-from scrapper.util.htmlutil import improve_content
+from scrapper.util.htmlutil import improve_content, improve_link
 from scrapper.parser import ParserError
 from scrapper.parser.article import parse as parse_article
 from scrapper.parser.links import parse as parse_links
@@ -30,11 +30,12 @@ def exception_handler(func):
 
 
 @app.route('/', methods=['GET'])
+@app.route('/newsfeed-parser', methods=['GET'])
 def index():
     args = list(default_args())
     placeholder = '&#10;'.join((f'{x[0]}={x[1]}' for x in args[:10]))  # max 10 args
     placeholder = placeholder.replace('=True', '=yes').replace('=False', '=no')
-    return render_template('index.html', context={'placeholder': placeholder})
+    return render_template('index.html', context={'placeholder': placeholder, 'newsfeed': '/newsfeed-parser' == request.path})
 
 
 @app.route('/favicon.ico')
@@ -48,7 +49,12 @@ def favicon():
 def result_html(id):
     data = load_result(id)
     if data:
-        data['content'] = improve_content(data)
+        if 'content' in data:
+            # article content
+            data['content'] = improve_content(data)
+        if 'links' in data:
+            # newsfeed links
+            data['links'] = [improve_link(x) for x in data['links']]
         return render_template('view.html', data=data)
     return 'Not found', Status.NOT_FOUND
 
@@ -83,16 +89,23 @@ def parse():
     return parse_article(request=request, args=args, _id=_id)
 
 
-@app.route('/rss', methods=['GET'])
+@app.route('/newsfeed', methods=['GET'])
 @exception_handler
-def rss():
+def newsfeed():
     args, err = validate_args(args=request.args)
     check_user_scrips(args=args, user_scripts_dir=USER_SCRIPTS, err=err)
     if err:
         return {'err': err}, Status.BAD_REQUEST
 
-    # never cached because it's a dynamic content
-    return parse_links(request=request, args=args)
+    _id = hashlib.sha1(request.full_path.encode()).hexdigest()  # unique request id
+
+    # get cache data if exists
+    if args.cache is True:
+        data = load_result(_id)
+        if data:
+            return data
+
+    return parse_links(request=request, args=args, _id=_id)
 
 
 def startup():

@@ -13,6 +13,14 @@
         return `${path.join(' > ')}`.toLowerCase();
     };
 
+    function replaceNbsps(str) {
+        return str.replace(new RegExp(String.fromCharCode(160), "g"), " ");  // remove \xa0
+    }
+
+    function splitIntoWords(str) {
+        return str.split(/[\r\n\s]+/).filter(s => s.length > 0);
+    }
+
     try {
         links = [];
         pos = 0;
@@ -34,8 +42,9 @@
                     let link = {
                         "pos": pos,
                         "cssSel": getCssSelector(elements[i]),
-                        "text": text,
+                        "text": replaceNbsps(text),
                         "href": href,
+                        "url": new URL(href, document.location).href,
                         "fontSize": parseFontSize(style.fontSize),  // e.g. "12px" -> 12
                         "fontWeight": parseInt(style.fontWeight),  // e.g. "400" -> 400
                         "color": style.color,  // e.g. "rgb(51, 51, 51)"
@@ -44,6 +53,7 @@
                         "parentMargin": parentStyle.margin,
                         "parentBgColor": parentStyle.backgroundColor,
                     };
+                    link["words"] = splitIntoWords(link.text);
                     links.push(link);
                 }
                 pos += 1;

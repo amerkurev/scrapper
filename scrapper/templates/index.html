@@ -21,7 +21,11 @@
       <li>
       </li>
       <li>
+        {% if context.newsfeed %}
+        <strong><a href="/newsfeed-parser" class="logo">Scrapper</a></strong>
+        {% else %}
         <strong><a href="/" class="logo">Scrapper</a></strong>
+        {% endif %}
         <g-emoji class="g-emoji" alias="broom" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f9f9.png">🧹</g-emoji>
       </li>
     </ul>
@@ -38,13 +42,23 @@
       <div>
         <form>
           <label for="url">Page URL</label>
+          {% if context.newsfeed %}
+          <input type="email" id="url" name="email" placeholder="https://example.com/" required>
+          <small>The page should contain hyperlinks to news articles. For example, this could be the main page of a website.</small>
+          {% else %}
           <input type="email" id="url" name="email" placeholder="https://example.com/article.html" required>
-          <small>The page should contain the text of the article that needs to be extracted.</small>
+          <small>The page should contain the text of the article that needs to be extracted from.</small>
+          {% endif %}
         </form>
         <ul id="errors" class="errors">
         </ul>
         <p>
           <a href="" role="button" class="contrast outline" aria-label="scrape-it" id="scrape-it">Scrape it!</a>
+          {% if context.newsfeed %}
+          <a href="/" role="button" class="outline" id="parser-mode" data-tooltip="Click on the button to switch the parser mode. The current mode is Newsfeed mode.">Newsfeed mode</a>
+          {% else %}
+          <a href="/newsfeed-parser" role="button" class="outline" id="parser-mode" data-tooltip="Click on the button to switch the parser mode. The current mode is Article mode.">Article mode</a>
+          {% endif %}
         </p>
         <br>
         <div>
@@ -75,6 +89,13 @@
     </div>
   </footer>
   <script src="/static/dark-mode.js"></script>
+  <script>
+    {% if context.newsfeed %}
+    var apiEndpoint = "/newsfeed";
+    {% else %}
+    var apiEndpoint = "/parse";
+    {% endif %}
+  </script>>
   <script src="/static/query.js"></script>
 </body>
 </html>

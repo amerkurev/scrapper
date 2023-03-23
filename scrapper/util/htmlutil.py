@@ -47,3 +47,10 @@ def improve_content(data):
     # 3.2 if not, create a new article tag and insert the title into it
     content = str(tree)
     return f'<article><h1>{title}</h1>{content}</article>'
+
+
+def improve_link(link):
+    lines = link['text'].splitlines()
+    if len(lines) > 1 and len(lines[0]) > 50:  # the first line is enough
+        link['text'] = lines[0]
+    return link
