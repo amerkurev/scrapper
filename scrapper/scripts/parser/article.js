@@ -1,7 +1,7 @@
 
 () => {
     try {
-        // remove elements that are not visible
+        // mark elements that are not visible
         let elements = document.body.getElementsByTagName("*");
         for (let i = 0; i < elements.length; i++) {
             let style = window.getComputedStyle(elements[i]);
@@ -9,9 +9,12 @@
                 style.visibility === "hidden" ||
                 style.opacity === "0" ||
                 style.opacity === "0.0") {
-                elements[i].parentNode.removeChild(elements[i]);
+                elements[i].classList.add("scrapper-hidden");
             }
         }
+        // remove marked elements
+        document.querySelectorAll(".scrapper-hidden").forEach(el => el.remove());
+
         // parse the article with Mozilla's Readability.js (https://videoinu.com/blog/firefox-reader-view-heuristics/)
         let documentClone = document.cloneNode(true);
         // https://github.com/mozilla/readability#api-reference

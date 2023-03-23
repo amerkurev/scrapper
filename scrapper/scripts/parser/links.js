@@ -22,9 +22,7 @@
     }
 
     try {
-        links = [];
-        pos = 0;
-        // remove elements that are not visible
+        // mark elements that are not visible
         let elements = document.body.getElementsByTagName("*");
         for (let i = 0; i < elements.length; i++) {
             let style = window.getComputedStyle(elements[i]);
@@ -32,31 +30,41 @@
                 style.visibility === "hidden" ||
                 style.opacity === "0" ||
                 style.opacity === "0.0") {
-                elements[i].parentNode.removeChild(elements[i]);
-            } else if (elements[i].tagName === "A") {
-                // extract links
-                let text = elements[i].innerText.trim();
-                let href = elements[i].getAttribute("href");
-                if (text && href) {
-                    let parentStyle = window.getComputedStyle(elements[i].parentNode);
-                    let link = {
-                        "pos": pos,
-                        "cssSel": getCssSelector(elements[i]),
-                        "text": replaceNbsps(text),
-                        "href": href,
-                        "url": new URL(href, document.location).href,
-                        "fontSize": parseFontSize(style.fontSize),  // e.g. "12px" -> 12
-                        "fontWeight": parseInt(style.fontWeight),  // e.g. "400" -> 400
-                        "color": style.color,  // e.g. "rgb(51, 51, 51)"
-                        "font": style.font,
-                        "parentPadding": parentStyle.padding,
-                        "parentMargin": parentStyle.margin,
-                        "parentBgColor": parentStyle.backgroundColor,
-                    };
-                    link["words"] = splitIntoWords(link.text);
-                    links.push(link);
-                }
-                pos += 1;
+                elements[i].classList.add("scrapper-hidden");
+            }
+        }
+        // remove marked elements
+        document.querySelectorAll(".scrapper-hidden").forEach(el => el.remove());
+
+        // traverse the DOM tree and extract links
+        let links = [];
+        elements = document.body.getElementsByTagName("A");
+
+        for (let i = 0; i < elements.length; i++) {
+            let text = elements[i].innerText.trim();
+            let href = elements[i].getAttribute("href");
+
+            if (text && href && href !== "/" && href !== "#" && href !== "javascript:void(0)") {
+                // get the computed style of the link and its parent
+                let style = window.getComputedStyle(elements[i]);
+                let parentStyle = window.getComputedStyle(elements[i].parentNode);
+
+                let link = {
+                    "pos": i,
+                    "cssSel": getCssSelector(elements[i]),
+                    "text": replaceNbsps(text),
+                    "href": href,
+                    "url": new URL(href, document.location).href,
+                    "fontSize": parseFontSize(style.fontSize),  // e.g. "12px" -> 12
+                    "fontWeight": parseInt(style.fontWeight),  // e.g. "400" -> 400
+                    "color": style.color,  // e.g. "rgb(51, 51, 51)"
+                    "font": style.font,
+                    "parentPadding": parentStyle.padding,
+                    "parentMargin": parentStyle.margin,
+                    "parentBgColor": parentStyle.backgroundColor,
+                };
+                link["words"] = splitIntoWords(link.text);
+                links.push(link);
             }
         }
         return links;
