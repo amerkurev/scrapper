@@ -38,11 +38,21 @@
 
         // traverse the DOM tree and extract links
         let links = [];
+        let seenTexts = new Set();
+        let seenHrefs = new Set();
         elements = document.body.getElementsByTagName("A");
 
         for (let i = 0; i < elements.length; i++) {
             let text = elements[i].innerText.trim();
             let href = elements[i].getAttribute("href");
+
+            // skip link if text was already seen
+            if (seenTexts.has(text)) continue;
+            seenTexts.add(text);
+
+            // skip link if href was already seen
+            if (seenHrefs.has(href)) continue;
+            seenHrefs.add(href);
 
             if (text && href && href !== "/" && href !== "#" && href !== "javascript:void(0)") {
                 // get the computed style of the link and its parent
