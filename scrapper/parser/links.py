@@ -48,7 +48,8 @@ def parse(request, args, _id):
         if stat['approved']:
             links.extend(group)
 
-    # sort filtered links by 'pos' field. pos is position of link in DOM
+    # Sort links by 'pos' field, to show links in the same order as they are on the page
+    # ('pos' is position of link in DOM)
     links.sort(key=itemgetter('pos'))
     links = list(map(link_to_json, links))
 
