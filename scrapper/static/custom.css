@@ -387,9 +387,14 @@ a.logo, a.logo:hover, a.logo:focus, a.logo:active {
   color: var(--h1-color);
 }
 
-a[role=button] {
+a.scrape-it {
   margin-right: 10px;
   min-width: 8rem;
+}
+
+select.select-parser-mode {
+  display: inline-block;
+  width: 11rem;
 }
 
 article.newsfeed ol li {

@@ -51,6 +51,14 @@ def improve_content(data):
 
 def improve_link(link):
     lines = link['text'].splitlines()
-    if len(lines) > 1 and len(lines[0]) > 50:  # the first line is enough
-        link['text'] = lines[0]
+    text = ''
+    # find the longest line
+    for line in lines:
+        if len(line) > len(text):
+            text = line
+        # stop if the line is long enough
+        if len(text) > 40:
+            break
+
+    link['text'] = text
     return link

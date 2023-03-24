@@ -26,6 +26,7 @@ The main features of Scrapper are:
 - **The Read mode in the browser is used for parsing.** Millions of people use the "Read" mode in the browser to display only the text of the article on the screen while hiding the other elements of the page. Scrapper follows the same path by using the excellent [Readability.js](https://github.com/mozilla/readability) library from Mozilla. The parsing result will be the same as in the "Read" mode of your favorite browser.
 - **A simple and beautiful web interface.** Working with Scrapper is easy and enjoyable because you can do it right in your browser. The simple web interface allows you to debug your query, experiment with each parameter in the API, and see the result in HTML, JSON, or a screenshot. The beautiful design helps achieve an excellent [Pico](https://github.com/picocss/pico) project. A dark theme for comfortable reading is also available.
 - **The Scrapper REST API is incredibly simple** to use as it only requires a [single call](#api-reference) and just a few parameters making it easy to integrate into any project. Furthermore, the web interface offers a visual query-builder that simplifies the learning process for the user.
+- **Scrapper can search for news links** on the main pages of websites. This is difficult because there may be not only links to news but also links to other parts of the website. However, the scraper can distinguish between them and select only links to news articles.
 
 And many other features:
 - **Stealth mode.** Various methods are used to make it difficult for websites to detect a Headless browser and bypass web scraping protection.
@@ -166,6 +167,29 @@ If an error (or multiple errors) occurs during the execution of a request, the r
 }
 ```
 Some errors do not have a detailed description in the response to the request. In this case, you should refer to the log of the Docker container to investigate the cause of the error.
+
+### GET /newsfeed?url=...
+To collect links to news articles on the main pages of websites, use a different query on the `/newsfeed` endpoint. The query parameters are similar, but the [Readability settings](#readability-settings) are not required for this query because no text is extracted. Instead, use the Newsfeed parser which has its own set of parameters. A description of these parameters is provided below.
+
+#### Newsfeed parser settings
+| Parameter               | Description                                                                                                                                                                                                                                                                                         | Default |
+|:------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------|
+| `text-len-threshold`    | The median (middle value) of the link text length in characters. The default value is 40 characters. Hyperlinks must adhere to this criterion to be included in the results. However, this criterion is not a strict threshold value, and some links may ignore it.                                 | 40      |
+| `words-threshold`       | The median (middle value) of the number of words in the link text. The default value is 3 words. Hyperlinks must adhere to this criterion to be included in the results. However, this criterion is not a strict threshold value, and some links may ignore it. | 3       |
+
+### Response fields
+The response to the `/newsfeed` request returns a JSON object that contains fields, which are described in the table below.
+
+| Parameter       | Description                                                                  | Type   |
+|:----------------|:-----------------------------------------------------------------------------|:-------|
+| `fullContent`   | full HTML contents of the page                                               | str    |
+| `id`            | unique request ID                                                            | str    |
+| `date`          | date when the links were collected in ISO 8601 format                        | str    |
+| `query`         | request parameters                                                           | object |
+| `resultUri`     | URL of the current result, the data here is always taken from cache          | str    |
+| `screenshotUri` | URL of the screenshot of the page                                            | str    |
+| `links`         | list of collected links                                                      | list   |
+| `title`         | page title                                                                   | str    |
 
 ## Supported architectures
 - linux/amd64

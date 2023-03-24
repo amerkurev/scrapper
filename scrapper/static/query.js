@@ -28,7 +28,7 @@
             .join("&");
     };
 
-    let parserMode = document.getElementById("parser-mode");
+    let parserMode = document.getElementById("select-parser-mode");
     let scrapeIt = document.getElementById("scrape-it");
     scrapeIt.addEventListener("click", (e) => {
         e.preventDefault();

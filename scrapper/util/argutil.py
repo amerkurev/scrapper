@@ -196,6 +196,16 @@ OPTIONS = (
     # The number of characters an article must have in order to return a result.
     # The default value is 500.
     ('char-threshold', (is_number, gt(0)), 500),
+
+    # # # Newsfeed parser settings:
+    # The median (middle value) of the link text length in characters. The default value is 40 characters.
+    # Hyperlinks must adhere to this criterion to be included in the results. However, this criterion is not a strict threshold value,
+    # and some links may ignore it.
+    ('text-len-threshold', (is_number, gte(0)), 40),
+    # The median (middle value) of the number of words in the link text. The default value is 3 words.
+    # Hyperlinks must adhere to this criterion to be included in the results. However, this criterion is not a strict threshold value,
+    # and some links may ignore it.
+    ('words-threshold', (is_number, gte(0)), 3),
 )
 
 REQUIRED = ('url',)

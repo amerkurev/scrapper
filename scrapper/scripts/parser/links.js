@@ -21,6 +21,8 @@
         return str.split(/[\r\n\s]+/).filter(s => s.length > 0);
     }
 
+    let restrictedHrefs = ["", "/", "#", "javascript:void(0)", "javascript:;"];
+
     try {
         // mark elements that are not visible
         let elements = document.body.getElementsByTagName("*");
@@ -54,7 +56,7 @@
             if (seenHrefs.has(href)) continue;
             seenHrefs.add(href);
 
-            if (text && href && href !== "/" && href !== "#" && href !== "javascript:void(0)") {
+            if (text && href && !restrictedHrefs.includes(href)) {
                 // get the computed style of the link and its parent
                 let style = window.getComputedStyle(elements[i]);
                 let parentStyle = window.getComputedStyle(elements[i].parentNode);

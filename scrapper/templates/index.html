@@ -26,7 +26,7 @@
         {% else %}
         <strong><a href="/" class="logo">Scrapper</a></strong>
         {% endif %}
-        <g-emoji class="g-emoji" alias="broom" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f9f9.png">🧹</g-emoji>
+        <span>🧹</span>
       </li>
     </ul>
     <ul>
@@ -42,23 +42,26 @@
       <div>
         <form>
           <label for="url">Page URL</label>
+          <input type="email" id="url" name="email" placeholder="https://example.com/{% if not context.newsfeed %}article.html{% endif %}" required>
           {% if context.newsfeed %}
-          <input type="email" id="url" name="email" placeholder="https://example.com/" required>
           <small>The page should contain hyperlinks to news articles. For example, this could be the main page of a website.</small>
           {% else %}
-          <input type="email" id="url" name="email" placeholder="https://example.com/article.html" required>
           <small>The page should contain the text of the article that needs to be extracted from.</small>
           {% endif %}
         </form>
         <ul id="errors" class="errors">
         </ul>
         <p>
-          <a href="" role="button" class="contrast outline" aria-label="scrape-it" id="scrape-it">Scrape it!</a>
-          {% if context.newsfeed %}
-          <a href="/" role="button" class="outline" id="parser-mode" data-tooltip="Click on the button to switch the parser mode. The current mode is Newsfeed mode.">Newsfeed mode</a>
-          {% else %}
-          <a href="/newsfeed-parser" role="button" class="outline" id="parser-mode" data-tooltip="Click on the button to switch the parser mode. The current mode is Article mode.">Article mode</a>
-          {% endif %}
+          <a href="" role="button" class="contrast outline scrape-it" aria-label="scrape-it" id="scrape-it">Scrape it!</a>
+          <select id="select-parser-mode" class="select-parser-mode" required onchange="location = this.value;">
+            {% if context.newsfeed %}
+            <option value="/">Article mode</option>
+            <option value="/newsfeed-parser" selected>Newsfeed mode</option>
+            {% else %}
+            <option value="/" selected>Article mode</option>
+            <option value="/newsfeed-parser">Newsfeed mode</option>
+            {% endif %}
+          </select>
         </p>
         <br>
         <div>
@@ -79,7 +82,7 @@
   <footer>
     <div class="container">
       <ul>
-        <li><a href="https://github.com/amerkurev/scrapper" class="contrast">Give us a <g-emoji class="g-emoji" alias="star" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/2b50.png">⭐</g-emoji> on GitHub</a></li>
+        <li><a href="https://github.com/amerkurev/scrapper" class="contrast">Give us a <span>⭐</span> on GitHub</a></li>
       </ul>
       <ul>
         <li><small>On <a href="https://hub.docker.com/r/amerkurev/scrapper" class="secondary">Docker Hub</a></small></li>

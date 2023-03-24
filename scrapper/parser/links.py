@@ -44,7 +44,11 @@ def parse(request, args, _id):
     # median length of text and words more than 40 and 3
     links = []
     for key, group in links_dict.items():
-        stat = get_stat(group)
+        stat = get_stat(
+            group,
+            text_len_threshold=args.text_len_threshold,
+            words_threshold=args.words_threshold,
+        )
         if stat['approved']:
             links.extend(group)
 
@@ -95,11 +99,11 @@ def make_key(link):
     return hashlib.sha1(s.encode()).hexdigest()[:7]  # because 7 chars is enough for uniqueness
 
 
-def get_stat(links):
+def get_stat(links, text_len_threshold, words_threshold):
     # Get stat for group of links
     median_text_len = median([len(x['text']) for x in links])
     median_words_count = median([len(x['words']) for x in links])
-    approved = median_text_len > 40 and median_words_count > 3
+    approved = median_text_len > text_len_threshold and median_words_count > words_threshold
     return {
         'count': len(links),
         'median_text_len': median_text_len,
