@@ -169,7 +169,7 @@ If an error (or multiple errors) occurs during the execution of a request, the r
 Some errors do not have a detailed description in the response to the request. In this case, you should refer to the log of the Docker container to investigate the cause of the error.
 
 ### GET /newsfeed?url=...
-To collect links to news articles on the main pages of websites, use a different query on the `/newsfeed` endpoint. The query parameters are similar, but the [Readability settings](#readability-settings) are not required for this query because no text is extracted. Instead, use the Newsfeed parser which has its own set of parameters. A description of these parameters is provided below.
+To collect links to news articles on the main pages of websites, use a different query on the `/newsfeed` endpoint. The query parameters are similar, but the [Readability settings](#readability-settings) are not required for this query because no text is extracted. Instead, the Newsfeed parser is used, which has its own set of parameters. A description of these parameters is provided below.
 
 #### Newsfeed parser settings
 | Parameter               | Description                                                                                                                                                                                                                                                                                         | Default |
