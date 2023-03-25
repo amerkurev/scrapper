@@ -171,6 +171,10 @@ Some errors do not have a detailed description in the response to the request. I
 ### GET /api/links?url=...
 To collect links to news articles on the main pages of websites, use a different query on the `/api/links` endpoint. The query parameters are similar, but the [Readability settings](#readability-settings) are not required for this query because no text is extracted. Instead, the Link parser is used, which has its own set of parameters. A description of these parameters is provided below.
 
+```console
+curl -X GET "localhost:3000/api/links?url=https://www.cnet.com/"
+```
+
 #### Link parser settings
 | Parameter               | Description                                                                                                                                                                                                                                                         | Default |
 |:------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------|
