@@ -196,7 +196,7 @@ The response to the `/newsfeed` request returns a JSON object that contains fiel
 - linux/arm64
 
 ## Status
-The project is under active development and may have breaking changes till v1 is released. However, we are trying our best not to break things unless there is a good reason. As of version 0.8.x, Scrapper is considered good enough for real-life usage, and many setups are running it in production.
+The project is under active development and may have breaking changes till `v1` is released. However, we are trying our best not to break things unless there is a good reason. As of version `v0.8.0`, Scrapper is considered good enough for real-life usage, and many setups are running it in production.
 
 ## License
 [Apache-2.0 license](LICENSE)
