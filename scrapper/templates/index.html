@@ -21,8 +21,8 @@
       <li>
       </li>
       <li>
-        {% if context.newsfeed %}
-        <strong><a href="/newsfeed-parser" class="logo">Scrapper</a></strong>
+        {% if context.linksRoute %}
+        <strong><a href="/links" class="logo">Scrapper</a></strong>
         {% else %}
         <strong><a href="/" class="logo">Scrapper</a></strong>
         {% endif %}
@@ -42,8 +42,8 @@
       <div>
         <form>
           <label for="url">Page URL</label>
-          <input type="email" id="url" name="email" placeholder="https://example.com/{% if not context.newsfeed %}article.html{% endif %}" required>
-          {% if context.newsfeed %}
+          <input type="email" id="url" name="email" placeholder="https://example.com/{% if not context.linksRoute %}article.html{% endif %}" required>
+          {% if context.linksRoute %}
           <small>The page should contain hyperlinks to news articles. For example, this could be the main page of a website.</small>
           {% else %}
           <small>The page should contain the text of the article that needs to be extracted from.</small>
@@ -52,14 +52,14 @@
         <ul id="errors" class="errors">
         </ul>
         <p>
-          <a href="" role="button" class="contrast outline scrape-it" aria-label="scrape-it" id="scrape-it">Scrape it!</a>
-          <select id="select-parser-mode" class="select-parser-mode" required onchange="location = this.value;">
-            {% if context.newsfeed %}
-            <option value="/">Article mode</option>
-            <option value="/newsfeed-parser" selected>Newsfeed mode</option>
+          <a href="" role="button" class="contrast outline scrape-it" aria-label="scrape-it" id="scrape-it">Scrape it</a>
+          <select id="select-route" class="select-route" required onchange="location = this.value;">
+            {% if context.linksRoute %}
+            <option value="/">Article</option>
+            <option value="/links" selected>Links</option>
             {% else %}
-            <option value="/" selected>Article mode</option>
-            <option value="/newsfeed-parser">Newsfeed mode</option>
+            <option value="/" selected>Article</option>
+            <option value="/links">Links</option>
             {% endif %}
           </select>
         </p>
@@ -93,10 +93,10 @@
   </footer>
   <script src="/static/dark-mode.js"></script>
   <script>
-    {% if context.newsfeed %}
-    var apiEndpoint = "/newsfeed";
+    {% if context.linksRoute %}
+    var apiEndpoint = "/api/links";
     {% else %}
-    var apiEndpoint = "/parse";
+    var apiEndpoint = "/api/article";
     {% endif %}
   </script>>
   <script src="/static/query.js"></script>

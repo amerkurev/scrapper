@@ -22,7 +22,7 @@
       </li>
       <li>
         {% if data.links %}
-        <strong><a href="/newsfeed-parser" class="logo">Scrapper</a></strong>
+        <strong><a href="/links" class="logo">Scrapper</a></strong>
         {% else %}
         <strong><a href="/" class="logo">Scrapper</a></strong>
         {% endif %}
@@ -52,9 +52,9 @@
     {% if data.content %}
     {{ data.content|safe }}
     {% endif %}
-    <!-- newsfeed -->
+    <!-- news links -->
     {% if data.links %}
-    <article class="newsfeed">
+    <article class="links">
       <h1>Newsfeed</h1>
       <ol>
       {% for link in data.links %}

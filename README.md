@@ -81,14 +81,14 @@ docker logs -f scrapper
 ```
 
 ## API Reference
-### GET /parse?url=...
+### GET /api/article?url=...
 The Scrapper API is very simple. Essentially, it is just one call that can easily be demonstrated using the cURL:
 
 ```console
-curl -X GET "localhost:3000/parse?url=https://en.wikipedia.org/wiki/web_scraping"
+curl -X GET "localhost:3000/api/article?url=https://en.wikipedia.org/wiki/web_scraping"
 ```
 
-Use the GET method on the `/parse` endpoint, passing one required parameter `url`. This is the full URL of the webpage on the Internet that contains an article. Scrapper will load the webpage in a browser, extract the article text, and return it in JSON format in the response.
+Use the GET method on the `/api/article` endpoint, passing one required parameter `url`. This is the full URL of the webpage on the Internet that contains an article. Scrapper will load the webpage in a browser, extract the article text, and return it in JSON format in the response.
 
 All other request parameters are optional and have default values. However, you can customize them to your liking. The table below lists all the parameters that you can use, along with their descriptions and default values. To make it easier to build requests, use the web interface where the final request link is generated in real-time as you configure the parameters.
 
@@ -139,7 +139,7 @@ All other request parameters are optional and have default values. However, you 
 | `char-threshold`         | The number of characters an article must have in order to return a result.                                                                                                                                                                                                                                                                                                                                                                                     | 500     |
 
 ### Response fields
-The response to the `/parse` request returns a JSON object that contains fields, which are described in the table below.
+The response to the `/api/article` request returns a JSON object that contains fields, which are described in the table below.
 
 | Parameter       | Description                                                         | Type          |
 |:----------------|:--------------------------------------------------------------------|:--------------|
@@ -168,17 +168,17 @@ If an error (or multiple errors) occurs during the execution of a request, the r
 ```
 Some errors do not have a detailed description in the response to the request. In this case, you should refer to the log of the Docker container to investigate the cause of the error.
 
-### GET /newsfeed?url=...
-To collect links to news articles on the main pages of websites, use a different query on the `/newsfeed` endpoint. The query parameters are similar, but the [Readability settings](#readability-settings) are not required for this query because no text is extracted. Instead, the Newsfeed parser is used, which has its own set of parameters. A description of these parameters is provided below.
+### GET /api/links?url=...
+To collect links to news articles on the main pages of websites, use a different query on the `/api/links` endpoint. The query parameters are similar, but the [Readability settings](#readability-settings) are not required for this query because no text is extracted. Instead, the Link parser is used, which has its own set of parameters. A description of these parameters is provided below.
 
-#### Newsfeed parser settings
-| Parameter               | Description                                                                                                                                                                                                                                                                                         | Default |
-|:------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------|
-| `text-len-threshold`    | The median (middle value) of the link text length in characters. The default value is 40 characters. Hyperlinks must adhere to this criterion to be included in the results. However, this criterion is not a strict threshold value, and some links may ignore it.                                 | 40      |
-| `words-threshold`       | The median (middle value) of the number of words in the link text. The default value is 3 words. Hyperlinks must adhere to this criterion to be included in the results. However, this criterion is not a strict threshold value, and some links may ignore it. | 3       |
+#### Link parser settings
+| Parameter               | Description                                                                                                                                                                                                                                                         | Default |
+|:------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------|
+| `text-len-threshold`    | The median (middle value) of the link text length in characters. The default value is 40 characters. Hyperlinks must adhere to this criterion to be included in the results. However, this criterion is not a strict threshold value, and some links may ignore it. | 40      |
+| `words-threshold`       | The median (middle value) of the number of words in the link text. The default value is 3 words. Hyperlinks must adhere to this criterion to be included in the results. However, this criterion is not a strict threshold value, and some links may ignore it.     | 3       |
 
 ### Response fields
-The response to the `/newsfeed` request returns a JSON object that contains fields, which are described in the table below.
+The response to the `/api/links` request returns a JSON object that contains fields, which are described in the table below.
 
 | Parameter       | Description                                                                  | Type   |
 |:----------------|:-----------------------------------------------------------------------------|:-------|

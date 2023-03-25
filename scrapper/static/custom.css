@@ -392,11 +392,11 @@ a.scrape-it {
   min-width: 8rem;
 }
 
-select.select-parser-mode {
+select.select-route {
   display: inline-block;
-  width: 11rem;
+  width: 8rem;
 }
 
-article.newsfeed ol li {
+article.links ol li {
   font-size: .75rem;
 }

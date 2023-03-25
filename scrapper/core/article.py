@@ -6,12 +6,12 @@ from playwright.sync_api import sync_playwright
 
 from scrapper.cache import dump_result
 from scrapper.settings import IN_DOCKER, READABILITY_SCRIPT, PARSER_SCRIPTS_DIR
-from scrapper.parser import new_context, close_context, page_processing
+from scrapper.core import new_context, close_context, page_processing
 from scrapper.util import check_fields
-from scrapper.parser import ParserError
+from scrapper.core import ParserError
 
 
-def parse(request, args, _id):
+def scrape(request, args, _id):
     with sync_playwright() as playwright:
         context = new_context(playwright, args)
         page = context.new_page()

@@ -11,9 +11,9 @@ from scrapper.settings import USER_SCRIPTS, STATIC_DIR, SCREENSHOT_TYPE
 from scrapper.cache import load_result, screenshot_location
 from scrapper.util.argutil import default_args, validate_args, check_user_scrips
 from scrapper.util.htmlutil import improve_content, improve_link
-from scrapper.parser import ParserError
-from scrapper.parser.article import parse as parse_article
-from scrapper.parser.links import parse as parse_links
+from scrapper.core import ParserError
+from scrapper.core.article import scrape as scrape_article
+from scrapper.core.links import scrape as scrape_links
 
 
 def exception_handler(func):
@@ -30,12 +30,12 @@ def exception_handler(func):
 
 
 @app.route('/', methods=['GET'])
-@app.route('/newsfeed-parser', methods=['GET'])
+@app.route('/links', methods=['GET'])
 def index():
     args = list(default_args())
     placeholder = '&#10;'.join((f'{x[0]}={x[1]}' for x in args[:10]))  # max 10 args
     placeholder = placeholder.replace('=True', '=yes').replace('=False', '=no')
-    return render_template('index.html', context={'placeholder': placeholder, 'newsfeed': '/newsfeed-parser' == request.path})
+    return render_template('index.html', context={'placeholder': placeholder, 'linksRoute': '/links' == request.path})
 
 
 @app.route('/favicon.ico')
@@ -53,7 +53,7 @@ def result_html(id):
             # article content
             data['content'] = improve_content(data)
         if 'links' in data:
-            # newsfeed links
+            # news links
             data['links'] = [improve_link(x) for x in data['links']]
         return render_template('view.html', data=data)
     return 'Not found', Status.NOT_FOUND
@@ -70,9 +70,10 @@ def result_screenshot(id):
     return send_file(screenshot_location(id), mimetype=f'image/{SCREENSHOT_TYPE}')
 
 
-@app.route('/parse', methods=['GET'])
+@app.route('/parse', methods=['GET'])   # DEPRECATED
+@app.route('/api/article', methods=['GET'])
 @exception_handler
-def parse():
+def article():
     args, err = validate_args(args=request.args)
     check_user_scrips(args=args, user_scripts_dir=USER_SCRIPTS, err=err)
     if err:
@@ -86,12 +87,12 @@ def parse():
         if data:
             return data
 
-    return parse_article(request=request, args=args, _id=_id)
+    return scrape_article(request=request, args=args, _id=_id)
 
 
-@app.route('/newsfeed', methods=['GET'])
+@app.route('/api/links', methods=['GET'])
 @exception_handler
-def newsfeed():
+def links():
     args, err = validate_args(args=request.args)
     check_user_scrips(args=args, user_scripts_dir=USER_SCRIPTS, err=err)
     if err:
@@ -105,7 +106,7 @@ def newsfeed():
         if data:
             return data
 
-    return parse_links(request=request, args=args, _id=_id)
+    return scrape_links(request=request, args=args, _id=_id)
 
 
 def startup():

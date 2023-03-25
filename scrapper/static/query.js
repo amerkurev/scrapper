@@ -28,7 +28,7 @@
             .join("&");
     };
 
-    let parserMode = document.getElementById("select-parser-mode");
+    let selectRoute = document.getElementById("select-route");
     let scrapeIt = document.getElementById("scrape-it");
     scrapeIt.addEventListener("click", (e) => {
         e.preventDefault();
@@ -57,12 +57,12 @@
                 }
                 scrapeIt.innerHTML = "Scrape it!";
                 scrapeIt.removeAttribute("aria-busy");
-                parserMode.style.visibility = "visible";
+                selectRoute.style.visibility = "visible";
             }
         };
         scrapeIt.innerHTML = "Please wait…";
         scrapeIt.setAttribute("aria-busy", "true");
-        parserMode.style.visibility = "hidden";
+        selectRoute.style.visibility = "hidden";
     });
 
     var url = document.getElementById("url");

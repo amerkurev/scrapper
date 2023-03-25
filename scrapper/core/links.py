@@ -11,12 +11,12 @@ from playwright.sync_api import sync_playwright
 
 from scrapper.cache import dump_result
 from scrapper.settings import IN_DOCKER, PARSER_SCRIPTS_DIR
-from scrapper.parser import new_context, close_context, page_processing
+from scrapper.core import new_context, close_context, page_processing
 from scrapper.util import check_fields
-from scrapper.parser import ParserError
+from scrapper.core import ParserError
 
 
-def parse(request, args, _id):
+def scrape(request, args, _id):
     with sync_playwright() as playwright:
         context = new_context(playwright, args)
         page = context.new_page()
@@ -58,7 +58,7 @@ def parse(request, args, _id):
     links = list(map(link_to_json, links))
 
     # set common fields
-    newsfeed = {
+    res = {
         'id': _id,
         'date': datetime.datetime.utcnow().isoformat(),
         'resultUri': f'{request.host_url}result/{_id}',
@@ -68,17 +68,17 @@ def parse(request, args, _id):
     }
 
     if args.full_content:
-        newsfeed['fullContent'] = page_content
+        res['fullContent'] = page_content
     if args.screenshot:
-        newsfeed['screenshotUri'] = f'{request.host_url}screenshot/{_id}'
+        res['screenshotUri'] = f'{request.host_url}screenshot/{_id}'
 
     # save result to disk
-    dump_result(newsfeed, filename=_id, screenshot=screenshot)
+    dump_result(res, filename=_id, screenshot=screenshot)
 
     # self-check for development
     if not IN_DOCKER:
-        check_fields(newsfeed, args=args, fields=NEWSFEED_FIELDS)
-    return newsfeed
+        check_fields(res, args=args, fields=NEWSFEED_FIELDS)
+    return res
 
 
 def group_links(links):
