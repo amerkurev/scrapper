@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 
 
 header_max_distance = 300
+acceptable_link_text_len = 40
 
 
 def improve_content(data):
@@ -57,7 +58,7 @@ def improve_link(link):
         if len(line) > len(text):
             text = line
         # stop if the line is long enough
-        if len(text) > 40:
+        if len(text) > acceptable_link_text_len:
             break
 
     link['text'] = text
