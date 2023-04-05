@@ -184,16 +184,17 @@ curl -X GET "localhost:3000/api/links?url=https://www.cnet.com/"
 ### Response fields
 The response to the `/api/links` request returns a JSON object that contains fields, which are described in the table below.
 
-| Parameter       | Description                                                                  | Type   |
-|:----------------|:-----------------------------------------------------------------------------|:-------|
-| `fullContent`   | full HTML contents of the page                                               | str    |
-| `id`            | unique request ID                                                            | str    |
-| `date`          | date when the links were collected in ISO 8601 format                        | str    |
-| `query`         | request parameters                                                           | object |
-| `resultUri`     | URL of the current result, the data here is always taken from cache          | str    |
-| `screenshotUri` | URL of the screenshot of the page                                            | str    |
-| `links`         | list of collected links                                                      | list   |
-| `title`         | page title                                                                   | str    |
+| Parameter       | Description                                                         | Type   |
+|:----------------|:--------------------------------------------------------------------|:-------|
+| `fullContent`   | full HTML contents of the page                                      | str    |
+| `id`            | unique request ID                                                   | str    |
+| `url`           | page URL after redirects, may not match the query URL               | str    |
+| `date`          | date when the links were collected in ISO 8601 format               | str    |
+| `query`         | request parameters                                                  | object |
+| `resultUri`     | URL of the current result, the data here is always taken from cache | str    |
+| `screenshotUri` | URL of the screenshot of the page                                   | str    |
+| `links`         | list of collected links                                             | list   |
+| `title`         | page title                                                          | str    |
 
 ## Supported architectures
 - linux/amd64

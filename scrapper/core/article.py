@@ -6,7 +6,7 @@ from playwright.sync_api import sync_playwright
 
 from scrapper.cache import dump_result
 from scrapper.settings import IN_DOCKER, READABILITY_SCRIPT, PARSER_SCRIPTS_DIR
-from scrapper.core import new_context, close_context, page_processing
+from scrapper.core import new_context, close_context, page_processing, get_screenshot
 from scrapper.util import check_fields
 from scrapper.core import ParserError
 
@@ -15,7 +15,10 @@ def scrape(request, args, _id):
     with sync_playwright() as playwright:
         context = new_context(playwright, args)
         page = context.new_page()
-        page_content, screenshot = page_processing(page, args=args, init_scripts=[READABILITY_SCRIPT])
+        page_processing(page, args=args, init_scripts=[READABILITY_SCRIPT])
+        page_content = page.content()
+        screenshot = get_screenshot(page) if args.screenshot else None
+        url = page.url
 
         # evaluating JavaScript: parse DOM and extract article content
         parser_args = {
@@ -34,6 +37,7 @@ def scrape(request, args, _id):
 
     # set common fields
     article['id'] = _id
+    article['url'] = url
     article['date'] = datetime.datetime.utcnow().isoformat()  # ISO 8601 format
     article['resultUri'] = f'{request.host_url}result/{_id}'
     article['query'] = request.args.to_dict(flat=True)
@@ -66,6 +70,8 @@ ARTICLE_FIELDS = (
     ('excerpt', (NoneType, str), None),
     # unique request ID
     ('id', str, None),
+    # page URL after redirects, may not match the query URL
+    ('url', str, None),
     # content language
     ('lang', (NoneType, str), None),
     # length of an article, in characters

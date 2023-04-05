@@ -142,6 +142,7 @@ OPTIONS = (
     # `domcontentloaded` - consider operation to be finished when the DOMContentLoaded event is fired.
     # `networkidle` -  consider operation to be finished when there are no network connections for at least 500 ms.
     # `commit` - consider operation to be finished when network response is received and the document started loading.
+    # See for details: https://playwright.dev/python/docs/navigations#navigation-lifecycle
     ('wait-until', (is_enum('domcontentloaded', 'load', 'networkidle', 'commit'),), 'domcontentloaded'),
     # Waits for the given timeout in milliseconds before parsing the article, and after the page has loaded.
     # In many cases, a sleep timeout is not necessary. However, for some websites, it can be quite useful.

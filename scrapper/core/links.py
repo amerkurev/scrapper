@@ -11,7 +11,7 @@ from playwright.sync_api import sync_playwright
 
 from scrapper.cache import dump_result
 from scrapper.settings import IN_DOCKER, PARSER_SCRIPTS_DIR
-from scrapper.core import new_context, close_context, page_processing
+from scrapper.core import new_context, close_context, page_processing, get_screenshot
 from scrapper.util import check_fields
 from scrapper.core import ParserError
 
@@ -20,7 +20,10 @@ def scrape(request, args, _id):
     with sync_playwright() as playwright:
         context = new_context(playwright, args)
         page = context.new_page()
-        page_content, screenshot = page_processing(page, args=args, init_scripts=[])
+        page_processing(page, args=args)
+        page_content = page.content()
+        screenshot = get_screenshot(page) if args.screenshot else None
+        url = page.url
 
         # evaluating JavaScript: parse DOM and extract links of articles
         parser_args = {}
@@ -60,6 +63,7 @@ def scrape(request, args, _id):
     # set common fields
     res = {
         'id': _id,
+        'url': url,
         'date': datetime.datetime.utcnow().isoformat(),
         'resultUri': f'{request.host_url}result/{_id}',
         'query': request.args.to_dict(flat=True),
@@ -133,6 +137,8 @@ NEWSFEED_FIELDS = (
 
     # unique request ID
     ('id', str, None),
+    # page URL after redirects, may not match the query URL
+    ('url', str, None),
     # date of extracted article in ISO 8601 format
     ('date', str, None),
     # request parameters

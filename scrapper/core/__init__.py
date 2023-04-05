@@ -38,14 +38,15 @@ def close_context(context):
         browser.close()
 
 
-def page_processing(page, args, init_scripts):
+def page_processing(page, args, init_scripts=None):
     # add stealth scripts for bypassing anti-scraping mechanisms
     if args.stealth:
         use_stealth_mode(page)
 
     # add extra init scripts
-    for path in init_scripts:
-        page.add_init_script(path=path)
+    if init_scripts:
+        for path in init_scripts:
+            page.add_init_script(path=path)
 
     # block by resource types
     if args.resource:
@@ -53,7 +54,6 @@ def page_processing(page, args, init_scripts):
 
     # navigate to the given url
     page.goto(args.url, timeout=args.timeout, wait_until=args.wait_until)
-    page_content = page.content()
 
     # waits for the given timeout in milliseconds
     if args.sleep:
@@ -63,9 +63,6 @@ def page_processing(page, args, init_scripts):
     if args.user_scripts:
         for script_name in args.user_scripts:
             page.add_script_tag(path=USER_SCRIPTS / script_name)
-
-    screenshot = get_screenshot(page) if args.screenshot else None
-    return page_content, screenshot
 
 
 def resource_blocker(whitelist):  # list of resource types to allow

@@ -394,6 +394,7 @@ a.scrape-it {
 
 select.select-route {
   display: inline-block;
+  text-align-last: center;
   width: 8rem;
 }
 
