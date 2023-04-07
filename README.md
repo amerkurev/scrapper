@@ -149,6 +149,7 @@ The response to the `/api/article` request returns a JSON object that contains f
 | `excerpt`       | article description, or short excerpt from the content              | null or str   |
 | `fullContent`   | full HTML contents of the page                                      | str           |
 | `id`            | unique request ID                                                   | str           |
+| `url`           | page URL after redirects, may not match the query URL               | str           |
 | `lang`          | content language                                                    | null or str   |
 | `length`        | length of an article, in characters                                 | null or int   |
 | `date`          | date of extracted article in ISO 8601 format                        | str           |
