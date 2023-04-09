@@ -133,6 +133,8 @@ OPTIONS = (
 
     # # # Playwright settings:
 
+    # Whether to run browser in headless mode.
+    ('headless', (is_bool,), True),
     # Allows creating `incognito` browser contexts. Incognito browser contexts don't write any browsing data to disk.
     ('incognito', (is_bool,), True),
     # Maximum operation time to navigate to the page in milliseconds; defaults to 30000 (30 seconds). Pass 0 to disable the timeout.

@@ -18,12 +18,12 @@ def new_context(playwright, args):
     browser_args = get_browser_args(args)
     if args.incognito:
         # create a new incognito browser context
-        browser = playwright.firefox.launch(headless=True)
+        browser = playwright.firefox.launch(headless=args.headless)
         context = browser.new_context(**browser_args)
     else:
         # create a persistent browser context
         context = playwright.firefox.launch_persistent_context(
-            headless=True,
+            headless=args.headless,
             user_data_dir=USER_DATA_DIR,
             **browser_args,
         )
