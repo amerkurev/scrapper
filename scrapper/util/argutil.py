@@ -133,8 +133,6 @@ OPTIONS = (
 
     # # # Playwright settings:
 
-    # Whether to run browser in headless mode.
-    ('headless', (is_bool,), True),
     # Allows creating `incognito` browser contexts. Incognito browser contexts don't write any browsing data to disk.
     ('incognito', (is_bool,), True),
     # Maximum operation time to navigate to the page in milliseconds; defaults to 30000 (30 seconds). Pass 0 to disable the timeout.
@@ -163,6 +161,10 @@ OPTIONS = (
     ('screen-width', (is_number, gt(0)), 828),
     # The page height in pixels. Defaults to 1792 (iPhone 11 Resolution).
     ('screen-height', (is_number, gt(0)), 1792),
+    # Scroll down the page by a specified number of pixels. This is particularly useful when dealing with lazy-loading pages
+    # (pages that are loaded only as you scroll down). This parameter is used in conjunction with the `sleep` parameter.
+    # Make sure to set a positive value for the `sleep` parameter, otherwise, the scroll function won't work.
+    ('scroll-down', (is_number, gt(0)), 0),
     # Whether to ignore HTTPS errors when sending network requests. The default setting is to ignore HTTPS errors.
     ('ignore-https-errors', (is_bool,), True),
     # Specific user agent.
@@ -176,6 +178,8 @@ OPTIONS = (
     ('http-credentials', (is_credentials,), None),
     # Contains additional HTTP headers to be sent with every request. Example: `X-API-Key:123456;X-Auth-Token:abcdef`.
     ('extra-http-headers', (is_dict,), None),
+    # Whether to run browser in headless mode.
+    ('headless', (is_bool,), True),
 
     # # # Network proxy settings:
 

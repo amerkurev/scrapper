@@ -55,9 +55,19 @@ def page_processing(page, args, init_scripts=None):
     # navigate to the given url
     page.goto(args.url, timeout=args.timeout, wait_until=args.wait_until)
 
-    # waits for the given timeout in milliseconds
+    # wait for the given timeout in milliseconds and scroll down the page
+    n = 10
     if args.sleep:
-        page.wait_for_timeout(args.sleep)
+        for _ in range(n):
+            # scroll down the page by 1/n of the given scroll_down value
+            if args.scroll_down:
+                page.mouse.wheel(0, args.scroll_down / n)
+            # sleep for 1/n of the given sleep value
+            page.wait_for_timeout(args.sleep / n)
+
+        # scroll to the top of the page for the screenshot to be in the correct position
+        if args.scroll_down:
+            page.mouse.wheel(0, 0)
 
     # add user scripts for DOM manipulation
     if args.user_scripts:
