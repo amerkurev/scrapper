@@ -1,5 +1,6 @@
 
 import datetime
+import tldextract
 
 # noinspection PyPackageRequirements
 from playwright.sync_api import sync_playwright
@@ -54,6 +55,10 @@ def scrape(request, args, _id):
         article['fullContent'] = page_content
     if args.screenshot:
         article['screenshotUri'] = f'{request.host_url}screenshot/{_id}'
+
+    if article['siteName'] is None:
+        # extract site name from the URL if it's not set by the parser
+        article['siteName'] = tldextract.extract(url).registered_domain
 
     # save result to disk
     dump_result(article, filename=_id, screenshot=screenshot)
