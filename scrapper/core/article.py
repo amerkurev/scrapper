@@ -6,9 +6,14 @@ from playwright.sync_api import sync_playwright
 
 from scrapper.cache import dump_result
 from scrapper.settings import IN_DOCKER, READABILITY_SCRIPT, PARSER_SCRIPTS_DIR
-from scrapper.core import new_context, close_context, page_processing, get_screenshot
-from scrapper.util import check_fields
-from scrapper.core import ParserError
+from scrapper.core import (
+    new_context,
+    close_context,
+    page_processing,
+    get_screenshot,
+    ParserError,
+    check_fields,
+)
 
 
 def scrape(request, args, _id):
@@ -30,6 +35,9 @@ def scrape(request, args, _id):
         with open(PARSER_SCRIPTS_DIR / 'article.js') as fd:
             article = page.evaluate(fd.read() % parser_args)
         close_context(context)
+
+    if article is None:
+        raise ParserError({'err': ["The page doesn't contain any articles."]})
 
     # parser error: article is not extracted, result has 'err' field
     if 'err' in article:

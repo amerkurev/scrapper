@@ -1,8 +1,8 @@
 
 from bs4 import BeautifulSoup
+from scrapper.util import levenshtein_similarity
 
-
-header_max_distance = 300
+title_max_distance = 350
 acceptable_link_text_len = 40
 
 
@@ -24,18 +24,21 @@ def improve_content(data):
 
     # 2. move the first tag h1 (or h2) to the top of the tree
     title = data['title']
-    header_distance = 0
+    title_distance = 0
 
     for el in tree.find_all(text=True):
-        # stop if the header is found
-        if el.parent.name in ('h1', 'h2'):
-            title = el.parent.get_text(strip=True)
-            el.parent.decompose()  # 'real' move will be below, at 3.1 or 3.2
-            break
+        if el.parent.name in ('h1', 'h2', 'h3'):
+            text = el.parent.get_text(strip=True)
+            # stop if the header is similar to the title
+            min_len = min(len(text), len(title))
+            if levenshtein_similarity(text[:min_len], title[:min_len]) > 0.9:
+                title = text
+                el.parent.decompose()  # 'real' move will be below, at 3.1 or 3.2
+                break
 
         # stop if distance is too big
-        header_distance += len(el.text)
-        if header_distance > header_max_distance:
+        title_distance += len(el.text)
+        if title_distance > title_max_distance:
             # will be used data['title'] as title
             break
 

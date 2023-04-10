@@ -11,9 +11,14 @@ from playwright.sync_api import sync_playwright
 
 from scrapper.cache import dump_result
 from scrapper.settings import IN_DOCKER, PARSER_SCRIPTS_DIR
-from scrapper.core import new_context, close_context, page_processing, get_screenshot
-from scrapper.util import check_fields
-from scrapper.core import ParserError
+from scrapper.core import (
+    new_context,
+    close_context,
+    page_processing,
+    get_screenshot,
+    ParserError,
+    check_fields,
+)
 
 
 def scrape(request, args, _id):

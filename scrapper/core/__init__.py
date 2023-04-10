@@ -108,3 +108,12 @@ class ParserError(Exception):
     def __init__(self, err):
         super().__init__('Parser error')
         self.err = err
+
+
+def check_fields(article, args, fields):
+    # fields = [(name, types, condition), ...]
+    # check if all fields are present and have the correct type in the article dict
+    for (name, types, condition) in fields:
+        if condition is None or condition(args):
+            assert name in article, f'Missing {name}'
+            assert isinstance(article[name], types), f'Invalid {name}'
