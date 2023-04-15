@@ -6,8 +6,8 @@ title_max_distance = 350
 acceptable_link_text_len = 40
 
 
-def improve_content(data):
-    content = data['content']
+def improve_content(article):
+    content = article['content']
     tree = BeautifulSoup(content, 'html.parser')
 
     # 1. remove all p and div tags that contain one word or less (or only digits),
@@ -23,7 +23,7 @@ def improve_content(data):
             el.decompose()
 
     # 2. move the first tag h1 (or h2) to the top of the tree
-    title = data['title']
+    title = article['title']
     title_distance = 0
 
     for el in tree.find_all(text=True):
@@ -39,7 +39,7 @@ def improve_content(data):
         # stop if distance is too big
         title_distance += len(el.text)
         if title_distance > title_max_distance:
-            # will be used data['title'] as title
+            # will be used article['title'] as title
             break
 
     # 3.1 check if article tag already exists, and then insert the title into it

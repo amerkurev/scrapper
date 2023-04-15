@@ -10,7 +10,6 @@ from scrapper import app
 from scrapper.settings import USER_SCRIPTS, STATIC_DIR, SCREENSHOT_TYPE
 from scrapper.cache import load_result, screenshot_location
 from scrapper.util.argutil import default_args, validate_args, check_user_scrips
-from scrapper.util.htmlutil import improve_content, improve_link
 from scrapper.core import ParserError
 from scrapper.core.article import scrape as scrape_article
 from scrapper.core.links import scrape as scrape_links
@@ -48,15 +47,7 @@ def favicon():
 @app.route('/view/<string:id>', methods=['GET'])
 def result_html(id):
     data = load_result(id)
-    if data:
-        if 'content' in data:
-            # article content
-            data['content'] = improve_content(data)
-        if 'links' in data:
-            # news links
-            data['links'] = [improve_link(x) for x in data['links']]
-        return render_template('view.html', data=data)
-    return 'Not found', Status.NOT_FOUND
+    return render_template('view.html', data=data) if data else 'Not found', Status.NOT_FOUND
 
 
 @app.route('/result/<string:id>', methods=['GET'])

@@ -6,6 +6,7 @@ import tldextract
 from playwright.sync_api import sync_playwright
 
 from scrapper.cache import dump_result
+from scrapper.util.htmlutil import improve_content
 from scrapper.settings import IN_DOCKER, READABILITY_SCRIPT, PARSER_SCRIPTS_DIR
 from scrapper.core import (
     new_context,
@@ -59,6 +60,9 @@ def scrape(request, args, _id):
     if article['siteName'] is None:
         # extract site name from the URL if it's not set by the parser
         article['siteName'] = tldextract.extract(url).registered_domain
+
+    if 'content' in article:
+        article['content'] = improve_content(article)
 
     # save result to disk
     dump_result(article, filename=_id, screenshot=screenshot)

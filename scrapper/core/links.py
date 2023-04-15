@@ -10,6 +10,7 @@ from operator import itemgetter
 from playwright.sync_api import sync_playwright
 
 from scrapper.cache import dump_result
+from scrapper.util.htmlutil import improve_link
 from scrapper.settings import IN_DOCKER, PARSER_SCRIPTS_DIR
 from scrapper.core import (
     new_context,
@@ -63,7 +64,7 @@ def scrape(request, args, _id):
     # Sort links by 'pos' field, to show links in the same order as they are on the page
     # ('pos' is position of link in DOM)
     links.sort(key=itemgetter('pos'))
-    links = list(map(link_to_json, links))
+    links = list(map(improve_link, map(link_to_json, links)))
 
     # set common fields
     res = {
