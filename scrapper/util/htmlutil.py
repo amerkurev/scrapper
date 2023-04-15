@@ -66,3 +66,25 @@ def improve_link(link):
 
     link['text'] = text
     return link
+
+
+def social_meta_tags(full_page_content):
+    og = {}  # open graph
+    twitter = {}
+    tree = BeautifulSoup(full_page_content, 'html.parser')
+    for el in tree.find_all('meta'):
+        attrs = el.attrs
+        # Open Graph protocol
+        if 'property' in attrs and attrs['property'].startswith('og:'):
+            key = attrs['property'][3:]  # len('og:') == 3
+            if key:
+                og[key] = attrs['content']
+
+        # Twitter protocol
+        if 'name' in attrs and attrs['name'].startswith('twitter:'):
+            key = attrs['name'][8:]  # len('twitter:') == 8
+            if key:
+                twitter[key] = attrs['content']
+
+    res = {key: props for key, props in (('og', og), ('twitter', twitter)) if props}
+    return res

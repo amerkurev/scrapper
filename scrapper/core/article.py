@@ -6,7 +6,7 @@ import tldextract
 from playwright.sync_api import sync_playwright
 
 from scrapper.cache import dump_result
-from scrapper.util.htmlutil import improve_content
+from scrapper.util.htmlutil import improve_content, social_meta_tags
 from scrapper.settings import IN_DOCKER, READABILITY_SCRIPT, PARSER_SCRIPTS_DIR
 from scrapper.core import (
     new_context,
@@ -48,18 +48,16 @@ def scrape(request, args, _id):
     # set common fields
     article['id'] = _id
     article['url'] = url
+    article['domain'] = tldextract.extract(url).registered_domain
     article['date'] = datetime.datetime.utcnow().isoformat()  # ISO 8601 format
     article['resultUri'] = f'{request.host_url}result/{_id}'
     article['query'] = request.args.to_dict(flat=True)
+    article['meta'] = social_meta_tags(page_content)
 
     if args.full_content:
         article['fullContent'] = page_content
     if args.screenshot:
         article['screenshotUri'] = f'{request.host_url}screenshot/{_id}'
-
-    if article['siteName'] is None:
-        # extract site name from the URL if it's not set by the parser
-        article['siteName'] = tldextract.extract(url).registered_domain
 
     if 'content' in article:
         article['content'] = improve_content(article)
@@ -89,6 +87,8 @@ ARTICLE_FIELDS = (
     ('id', str, None),
     # page URL after redirects, may not match the query URL
     ('url', str, None),
+    # page's registered domain
+    ('domain', str, None),
     # content language
     ('lang', (NoneType, str), None),
     # length of an article, in characters
@@ -97,6 +97,8 @@ ARTICLE_FIELDS = (
     ('date', str, None),
     # request parameters
     ('query', dict, None),
+    # social meta tags (open graph, twitter)
+    ('meta', dict, None),
     # URL of the current result, the data here is always taken from cache
     ('resultUri', str, None),
     # full HTML contents of the page

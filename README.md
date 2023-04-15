@@ -142,24 +142,26 @@ All other request parameters are optional and have default values. However, you 
 ### Response fields
 The response to the `/api/article` request returns a JSON object that contains fields, which are described in the table below.
 
-| Parameter       | Description                                                         | Type          |
-|:----------------|:--------------------------------------------------------------------|:--------------|
-| `byline`        | author metadata                                                     | null or str   |
-| `content`       | HTML string of processed article content                            | null or str   |
-| `dir`           | content direction                                                   | null or str   |
-| `excerpt`       | article description, or short excerpt from the content              | null or str   |
-| `fullContent`   | full HTML contents of the page                                      | str           |
-| `id`            | unique request ID                                                   | str           |
-| `url`           | page URL after redirects, may not match the query URL               | str           |
-| `lang`          | content language                                                    | null or str   |
-| `length`        | length of an article, in characters                                 | null or int   |
-| `date`          | date of extracted article in ISO 8601 format                        | str           |
-| `query`         | request parameters                                                  | object        |
-| `resultUri`     | URL of the current result, the data here is always taken from cache | str           |
-| `screenshotUri` | URL of the screenshot of the page                                   | str           |
-| `siteName`      | name of the site                                                    | null or str   |
-| `textContent`   | text content of the article, with all the HTML tags removed         | null or str   |
-| `title`         | article title                                                       | null or str   |
+| Parameter       | Description                                                         | Type        |
+|:----------------|:--------------------------------------------------------------------|:------------|
+| `byline`        | author metadata                                                     | null or str |
+| `content`       | HTML string of processed article content                            | null or str |
+| `dir`           | content direction                                                   | null or str |
+| `excerpt`       | article description, or short excerpt from the content              | null or str |
+| `fullContent`   | full HTML contents of the page                                      | str         |
+| `id`            | unique request ID                                                   | str         |
+| `url`           | page URL after redirects, may not match the query URL               | str         |
+| `domain`        | page's registered domain                                            | str         |
+| `lang`          | content language                                                    | null or str |
+| `length`        | length of an article, in characters                                 | null or int |
+| `date`          | date of extracted article in ISO 8601 format                        | str         |
+| `query`         | request parameters                                                  | object      |
+| `meta`          | social meta tags (open graph, twitter)                              | object      |
+| `resultUri`     | URL of the current result, the data here is always taken from cache | str         |
+| `screenshotUri` | URL of the screenshot of the page                                   | str         |
+| `siteName`      | name of the site                                                    | null or str |
+| `textContent`   | text content of the article, with all the HTML tags removed         | null or str |
+| `title`         | article title                                                       | null or str |
 
 ### Error handling
 If an error (or multiple errors) occurs during the execution of a request, the response structure will be as follows:
@@ -186,17 +188,19 @@ curl -X GET "localhost:3000/api/links?url=https://www.cnet.com/"
 ### Response fields
 The response to the `/api/links` request returns a JSON object that contains fields, which are described in the table below.
 
-| Parameter       | Description                                                         | Type   |
-|:----------------|:--------------------------------------------------------------------|:-------|
-| `fullContent`   | full HTML contents of the page                                      | str    |
-| `id`            | unique request ID                                                   | str    |
-| `url`           | page URL after redirects, may not match the query URL               | str    |
-| `date`          | date when the links were collected in ISO 8601 format               | str    |
-| `query`         | request parameters                                                  | object |
-| `resultUri`     | URL of the current result, the data here is always taken from cache | str    |
-| `screenshotUri` | URL of the screenshot of the page                                   | str    |
-| `links`         | list of collected links                                             | list   |
-| `title`         | page title                                                          | str    |
+| Parameter       | Description                                                               | Type     |
+|:----------------|:--------------------------------------------------------------------------|:---------|
+| `fullContent`   | full HTML contents of the page                                            | str      |
+| `id`            | unique request ID                                                         | str      |
+| `url`           | page URL after redirects, may not match the query URL                     | str      |
+| `domain`        | page's registered domain                                                  | str      |
+| `date`          | date when the links were collected in ISO 8601 format                     | str      |
+| `query`         | request parameters                                                        | object   |
+| `meta`          | social meta tags (open graph, twitter)                                    | object   |
+| `resultUri`     | URL of the current result, the data here is always taken from cache       | str      |
+| `screenshotUri` | URL of the screenshot of the page                                         | str      |
+| `links`         | list of collected links                                                   | list     |
+| `title`         | page title                                                                | str      |
 
 ## Supported architectures
 - linux/amd64

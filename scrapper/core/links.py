@@ -10,7 +10,7 @@ from operator import itemgetter
 from playwright.sync_api import sync_playwright
 
 from scrapper.cache import dump_result
-from scrapper.util.htmlutil import improve_link
+from scrapper.util.htmlutil import improve_link, social_meta_tags
 from scrapper.settings import IN_DOCKER, PARSER_SCRIPTS_DIR
 from scrapper.core import (
     new_context,
@@ -70,11 +70,13 @@ def scrape(request, args, _id):
     res = {
         'id': _id,
         'url': url,
+        'domain': tldextract.extract(url).registered_domain,
         'date': datetime.datetime.utcnow().isoformat(),
         'resultUri': f'{request.host_url}result/{_id}',
         'query': request.args.to_dict(flat=True),
         'links': links,
         'title': title,
+        'meta': social_meta_tags(page_content),
     }
 
     if args.full_content:
@@ -145,10 +147,14 @@ NEWSFEED_FIELDS = (
     ('id', str, None),
     # page URL after redirects, may not match the query URL
     ('url', str, None),
+    # page's registered domain
+    ('domain', str, None),
     # date of extracted article in ISO 8601 format
     ('date', str, None),
     # request parameters
     ('query', dict, None),
+    # social meta tags (open graph, twitter)
+    ('meta', dict, None),
     # URL of the current result, the data here is always taken from cache
     ('resultUri', str, None),
     # full HTML contents of the page
