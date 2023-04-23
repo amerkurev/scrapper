@@ -47,13 +47,13 @@ def favicon():
 @app.route('/view/<string:id>', methods=['GET'])
 def result_html(id):
     data = load_result(id)
-    return render_template('view.html', data=data) if data else 'Not found', Status.NOT_FOUND
+    return render_template('view.html', data=data) if data else ('Not found', Status.NOT_FOUND)
 
 
 @app.route('/result/<string:id>', methods=['GET'])
 def result_json(id):
     data = load_result(id)
-    return data if data else 'Not found', Status.NOT_FOUND
+    return data if data else ('Not found', Status.NOT_FOUND)
 
 
 @app.route('/screenshot/<string:id>', methods=['GET'])
