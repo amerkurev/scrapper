@@ -58,7 +58,10 @@ def result_json(id):
 
 @app.route('/screenshot/<string:id>', methods=['GET'])
 def result_screenshot(id):
-    return send_file(screenshot_location(id), mimetype=f'image/{SCREENSHOT_TYPE}')
+    path = screenshot_location(id)
+    if not path.exists():
+        return 'Not found', Status.NOT_FOUND
+    return send_file(path, mimetype=f'image/{SCREENSHOT_TYPE}')
 
 
 @app.route('/parse', methods=['GET'])   # DEPRECATED

@@ -36,4 +36,4 @@ def json_location(filename):
 
 
 def screenshot_location(filename):
-    return str(json_location(filename)) + '.' + SCREENSHOT_TYPE
+    return USER_DATA_DIR / '_res' / filename[:2] / (filename + '.' + SCREENSHOT_TYPE)
