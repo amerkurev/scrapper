@@ -74,6 +74,9 @@ def page_processing(page, args, init_scripts=None):
         for script_name in args.user_scripts:
             page.add_script_tag(path=USER_SCRIPTS / script_name)
 
+    # wait for the given timeout in miliseconds after user scripts were injected.
+    if args.user_scripts_timeout:
+        page.wait_for_timeout(args.user_scripts_timeout)
 
 def resource_blocker(whitelist):  # list of resource types to allow
     def block(route):

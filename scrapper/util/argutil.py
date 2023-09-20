@@ -129,7 +129,12 @@ OPTIONS = (
     # and list the required ones (separated by commas) in the `user-scripts` parameter. These scripts will execute after the page loads
     # but before the article parser runs. This allows you to help parse the article in a variety of ways,
     # such as removing markup, ad blocks, or anything else. For example: user-scripts=remove_ads.js, click_cookie_accept_button.js
+    # If you plan to run asynchronous long-running scripts, check --user_scripts_timeout parameter.
     ('user-scripts', (is_list,), None),
+    # Waits for the given timeout in milliseconds after injecting users scripts.
+    # For example if you want to navigate through page to specific content, set a longer period (higher value)
+    # The default value is 0, which means no sleep.
+    ('user-scripts-timeout', (is_number, gte(0)), 0),
 
     # # # Playwright settings:
 
