@@ -13,6 +13,7 @@ from scrapper.util.argutil import default_args, validate_args, check_user_scrips
 from scrapper.core import ParserError
 from scrapper.core.article import scrape as scrape_article
 from scrapper.core.links import scrape as scrape_links
+from scrapper.core.raw import scrape as scrape_raw
 
 
 def exception_handler(func):
@@ -30,11 +31,12 @@ def exception_handler(func):
 
 @app.route('/', methods=['GET'])
 @app.route('/links', methods=['GET'])
+@app.route('/raw', methods=['GET'])
 def index():
     args = list(default_args())
     placeholder = '&#10;'.join((f'{x[0]}={x[1]}' for x in args[:10]))  # max 10 args
     placeholder = placeholder.replace('=True', '=yes').replace('=False', '=no')
-    return render_template('index.html', context={'placeholder': placeholder, 'linksRoute': '/links' == request.path})
+    return render_template('index.html', context={'placeholder': placeholder, 'route': request.path})
 
 
 @app.route('/favicon.ico')
@@ -101,6 +103,26 @@ def links():
             return data
 
     return scrape_links(request=request, args=args, _id=_id)
+
+
+
+@app.route('/api/raw', methods=['GET'])
+@exception_handler
+def raw():
+    args, err = validate_args(args=request.args)
+    check_user_scrips(args=args, user_scripts_dir=USER_SCRIPTS, err=err)
+    if err:
+        return {'err': err}, Status.BAD_REQUEST
+
+    _id = hashlib.sha1(request.full_path.encode()).hexdigest()  # unique request id
+
+    # get cache data if exists
+    if args.cache is True:
+        data = load_result(_id)
+        if data:
+            return data
+
+    return scrape_raw(request=request, args=args, _id=_id)
 
 
 def startup():

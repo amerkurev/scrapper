@@ -21,8 +21,10 @@
       <li>
       </li>
       <li>
-        {% if context.linksRoute %}
+        {% if context.route == "/links" %}
         <strong><a href="/links" class="logo">Scrapper</a></strong>
+        {% elif context.route == "/raw" %}
+        <strong><a href="/raw" class="logo">Scrapper</a></strong>
         {% else %}
         <strong><a href="/" class="logo">Scrapper</a></strong>
         {% endif %}
@@ -42,8 +44,8 @@
       <div>
         <form>
           <label for="url">Page URL</label>
-          <input type="email" id="url" name="email" placeholder="https://example.com/{% if not context.linksRoute %}article.html{% endif %}" required>
-          {% if context.linksRoute %}
+          <input type="email" id="url" name="email" placeholder="https://example.com/{% if not context.route == "/links" %}article.html{% endif %}" required>
+          {% if context.route == "/links" %}
           <small>The page should contain hyperlinks to news articles. For example, this could be the main page of a website.</small>
           {% else %}
           <small>The page should contain the text of the article that needs to be extracted from.</small>
@@ -54,12 +56,18 @@
         <p>
           <a href="" role="button" class="contrast outline scrape-it" aria-label="scrape-it" id="scrape-it">Scrape it</a>
           <select id="select-route" class="select-route" required onchange="location = this.value;">
-            {% if context.linksRoute %}
+            {% if context.route == "/links" %}
             <option value="/">Article</option>
             <option value="/links" selected>Links</option>
+            <option value="/raw">Raw</option>
+            {% elif context.route == "/raw" %}
+            <option value="/">Article</option>
+            <option value="/links">Links</option>
+            <option value="/raw" selected>Raw</option>
             {% else %}
             <option value="/" selected>Article</option>
             <option value="/links">Links</option>
+            <option value="/raw">Raw</option>
             {% endif %}
           </select>
         </p>
@@ -93,12 +101,14 @@
   </footer>
   <script src="/static/dark-mode.js"></script>
   <script>
-    {% if context.linksRoute %}
+    {% if context.route == "/links" %}
     var apiEndpoint = "/api/links";
+    {% elif context.route == "/raw" %}
+    var apiEndpoint = "/api/raw";
     {% else %}
     var apiEndpoint = "/api/article";
     {% endif %}
-  </script>>
+  </script>
   <script src="/static/query.js"></script>
 </body>
 </html>
