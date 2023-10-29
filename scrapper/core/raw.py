@@ -1,6 +1,7 @@
 # noinspection PyPackageRequirements
 from playwright.sync_api import sync_playwright, Error
 
+from scrapper.cache import dump_result
 from scrapper.core import (
     new_context,
     close_context,
@@ -25,5 +26,8 @@ def scrape(request, args, _id):
             print(error)
 
         close_context(context)
+
+    # save result to disk
+    dump_result(page_content, filename=_id)
 
     return page_content
