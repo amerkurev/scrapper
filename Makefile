@@ -17,13 +17,10 @@ info:
 	- @echo "os $(GOOS)"
 	- @echo "revision $(REV)"
 
-# flask
 # before run: install python packages from requirements.txt
-debug-server:
-	- @pip install -e .
-	- @flask --app scrapper run --port 3000 --debug
+run:
+	- @python app/main.py
 
-## Docker ##
 docker:
 	docker build -t amerkurev/$(BIN):master --progress=plain .
 

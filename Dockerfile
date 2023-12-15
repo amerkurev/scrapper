@@ -1,12 +1,13 @@
-FROM mcr.microsoft.com/playwright/python:v1.31.0-focal
+FROM mcr.microsoft.com/playwright/python:v1.40.0-jammy
+# python==3.10.12, playwright==1.40.0
 
 # RUN apt update
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r ./requirements.txt
+RUN pip install --no-cache-dir -r ./requirements.txt && rm requirements.txt
 
 ENV \
 	IN_DOCKER=1 \
-	# Docker user
+	# docker user
 	USER=user \
 	USER_UID=1001 \
 	USER_HOME=/home/user \
@@ -14,14 +15,10 @@ ENV \
 	USER_SCRIPTS=/home/user/user_scripts
 
 RUN useradd -s /bin/bash -m -d $USER_HOME -u $USER_UID $USER
-USER user
+USER $USER
 
 RUN mkdir -p $USER_DATA_DIR $USER_SCRIPTS
+COPY --chown=$USER:$USER app $USER_HOME/app
 
-# install scrapper package
 WORKDIR $USER_HOME
-COPY scrapper $USER_HOME/scrapper
-COPY setup.py $USER_HOME/setup.py
-RUN pip install -e .
-
-CMD waitress-serve --host 0.0.0.0 --port=3000 scrapper:app
+CMD python app/main.py
