@@ -5,20 +5,31 @@ FROM mcr.microsoft.com/playwright/python:v1.40.0-jammy
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r ./requirements.txt && rm requirements.txt
 
+ARG USER=user
+ARG USER_UID=1001
+ARG USER_HOME=/home/$USER
+ARG USER_DATA_DIR=$USER_HOME/user_data_dir
+ARG USER_SCRIPTS=$USER_HOME/user_scripts
+ARG APP_DIR=$USER_HOME/app
+ARG APP_HOST=0.0.0.0
+ARG APP_PORT=3000
+
 ENV \
 	IN_DOCKER=1 \
-	# docker user
-	USER=user \
-	USER_UID=1001 \
-	USER_HOME=/home/user \
-	USER_DATA_DIR=/home/user/user_data_dir \
-	USER_SCRIPTS=/home/user/user_scripts
+	USER=$USER \
+	USER_UID=$USER_UID \
+	USER_HOME=$USER_HOME \
+	USER_DATA_DIR=$USER_DATA_DIR \
+	USER_SCRIPTS=$USER_SCRIPTS \
+	APP_DIR=$APP_DIR \
+	APP_HOST=$APP_HOST \
+	APP_PORT=$APP_PORT
 
 RUN useradd -s /bin/bash -m -d $USER_HOME -u $USER_UID $USER
 USER $USER
 
 RUN mkdir -p $USER_DATA_DIR $USER_SCRIPTS
-COPY --chown=$USER:$USER app $USER_HOME/app
+COPY --chown=$USER:$USER app $APP_DIR
 
 WORKDIR $USER_HOME
-CMD python app/main.py
+CMD uvicorn --app-dir $APP_DIR main:app --host $APP_HOST --port $APP_PORT

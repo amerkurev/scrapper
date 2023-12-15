@@ -19,16 +19,13 @@ info:
 
 # before run: install python packages from requirements.txt
 run:
-	- @python app/main.py
+	- @uvicorn --app-dir app main:app --port 3000
 
 docker:
-	docker build -t amerkurev/$(BIN):master --progress=plain .
+	- @docker build -t amerkurev/$(BIN):master --progress=plain .
 
 docker-run: docker
 	- @# Using --ipc=host is recommended when using Chrome. Chrome can run out of memory without this flag.
-	- docker run -d --rm -p 3000:3000 -v $(PWD)/user_data_dir:/home/user/user_data_dir -v $(PWD)/user_scripts:/home/user/user_scripts --name $(BIN) amerkurev/$(BIN):master
+	- @docker run -it --rm --ipc=host -p 3000:3000 -v $(PWD)/user_data_dir:/home/user/user_data_dir -v $(PWD)/user_scripts:/home/user/user_scripts --name $(BIN) amerkurev/$(BIN):master || true
 
-docker-rm:
-	- @docker rm -f $(BIN)
-
-.PHONY: info build run clean test docker dist
+.PHONY: info run docker
