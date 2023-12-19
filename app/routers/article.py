@@ -48,6 +48,7 @@ class Article(BaseModel):
     siteName: Annotated[str | None, Query(description='name of the site')]
     textContent: Annotated[str | None, Query(description='text content of the article, with all the HTML tags removed')]
     title: Annotated[str | None, Query(description='article title')]
+    publishedTime: Annotated[str | None, Query(description='article publication time')]
 
 
 class URLParam:

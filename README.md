@@ -163,6 +163,7 @@ The response to the `/api/article` request returns a JSON object that contains f
 | `siteName`      | name of the site                                                    | null or str |
 | `textContent`   | text content of the article, with all the HTML tags removed         | null or str |
 | `title`         | article title                                                       | null or str |
+| `publishedTime` | article publication time                                            | null or str |
 
 ### Error handling
 If an error (or multiple errors) occurs during the execution of a request, the response structure will be as follows:
