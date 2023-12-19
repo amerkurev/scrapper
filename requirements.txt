@@ -1,5 +1,9 @@
 beautifulsoup4==4.12.2
 fastapi==0.105.0
+jinja2==3.1.2
 playwright==1.40.0
+pydantic==2.5.2
+starlette==0.27.0
 tldextract==5.1.1
 uvicorn[standard]==0.24.0.post1
+validators==0.22.0
