@@ -1,10 +1,10 @@
 # Scrapper 🧹
 <div>
 
-[![Build](https://github.com/amerkurev/scrapper/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/amerkurev/scrapper/actions/workflows/ci.yml)&nbsp;
-[![Coverage Status](https://coveralls.io/repos/github/amerkurev/scrapper/badge.svg?branch=master)](https://coveralls.io/github/amerkurev/scrapper?branch=master)&nbsp;
+[![Build](https://github.com/amerkurev/scrapper/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/amerkurev/scrapper/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/amerkurev/scrapper/badge.svg?branch=master)](https://coveralls.io/github/amerkurev/scrapper?branch=master)
 [![License](https://img.shields.io/badge/license-apache2.0-blue.svg)](https://github.com/amerkurev/scrapper/blob/master/LICENSE)
-[![Docker Hub](https://img.shields.io/docker/automated/amerkurev/scrapper.svg)](https://hub.docker.com/r/amerkurev/scrapper/tags)&nbsp;
+[![Docker Hub](https://img.shields.io/docker/automated/amerkurev/scrapper.svg)](https://hub.docker.com/r/amerkurev/scrapper/tags)
 </div>
 
 If you were looking for a web scraper that actually works, you just found it. It's called Scrapper! Downloading a page from the Internet and then extracting an article from it in a structured format is not as easy as it may seem at first glance. Sometimes it can be damn hard. But Scrapper will help you with this, I hope :) To do this, Scrapper has plenty of features.
