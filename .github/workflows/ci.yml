@@ -30,11 +30,8 @@ jobs:
 
       - name: Test and submit coverage report
         run: |
-          docker buildx build \
-              --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
-              --platform linux/amd64,linux/arm64 \
-              -t scrapper .
-          docker run --rm --ipc=host scrapper ./tests.sh coveralls
+          pip install -r requirements.txt
+          ./tests.sh coveralls
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
