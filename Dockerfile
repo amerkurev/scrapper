@@ -30,6 +30,7 @@ USER $USER
 
 RUN mkdir -p $USER_DATA_DIR $USER_SCRIPTS
 COPY --chown=$USER:$USER app $APP_DIR
+COPY --chown=$USER:$USER tests.sh $USER_HOME
 
 WORKDIR $USER_HOME
 CMD uvicorn --app-dir $APP_DIR main:app --host $APP_HOST --port $APP_PORT
