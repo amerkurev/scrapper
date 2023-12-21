@@ -23,6 +23,7 @@ jobs:
       - name: Test and submit coverage report
         run: |
           pip install -r requirements.txt
+          playwright install firefox
           ./tests.sh coveralls
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
