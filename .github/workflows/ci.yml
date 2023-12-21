@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - coveralls
     tags:
       - '*'
     paths-ignore:
