@@ -30,7 +30,7 @@ jobs:
 
       - name: Test and submit coverage report
         run: |
-          docker buildx build --load \
+          docker buildx build \
               --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
               --platform linux/amd64,linux/arm64 \
               -t scrapper .
