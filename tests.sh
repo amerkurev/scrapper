@@ -5,7 +5,7 @@ coverage report -m
 
 # if pass `coveralls` as argument, then send coverage report to coveralls.io
 if [ "$1" == "coveralls" ]; then
-    coveralls
+    coveralls --service=github
 fi
 # if pass `html` as argument, then generate html report
 if [ "$1" == "html" ]; then
