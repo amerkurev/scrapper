@@ -54,7 +54,7 @@ class URLParam:
             str,
             Query(
                 description='Page URL. The page should contain hyperlinks to news articles. For example, this could be the main page of a website.<br><br>',
-                example='http://example.com/',
+                examples=['http://example.com/'],
             ),
         ],
     ):

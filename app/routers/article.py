@@ -58,7 +58,7 @@ class URLParam:
             str,
             Query(
                 description='Page URL. The page should contain the text of the article that needs to be extracted.<br><br>',
-                example='http://example.com/article.html',
+                examples=['http://example.com/article.html'],
             ),
         ],
     ):

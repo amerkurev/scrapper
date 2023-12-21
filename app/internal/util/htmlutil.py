@@ -25,7 +25,7 @@ def improve_content(title: str, content: str) -> str:
     # 2. move the first tag h1 (or h2) to the top of the tree
     title_distance = 0
 
-    for el in tree.find_all(text=True):
+    for el in tree.find_all(string=True):
         if el.parent.name in ('h1', 'h2', 'h3'):
             text = el.parent.get_text(strip=True)
             # stop if the header is similar to the title

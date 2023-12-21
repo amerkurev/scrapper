@@ -15,15 +15,13 @@ class WaitUntilEnum(str, Enum):
     commit = 'commit'
 
 
-def query_parsing_error(field: str, msg: str, value: Any, ctx: dict | None = None) -> RequestValidationError:
+def query_parsing_error(field: str, msg: str, value: Any) -> RequestValidationError:
     obj = {
         'type': f'{field}_parsing',
         'loc': ('query', field),
         'msg': msg,
         'input': value,
     }
-    if ctx:
-        obj['ctx'] = ctx
     return RequestValidationError([obj])
 
 
