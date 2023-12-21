@@ -20,6 +20,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Test and submit coverage report
+        run: |
+          pip install -r requirements.txt
+          ./tests.sh coveralls
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
