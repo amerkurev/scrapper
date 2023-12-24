@@ -42,10 +42,11 @@ async def new_context(
     if proxy.proxy_server:
         browser_args['proxy'] = {
             'server': proxy.proxy_server,
-            'bypass': proxy.proxy_bypass,
             'username': proxy.proxy_username,
             'password': proxy.proxy_password,
         }
+        if proxy.proxy_bypass:
+            browser_args['proxy']['bypass'] = proxy.proxy_bypass
 
     if params.incognito:
         # create a new incognito browser context

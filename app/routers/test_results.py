@@ -11,7 +11,7 @@ def test_get_article():
 
 def test_get_links():
     api_url = '/api/links'
-    url = 'https://www.scrapethissite.com/pages/'
+    url = 'https://en.wikinews.org/wiki/Main_Page'
     _get_result(api_url, url)
 
 
