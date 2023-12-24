@@ -32,6 +32,6 @@ docker-run: docker
 	- @docker run -it --rm --ipc=host -p 3000:3000 -v $(PWD)/user_data_dir:/home/user/user_data_dir -v $(PWD)/user_scripts:/home/user/user_scripts --name $(BIN) amerkurev/$(BIN):master || true
 
 docker-test: docker
-	- @docker run -t --rm --ipc=host --name $(BIN) amerkurev/$(BIN):master ./tests.sh
+	- @docker run -t --rm --name $(BIN) amerkurev/$(BIN):master ./tests.sh
 
 .PHONY: info run test docker

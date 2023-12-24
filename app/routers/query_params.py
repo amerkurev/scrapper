@@ -110,11 +110,11 @@ class BrowserQueryParams:
         timeout: Annotated[
             int,
             Query(
-                description='Maximum operation time to navigate to the page in milliseconds; defaults to 30000 (30 seconds).<br>'
+                description='Maximum operation time to navigate to the page in milliseconds; defaults to 60000 (60 seconds).<br>'
                             'Pass 0 to disable the timeout.<br><br>',
                 ge=0,
             ),
-        ] = 30000,
+        ] = 60000,
         wait_until: Annotated[
             WaitUntilEnum,
             Query(

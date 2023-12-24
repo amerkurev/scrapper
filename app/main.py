@@ -1,8 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from fastapi.requests import Request
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from playwright.async_api import Error as PlaywrightError
 
 from dependencies import lifespan
 from settings import TEMPLATES_DIR, STATIC_DIR, ICON_PATH
@@ -31,7 +32,7 @@ async def root(request: Request):
         'stealth=no',
         'screenshot=no',
         'incognito=yes',
-        'timeout=30000',
+        'timeout=60000',
         'wait-until=domcontentloaded',
         'sleep=0',
         'viewport-width=414',
@@ -42,3 +43,9 @@ async def root(request: Request):
         'for_example': '&#10;'.join(for_example),
     }
     return templates.TemplateResponse('index.html', context=context)
+
+
+@app.exception_handler(PlaywrightError)
+async def playwright_exception_handler(_, err):
+    content = f'PlaywrightError: {err}'
+    return PlainTextResponse(content, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

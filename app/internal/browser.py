@@ -59,8 +59,11 @@ async def new_context(
             user_data_dir=USER_DATA_DIR,
             **browser_args,
         )
-    yield context
-    await context.close()
+    try:
+        yield context
+    finally:
+        # context should always be closed at the end
+        await context.close()
 
 
 async def page_processing(

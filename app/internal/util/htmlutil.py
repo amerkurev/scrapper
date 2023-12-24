@@ -76,13 +76,13 @@ def social_meta_tags(full_page_content: str) -> dict:
         # Open Graph protocol
         if 'property' in attrs and attrs['property'].startswith('og:'):
             key = attrs['property'][3:]  # len('og:') == 3
-            if key:
+            if key and 'content' in attrs:
                 og[key] = attrs['content']
 
         # Twitter protocol
         if 'name' in attrs and attrs['name'].startswith('twitter:'):
             key = attrs['name'][8:]  # len('twitter:') == 8
-            if key:
+            if key and 'content' in attrs:
                 twitter[key] = attrs['content']
 
     res = {key: props for key, props in (('og', og), ('twitter', twitter)) if props}
