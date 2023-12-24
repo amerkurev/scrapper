@@ -379,7 +379,8 @@ code {
   width: 100%
 }
 
-.errors {
+.errors,
+.errors pre {
   color: #e53935;
 }
 

@@ -45,13 +45,11 @@
                 } else {
                     // Handle error
                     try {
-                        let response = JSON.parse(xhr.responseText);
-                        // Print array of errors as li elements
-                        errors.innerHTML = response.err.map((err) => {
-                            return "<li>" + err + "</li>";
-                        }).join("");
+                        // pretty print the xhr.responseText
+                        let json = JSON.parse(xhr.responseText);
+                        errors.innerHTML = "<pre>An error occurred\n" + JSON.stringify(json, null, 2) + "</pre>";
                     } catch(err) {
-                        errors.innerHTML = "<li>Unknown error. See the server log for more details.</li>";
+                        errors.innerHTML = "<pre>An error occurred. See the server log for more details.</pre>";
                     }
                     errors.style.display = "block";
                 }
