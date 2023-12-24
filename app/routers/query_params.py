@@ -67,7 +67,8 @@ class CommonQueryParams:
                 description='To use your JavaScript scripts on the page, add script files to the `user_scripts` directory, and list the required ones (separated by commas) in the `user-scripts` parameter. '
                             'These scripts will execute after the page loads but before the article parser runs. This allows you to help parse the article in a variety of ways, '
                             'such as removing markup, ad blocks, or anything else. For example: user-scripts=remove_ads.js, click_cookie_accept_button.js.<br>'
-                            'If you plan to run asynchronous long-running scripts, check --user-scripts-timeout parameter.',
+                            'If you plan to run asynchronous long-running scripts, check --user-scripts-timeout parameter.<br><br>'
+                            'Keep in mind that name of the script cannot contain commas because it will be parsed as a list of scripts.<br>',
             ),
         ] = None,
         user_scripts_timeout: Annotated[
