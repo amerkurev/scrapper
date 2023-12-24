@@ -49,7 +49,8 @@
                         let json = JSON.parse(xhr.responseText);
                         errors.innerHTML = "<pre>An error occurred\n" + JSON.stringify(json, null, 2) + "</pre>";
                     } catch(err) {
-                        errors.innerHTML = "<pre>An error occurred. See the server log for more details.</pre>";
+                        let lines = ["An error occurred. See the server log for more details.", xhr.responseText]
+                        errors.innerHTML = "<pre>" + lines.join("\n\n") + "</pre>"
                     }
                     errors.style.display = "block";
                 }
