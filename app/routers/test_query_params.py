@@ -35,23 +35,6 @@ def test_various_query_params():
         response = client.get(api_url, params=params)
         assert response.status_code == 200
 
-        # wrong http credentials
-        params = {
-            'url': url,
-            'extra-http-headers': 'Accept-Language',
-            'http-credentials': 'username::',
-        }
-        response = client.get(api_url, params=params)
-        assert response.status_code == 422
-        assert response.json() == {
-            'detail': [{
-                'input': 'username::',
-                'loc': ['query', 'http_credentials'],
-                'msg': 'Invalid HTTP credentials',
-                'type': 'http_credentials_parsing',
-            }]
-        }
-
         # wrong http header
         params = {
             'url': url,

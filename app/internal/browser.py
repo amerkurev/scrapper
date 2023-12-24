@@ -42,9 +42,11 @@ async def new_context(
     if proxy.proxy_server:
         browser_args['proxy'] = {
             'server': proxy.proxy_server,
-            'username': proxy.proxy_username,
-            'password': proxy.proxy_password,
         }
+        if proxy.proxy_username:
+            browser_args['proxy']['username'] = proxy.proxy_username
+        if proxy.proxy_password:
+            browser_args['proxy']['password'] = proxy.proxy_password
         if proxy.proxy_bypass:
             browser_args['proxy']['bypass'] = proxy.proxy_bypass
 

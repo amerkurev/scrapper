@@ -1,6 +1,7 @@
 from enum import Enum
 from operator import methodcaller
 from typing import Any, Annotated
+from urllib.parse import urlparse
 
 from fastapi import Query
 from fastapi.exceptions import RequestValidationError
@@ -272,12 +273,14 @@ class BrowserQueryParams:
                 self.resource = resource
 
         if http_credentials:
-            parts = http_credentials.split(':')
-            if len(parts) == 1:
-                self.http_credentials = {'username': parts[0], 'password': ''}
-            elif len(parts) == 2:
-                self.http_credentials = {'username': parts[0], 'password': parts[1]}
-            else:
+            fake_url = f'http://{http_credentials}@localhost'
+            try:
+                p = urlparse(fake_url)
+                self.http_credentials = {
+                    'username': p.username or '',  # expected only string, not None
+                    'password': p.password or '',  # same
+                }
+            except ValueError:
                 raise query_parsing_error('http_credentials', 'Invalid HTTP credentials', http_credentials)
 
         if extra_http_headers:
