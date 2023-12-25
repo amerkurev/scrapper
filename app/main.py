@@ -7,13 +7,14 @@ from playwright.async_api import Error as PlaywrightError
 
 from dependencies import lifespan
 from settings import TEMPLATES_DIR, STATIC_DIR, ICON_PATH
-from routers import article, links, results
+from routers import article, links, misc, results
 
 
 app = FastAPI(lifespan=lifespan)
 app.mount('/static', StaticFiles(directory=STATIC_DIR), name='static')
 app.include_router(article.router)
 app.include_router(links.router)
+app.include_router(misc.router)
 app.include_router(results.router)
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 

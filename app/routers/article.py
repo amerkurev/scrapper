@@ -8,6 +8,7 @@ from fastapi import APIRouter, Query, Depends, status
 from fastapi.requests import Request
 from fastapi.exceptions import HTTPException
 from pydantic import BaseModel
+from playwright.async_api import Browser
 
 from internal import cache
 from internal.browser import (
@@ -86,7 +87,7 @@ async def parse_article(
         if data:
             return data
 
-    browser = request.state.browser
+    browser: Browser = request.state.browser
 
     # create a new browser context
     async with new_context(browser, browser_params, proxy_params) as context:
