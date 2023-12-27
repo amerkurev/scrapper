@@ -28,7 +28,11 @@ def test_various_query_params():
             'cache': False,
             'incognito': False,
             'resource': 'document,stylesheet,fetch',
-            'extra-http-headers': 'Accept-Language:da, en-gb, en',
+            'extra-http-headers': [
+                'Accept-Language:da, en-gb, en',
+                'Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3;',
+                'Accept: text/html;q=0.9,text/plain',
+            ],
             'user-scripts-timeout': 1000,  # 1 second
             'http-credentials': 'username:password',
         }
@@ -44,7 +48,7 @@ def test_various_query_params():
         assert response.status_code == 422
         assert response.json() == {
             'detail': [{
-                'input': 'Accept-Language',
+                'input': ['Accept-Language'],
                 'loc': ['query', 'extra_http_headers'],
                 'msg': 'Invalid HTTP header',
                 'type': 'extra_http_headers_parsing',

@@ -1,5 +1,6 @@
 from enum import Enum
-from operator import methodcaller
+from email.errors import MessageParseError
+from email.parser import Parser as HeaderParser
 from typing import Any, Annotated
 from urllib.parse import urlparse
 
@@ -91,7 +92,7 @@ class CommonQueryParams:
         self.user_scripts_timeout = user_scripts_timeout
 
         if user_scripts:
-            user_scripts = list(filter(None, map(methodcaller('strip'), user_scripts.split(','))))
+            user_scripts = list(filter(None, map(str.strip, user_scripts.split(','))))
             if user_scripts:
                 # check if all files exist
                 for script in user_scripts:
@@ -245,7 +246,7 @@ class BrowserQueryParams:
             ),
         ] = None,
         extra_http_headers: Annotated[
-            str | None,
+            list | None,
             Query(
                 alias='extra-http-headers',
                 description='Contains additional HTTP headers to be sent with every request. Example: `X-API-Key:123456;X-Auth-Token:abcdef`.',
@@ -270,7 +271,7 @@ class BrowserQueryParams:
         self.extra_http_headers = None
 
         if resource:
-            resource = list(filter(None, map(methodcaller('strip'), resource.split(','))))
+            resource = list(filter(None, map(str.strip, resource.split(','))))
             if resource:
                 self.resource = resource
 
@@ -286,14 +287,14 @@ class BrowserQueryParams:
                 raise query_parsing_error('http_credentials', 'Invalid HTTP credentials', http_credentials)
 
         if extra_http_headers:
-            r = {}
-            parts = extra_http_headers.split(';')
-            for part in parts:
-                if ':' not in part:
-                    raise query_parsing_error('extra_http_headers', 'Invalid HTTP header', extra_http_headers)
-                key, v = part.split(':', 1)  # maxsplit=1
-                r[key] = v.strip()
-            self.extra_http_headers = r
+            try:
+                headers = HeaderParser().parsestr('\r\n'.join(extra_http_headers))
+                self.extra_http_headers = dict(headers)
+                # check if headers were parsed correctly
+                if not self.extra_http_headers:
+                    raise MessageParseError()
+            except MessageParseError:
+                raise query_parsing_error('extra_http_headers', 'Invalid HTTP header', extra_http_headers)
 
 
 class ProxyQueryParams:
@@ -400,5 +401,3 @@ class LinkParserQueryParams:
     ):
         self.text_len_threshold = text_len_threshold
         self.words_threshold = words_threshold
-
-

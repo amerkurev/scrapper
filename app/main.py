@@ -10,7 +10,20 @@ from settings import TEMPLATES_DIR, STATIC_DIR, ICON_PATH
 from routers import article, links, misc, results
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    title='Scrapper',
+    summary='Web scraper with a simple REST API living in Docker and using a Headless browser and Readability.js for parsing.',
+    contact={
+        'name': 'GitHub',
+        'url': 'https://github.com/amerkurev/scrapper',
+    },
+    license_info={
+        'name': 'Apache-2.0 license',
+        'url': 'https://github.com/amerkurev/scrapper/blob/master/LICENSE',
+    },
+    version='v0.13.0',
+    lifespan=lifespan,
+)
 app.mount('/static', StaticFiles(directory=STATIC_DIR), name='static')
 app.include_router(article.router)
 app.include_router(links.router)
