@@ -73,7 +73,17 @@ The last command (`ls -l`) should output a result similar to this:
 drwxr-xr-x 2 1001 1001 4096 Mar 17 23:23 user_data_dir
 drwxr-xr-x 2 1001 1001 4096 Mar 17 23:23 user_scripts
 ```
-<b>Important implementation details</b>. Over time, the Scrapper cache will grow, especially if you frequently request screenshots. Currently, there is no automatic data clearing in the cache, so keep an eye on the `user_data_dir/_res` directory if disk space starts to run low.
+
+### Managing Scrapper Cache
+Over time, the Scrapper cache will grow in size, especially if you are making frequent requests with screenshots. The scrapper's cache is stored in the `user_data_dir/_res` directory. You will need to set up automatic clearing of this directory yourself.
+
+For example, you could add the following task to your cron jobs:
+```
+find /path/to/user_data_dir/_res -ctime +7 -delete
+```
+This command will use the `find` utility to locate all files in the cache that were created more than 7 days ago. All such files will be deleted because the `find` utility accepts the `-delete` option.
+
+This is just an example of how you might deal with the scrapper's cache growing over time. You can come up with other strategies for this and implement them yourself. The main thing to remember is where Scrapper stores its cache data - it's in the `user_data_dir/_res`.
 
 ### Using Scrapper
 Once the directories have been created and write permissions have been set, you can run Scrapper using the following command:
