@@ -78,7 +78,7 @@ drwxr-xr-x 2 1001 1001 4096 Mar 17 23:23 user_scripts
 Over time, the Scrapper cache will grow in size, especially if you are making frequent requests with screenshots. The scrapper's cache is stored in the `user_data_dir/_res` directory. You will need to set up automatic clearing of this directory yourself.
 
 For example, you could add the following task to your cron jobs:
-```
+```console
 find /path/to/user_data_dir/_res -ctime +7 -delete
 ```
 This command will use the `find` utility to locate all files in the cache that were created more than 7 days ago. All such files will be deleted because the `find` utility accepts the `-delete` option.
