@@ -6,6 +6,8 @@ from fastapi.requests import Request
 from pydantic import BaseModel
 from playwright.async_api import Browser
 
+from version import revision
+
 
 router = APIRouter(tags=['misc'])
 
@@ -16,6 +18,7 @@ class PingData(BaseModel):
     contexts: Annotated[int, Query(description='number of active browser contexts')]
     isConnected: Annotated[bool, Query(description='indicates that the browser is connected')]
     now: Annotated[datetime.datetime, Query(description='UTC time now')]
+    revision: Annotated[str, Query(description='the scrapper revision')]
 
 
 @router.get('/ping')
@@ -27,5 +30,6 @@ async def ping(request: Request) -> PingData:
         'contexts': len(browser.contexts),
         'isConnected': browser.is_connected(),
         'now': datetime.datetime.utcnow(),
+        'revision': revision,
     }
     return PingData(**r)

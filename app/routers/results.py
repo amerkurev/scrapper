@@ -7,6 +7,7 @@ from fastapi.templating import Jinja2Templates
 
 from internal import cache
 from settings import TEMPLATES_DIR, SCREENSHOT_TYPE
+from version import revision
 
 
 router = APIRouter(tags=['results'])
@@ -22,7 +23,7 @@ async def result_html(
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Not found result with id: {r_id}')
 
-    context = {'request': request, 'data': data}
+    context = {'request': request, 'data': data, 'revision': revision}
     return templates.TemplateResponse('view.html', context=context)
 
 

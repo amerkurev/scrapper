@@ -5,6 +5,9 @@ FROM mcr.microsoft.com/playwright/python:v1.40.0-jammy
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r ./requirements.txt && rm requirements.txt
 
+ARG GIT_BRANCH
+ARG GITHUB_SHA
+
 ARG USER=user
 ARG USER_UID=1001
 ARG USER_HOME=/home/$USER
@@ -31,6 +34,11 @@ USER $USER
 RUN mkdir -p $USER_DATA_DIR $USER_SCRIPTS
 COPY --chown=$USER:$USER app $APP_DIR
 COPY --chown=$USER:$USER tests.sh $USER_HOME
+
+SHELL ["/bin/bash", "-c"]
+RUN \
+    rev=${GIT_BRANCH}-${GITHUB_SHA:0:7}-$(date +%Y%m%dT%H:%M:%S) && \
+    echo "revision = '$rev'" | tee $APP_DIR/version.py
 
 WORKDIR $USER_HOME
 EXPOSE $APP_PORT

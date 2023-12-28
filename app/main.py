@@ -8,6 +8,10 @@ from playwright.async_api import Error as PlaywrightError
 from dependencies import lifespan
 from settings import TEMPLATES_DIR, STATIC_DIR, ICON_PATH
 from routers import article, links, misc, results
+from version import revision
+
+# at startup
+print('revision:', revision)
 
 
 app = FastAPI(
@@ -21,7 +25,7 @@ app = FastAPI(
         'name': 'Apache-2.0 license',
         'url': 'https://github.com/amerkurev/scrapper/blob/master/LICENSE',
     },
-    version='v0.13.0',
+    description=f'revision: {revision}',
     lifespan=lifespan,
 )
 app.mount('/static', StaticFiles(directory=STATIC_DIR), name='static')
@@ -54,6 +58,7 @@ async def root(request: Request):
     )
     context = {
         'request': request,
+        'revision': revision,
         'for_example': '&#10;'.join(for_example),
     }
     return templates.TemplateResponse('index.html', context=context)

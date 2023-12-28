@@ -88,7 +88,8 @@
       <ul>
         <li><small>On <a href="https://hub.docker.com/r/amerkurev/scrapper" class="secondary">Docker Hub</a></small></li>
         <li><small>Submit <a href="https://github.com/amerkurev/scrapper/issues/new" class="secondary">new issue</a></small></li>
-        <li><small>Scrapper is licensed under the <a href="https://github.com/amerkurev/scrapper/blob/master/LICENSE" class="secondary">Apache License 2.0</a></small></li>
+        <li><small><a href="https://github.com/amerkurev/scrapper/blob/master/LICENSE" class="secondary">Apache License 2.0</a></small></li>
+        {% if revision %}<li><small>{{ revision }}</small></li>{% endif %}
       </ul>
     </div>
   </footer>
@@ -99,7 +100,7 @@
     {% else %}
     var apiEndpoint = "/api/article";
     {% endif %}
-  </script>>
+  </script>
   <script src="/static/query.js"></script>
 </body>
 </html>
