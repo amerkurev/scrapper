@@ -21,7 +21,7 @@ docker:
 
 docker-run: docker
 	- @# Using --ipc=host is recommended when using Chrome. Chrome can run out of memory without this flag.
-	- @docker run -it --rm --ipc=host -p 3000:3000 -v $(PWD)/user_data_dir:/home/user/user_data_dir -v $(PWD)/user_scripts:/home/user/user_scripts --name $(BIN) amerkurev/$(BIN):master || true
+	- @docker run -it --rm --ipc=host -p 3000:3000 -v $(PWD)/user_data:/home/user/user_data -v $(PWD)/user_scripts:/home/user/user_scripts --name $(BIN) amerkurev/$(BIN):master || true
 
 docker-test: docker
 	- @docker run -t --rm --name $(BIN) amerkurev/$(BIN):master ./tests.sh

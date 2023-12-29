@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 from fastapi import Query
 from fastapi.exceptions import RequestValidationError
 
-from settings import USER_SCRIPTS
+from settings import USER_SCRIPTS_DIR
 
 
 class WaitUntilEnum(str, Enum):
@@ -34,7 +34,7 @@ class CommonQueryParams:
         cache: Annotated[
             bool,
             Query(
-                description='All results of the parsing process will be cached in the `user_data_dir` directory.<br>'
+                description='All results of the parsing process will be cached in the `user_data` directory.<br>'
                             'Cache can be disabled by setting the cache option to false. In this case, the page will be fetched and parsed every time.<br>'
                             'Cache is enabled by default.<br><br>',
             ),
@@ -96,7 +96,7 @@ class CommonQueryParams:
             if user_scripts:
                 # check if all files exist
                 for script in user_scripts:
-                    if not (USER_SCRIPTS / script).exists():
+                    if not (USER_SCRIPTS_DIR / script).exists():
                         raise query_parsing_error('user_scripts', 'User script not found', script)
                 self.user_scripts = user_scripts
 

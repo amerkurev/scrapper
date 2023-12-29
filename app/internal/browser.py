@@ -7,7 +7,7 @@ from routers.query_params import CommonQueryParams, BrowserQueryParams, ProxyQue
 
 from settings import (
     USER_DATA_DIR,
-    USER_SCRIPTS,
+    USER_SCRIPTS_DIR,
     STEALTH_SCRIPTS_DIR,
     SCREENSHOT_TYPE,
     SCREENSHOT_QUALITY,
@@ -111,7 +111,7 @@ async def page_processing(
     # add user scripts for DOM manipulation
     if params.user_scripts:
         for script in params.user_scripts:
-            await page.add_script_tag(path=USER_SCRIPTS / script)
+            await page.add_script_tag(path=USER_SCRIPTS_DIR / script)
 
     # wait for the given timeout in milliseconds after user scripts were injected.
     if params.user_scripts_timeout:

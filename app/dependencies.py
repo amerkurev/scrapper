@@ -5,7 +5,7 @@ from typing import TypedDict
 from fastapi import FastAPI
 from playwright.async_api import async_playwright, Browser
 
-from settings import USER_SCRIPTS
+from settings import USER_DATA_DIR, USER_SCRIPTS_DIR
 
 
 class State(TypedDict):
@@ -14,8 +14,10 @@ class State(TypedDict):
 
 
 @contextlib.asynccontextmanager
-async def lifespan(app: FastAPI):
-    os.makedirs(USER_SCRIPTS, exist_ok=True)
+async def lifespan(_: FastAPI):
+    os.makedirs(USER_DATA_DIR, exist_ok=True)
+    os.makedirs(USER_SCRIPTS_DIR, exist_ok=True)
+
     async with async_playwright() as playwright:
         firefox = playwright.firefox
         browser = await firefox.launch(headless=True)
