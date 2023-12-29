@@ -42,7 +42,7 @@ async def parse_one_page(
         url = f'{host}/api/article'
         params = {'url': page_url, 'cache': 'no'}
         async with semaphore:
-            resp = await client.get(url, params=params)
+            resp = await client.get(url, params=params, timeout=httpx.Timeout(30.0))
             resp.raise_for_status()
             # data = resp.json()
     except httpx.HTTPStatusError as exc:
@@ -89,7 +89,7 @@ async def supervisor(
                 msg = f'HTTP error {exc.response.status_code}: {exc.response.text}'
                 error = exc
             except httpx.RequestError as exc:
-                msg = f'Request Error: {exc}'
+                msg = f'Request Error: {type(exc).__name__}'
                 error = exc
             except KeyboardInterrupt:
                 break

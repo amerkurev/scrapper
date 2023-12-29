@@ -14,6 +14,10 @@ PARSER_SCRIPTS_DIR = SCRIPTS_DIR / 'parser'
 STEALTH_SCRIPTS_DIR = SCRIPTS_DIR / 'stealth'
 ICON_PATH = STATIC_DIR / 'icons' / 'favicon.ico'
 
-SCREENSHOT_TYPE = 'jpeg'  # png, jpeg
-SCREENSHOT_QUALITY = 80  # 0-100
+BROWSER_CONTEXT_LIMIT = int(os.environ.get('BROWSER_CONTEXT_LIMIT', 20))
+SCREENSHOT_TYPE = os.environ.get('SCREENSHOT_TYPE', 'jpeg')  # jpeg, png
+SCREENSHOT_QUALITY = int(os.environ.get('SCREENSHOT_QUALITY', 80))  # 0-100
 
+assert BROWSER_CONTEXT_LIMIT > 0, 'BROWSER_CONTEXT_LIMIT must be greater than 0'
+assert SCREENSHOT_TYPE in ('jpeg', 'png'), 'SCREENSHOT_TYPE must be jpeg or png'
+assert 0 <= SCREENSHOT_QUALITY <= 100, 'SCREENSHOT_QUALITY must be between 0 and 100'

@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import hashlib
 import tldextract
@@ -84,25 +85,27 @@ async def parser_links(
             return data
 
     browser: Browser = request.state.browser
+    semaphore: asyncio.Semaphore = request.state.semaphore
 
     # create a new browser context
-    async with new_context(browser, browser_params, proxy_params) as context:
-        page = await context.new_page()
-        await page_processing(
-            page=page,
-            url=url.url,
-            params=common_params,
-            browser_params=browser_params,
-        )
-        page_content = await page.content()
-        screenshot = await get_screenshot(page) if common_params.screenshot else None
-        page_url = page.url
-        title = await page.title()
+    async with semaphore:
+        async with new_context(browser, browser_params, proxy_params) as context:
+            page = await context.new_page()
+            await page_processing(
+                page=page,
+                url=url.url,
+                params=common_params,
+                browser_params=browser_params,
+            )
+            page_content = await page.content()
+            screenshot = await get_screenshot(page) if common_params.screenshot else None
+            page_url = page.url
+            title = await page.title()
 
-        # evaluating JavaScript: parse DOM and extract links of articles
-        parser_args = {}
-        with open(PARSER_SCRIPTS_DIR / 'links.js') as fd:
-            links = await page.evaluate(fd.read() % parser_args)
+            # evaluating JavaScript: parse DOM and extract links of articles
+            parser_args = {}
+            with open(PARSER_SCRIPTS_DIR / 'links.js') as fd:
+                links = await page.evaluate(fd.read() % parser_args)
 
     # parser error: links are not extracted, result has 'err' field
     if 'err' in links:

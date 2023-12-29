@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import tldextract
 import validators
@@ -88,30 +89,32 @@ async def parse_article(
             return data
 
     browser: Browser = request.state.browser
+    semaphore: asyncio.Semaphore = request.state.semaphore
 
     # create a new browser context
-    async with new_context(browser, browser_params, proxy_params) as context:
-        page = await context.new_page()
-        await page_processing(
-            page=page,
-            url=url.url,
-            params=common_params,
-            browser_params=browser_params,
-            init_scripts=[READABILITY_SCRIPT],
-        )
-        page_content = await page.content()
-        screenshot = await get_screenshot(page) if common_params.screenshot else None
-        page_url = page.url
+    async with semaphore:
+        async with new_context(browser, browser_params, proxy_params) as context:
+            page = await context.new_page()
+            await page_processing(
+                page=page,
+                url=url.url,
+                params=common_params,
+                browser_params=browser_params,
+                init_scripts=[READABILITY_SCRIPT],
+            )
+            page_content = await page.content()
+            screenshot = await get_screenshot(page) if common_params.screenshot else None
+            page_url = page.url
 
-        # evaluating JavaScript: parse DOM and extract article content
-        parser_args = {
-            # Readability options:
-            'maxElemsToParse': readability_params.max_elems_to_parse,
-            'nbTopCandidates': readability_params.nb_top_candidates,
-            'charThreshold': readability_params.char_threshold,
-        }
-        with open(PARSER_SCRIPTS_DIR / 'article.js') as fd:
-            article = await page.evaluate(fd.read() % parser_args)
+            # evaluating JavaScript: parse DOM and extract article content
+            parser_args = {
+                # Readability options:
+                'maxElemsToParse': readability_params.max_elems_to_parse,
+                'nbTopCandidates': readability_params.nb_top_candidates,
+                'charThreshold': readability_params.char_threshold,
+            }
+            with open(PARSER_SCRIPTS_DIR / 'article.js') as fd:
+                article = await page.evaluate(fd.read() % parser_args)
 
     if article is None:
         raise article_parsing_error(page_url, "The page doesn't contain any articles.")
