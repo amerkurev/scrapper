@@ -143,4 +143,4 @@ async def get_screenshot(page: Page):
         # if the page is too large, take a screenshot of the currently visible viewport
         if 'Cannot take screenshot larger than ' in err.message:
             return await page.screenshot(full_page=False, **kwargs)
-        raise err
+        raise err  # pragma: no cover

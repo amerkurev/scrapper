@@ -6,7 +6,7 @@ from typing import TypedDict
 from fastapi import FastAPI
 from playwright.async_api import async_playwright, Browser
 
-from settings import USER_DATA_DIR, USER_SCRIPTS_DIR, BROWSER_CONTEXT_LIMIT
+from settings import USER_SCRIPTS_DIR, BROWSER_CONTEXT_LIMIT
 
 
 class State(TypedDict):
@@ -16,7 +16,6 @@ class State(TypedDict):
 
 @contextlib.asynccontextmanager
 async def lifespan(_: FastAPI):
-    os.makedirs(USER_DATA_DIR, exist_ok=True)
     os.makedirs(USER_SCRIPTS_DIR, exist_ok=True)
     semaphore = asyncio.Semaphore(BROWSER_CONTEXT_LIMIT)
 

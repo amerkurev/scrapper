@@ -12,7 +12,7 @@ run:
 	- @uvicorn --app-dir app main:app --port 3000
 
 test:
-	- @$(PWD)/tests.sh
+	- @$(PWD)/runtest.sh && coverage html
 
 docker:
 	- @docker buildx build \
@@ -24,6 +24,6 @@ docker-run: docker
 	- @docker run -it --rm --ipc=host -p 3000:3000 -v $(PWD)/user_data:/home/user/user_data -v $(PWD)/user_scripts:/home/user/user_scripts --name $(BIN) amerkurev/$(BIN):master || true
 
 docker-test: docker
-	- @docker run -t --rm --name $(BIN) amerkurev/$(BIN):master ./tests.sh
+	- @docker run -t --rm --name $(BIN) amerkurev/$(BIN):master ./runtest.sh
 
 .PHONY: info run test docker

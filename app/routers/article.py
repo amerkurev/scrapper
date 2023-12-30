@@ -148,7 +148,7 @@ async def parse_article(
     return Article(**article)
 
 
-def article_parsing_error(url: str, msg: str) -> HTTPException:
+def article_parsing_error(url: str, msg: str) -> HTTPException:  # pragma: no cover
     obj = {
         'type': 'article_parsing',
         'loc': ('readability.js',),

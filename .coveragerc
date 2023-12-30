@@ -1,0 +1,8 @@
+[paths]
+source =
+  app
+
+[report]
+exclude_lines =
+  pragma: no cover
+  def __repr__

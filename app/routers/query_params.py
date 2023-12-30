@@ -284,7 +284,7 @@ class BrowserQueryParams:
                     'password': p.password or '',  # same
                 }
             except ValueError:
-                raise query_parsing_error('http_credentials', 'Invalid HTTP credentials', http_credentials)
+                raise query_parsing_error('http_credentials', 'Invalid HTTP credentials', http_credentials)  # pragma: no cover
 
         if extra_http_headers:
             try:

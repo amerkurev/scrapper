@@ -157,7 +157,7 @@ async def parser_links(
     return Links(**r)
 
 
-def links_parsing_error(url: str, msg: str) -> HTTPException:
+def links_parsing_error(url: str, msg: str) -> HTTPException:  # pragma: no cover
     obj = {
         'type': 'links_parsing',
         'loc': ('links.js',),
