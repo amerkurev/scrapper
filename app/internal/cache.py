@@ -21,7 +21,7 @@ def dump_result(data: Any, key: str, screenshot: bytes | None = None) -> None:
         os.makedirs(d, exist_ok=True)
 
     # save result as json
-    with open(path, mode='w') as f:
+    with open(path, mode='w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=True)
 
     # save screenshot
@@ -34,7 +34,7 @@ def load_result(key: str) -> Any | None:
     path = json_location(key)
     if not path.exists():
         return None
-    with open(path, mode='r') as f:
+    with open(path, mode='r', encoding='utf-8') as f:
         return json.load(f)
 
 

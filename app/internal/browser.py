@@ -135,12 +135,12 @@ async def use_stealth_mode(page: Page):
 async def get_screenshot(page: Page):
     # First try to take a screenshot of the full scrollable page,
     # if it fails, take a screenshot of the currently visible viewport.
-    kwargs = dict(type=SCREENSHOT_TYPE, quality=SCREENSHOT_QUALITY)
+    kwargs = {'type': SCREENSHOT_TYPE, 'quality': SCREENSHOT_QUALITY}
     try:
         # try to take a full page screenshot
         return await page.screenshot(full_page=True, **kwargs)
-    except PlaywrightError as err:
+    except PlaywrightError as exc:
         # if the page is too large, take a screenshot of the currently visible viewport
-        if 'Cannot take screenshot larger than ' in err.message:
+        if 'Cannot take screenshot larger than ' in exc.message:
             return await page.screenshot(full_page=False, **kwargs)
-        raise err  # pragma: no cover
+        raise exc  # pragma: no cover

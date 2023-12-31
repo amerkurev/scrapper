@@ -1,9 +1,9 @@
 import asyncio
 import datetime
+from typing import Annotated
+
 import tldextract
 import validators
-
-from typing import Annotated
 
 from fastapi import APIRouter, Query, Depends, status
 from fastapi.requests import Request
@@ -11,6 +11,7 @@ from fastapi.exceptions import HTTPException
 from pydantic import BaseModel
 from playwright.async_api import Browser
 
+from settings import READABILITY_SCRIPT, PARSER_SCRIPTS_DIR
 from internal import cache
 from internal.browser import (
     new_context,
@@ -25,7 +26,6 @@ from .query_params import (
     ProxyQueryParams,
     ReadabilityQueryParams,
 )
-from settings import READABILITY_SCRIPT, PARSER_SCRIPTS_DIR
 
 
 router = APIRouter(prefix='/api/article', tags=['article'])
@@ -78,6 +78,7 @@ async def parse_article(
     proxy_params: Annotated[ProxyQueryParams, Depends()],
     readability_params: Annotated[ReadabilityQueryParams, Depends()],
 ) -> Article:
+    # pylint: disable=duplicate-code
     # split URL into parts: host with scheme, path with query, query params as a dict
     host_url, full_path, query_dict = split_url(request.url)
 
@@ -113,7 +114,7 @@ async def parse_article(
                 'nbTopCandidates': readability_params.nb_top_candidates,
                 'charThreshold': readability_params.char_threshold,
             }
-            with open(PARSER_SCRIPTS_DIR / 'article.js') as fd:
+            with open(PARSER_SCRIPTS_DIR / 'article.js', encoding='utf-8') as fd:
                 article = await page.evaluate(fd.read() % parser_args)
 
     if article is None:

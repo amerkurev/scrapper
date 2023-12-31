@@ -1,3 +1,4 @@
+# pylint: disable=too-many-arguments,too-many-instance-attributes,too-many-locals
 from enum import Enum
 from email.errors import MessageParseError
 from email.parser import Parser as HeaderParser
@@ -11,10 +12,10 @@ from settings import USER_SCRIPTS_DIR
 
 
 class WaitUntilEnum(str, Enum):
-    load = 'load'
-    domcontentloaded = 'domcontentloaded'
-    networkidle = 'networkidle'
-    commit = 'commit'
+    LOAD = 'load'
+    DOMCONTENTLOADED = 'domcontentloaded'
+    NETWORKIDLE = 'networkidle'
+    COMMIT = 'commit'
 
 
 def query_parsing_error(field: str, msg: str, value: Any) -> RequestValidationError:
@@ -34,43 +35,58 @@ class CommonQueryParams:
         cache: Annotated[
             bool,
             Query(
-                description='All results of the parsing process will be cached in the `user_data` directory.<br>'
-                            'Cache can be disabled by setting the cache option to false. In this case, the page will be fetched and parsed every time.<br>'
-                            'Cache is enabled by default.<br><br>',
+                description=(
+                    'All results of the parsing process will be cached in the `user_data` directory.<br>'
+                    'Cache can be disabled by setting the cache option to false. '
+                    'In this case, the page will be fetched and parsed every time.<br>'
+                    'Cache is enabled by default.<br><br>'
+                ),
             ),
         ] = True,
         full_content: Annotated[
             bool,
             Query(
                 alias='full-content',
-                description='If this option is set to true, the result will have the full HTML contents of the page (`fullContent` field in the result).<br><br>',
+                description=(
+                    'If this option is set to true, the result will have the full HTML contents of the page '
+                    '(`fullContent` field in the result).<br><br>'
+                )
             ),
         ] = False,
         stealth: Annotated[
             bool,
             Query(
-                description='Stealth mode allows you to bypass anti-scraping techniques. It is disabled by default.<br>'
-                            'Mostly taken from [https://github.com/berstend/puppeteer-extra/tree/master/packages/puppeteer-extra-plugin-stealth/evasions](https://github.com/berstend/puppeteer-extra/tree/master/packages/puppeteer-extra-plugin-stealth/evasions)<br><br>',
+                description=(
+                    'Stealth mode allows you to bypass anti-scraping techniques. It is disabled by default.<br>Mostly taken from '
+                    '[https://github.com/berstend/puppeteer-extra/tree/master/packages/puppeteer-extra-plugin-stealth/evasions]'
+                    '(https://github.com/berstend/puppeteer-extra/tree/master/packages/puppeteer-extra-plugin-stealth/evasions)<br><br>'
+                )
             ),
         ] = False,
         screenshot: Annotated[
             bool,
             Query(
-                description='If this option is set to true, the result will have the link to the screenshot of the page (`screenshot` field in the result).<br>'
-                            'Important implementation details: Initially, Scrapper attempts to take a screenshot of the entire scrollable page.<br>'
-                            'If it fails because the image is too large, it will only capture the currently visible viewport.<br><br>',
+                description=(
+                    'If this option is set to true, the result will have the link to the screenshot of the page '
+                    '(`screenshot` field in the result).<br>'
+                    'Important implementation details: Initially, Scrapper attempts to take a screenshot of the entire scrollable page.<br>'
+                    'If it fails because the image is too large, it will only capture the currently visible viewport.<br><br>'
+                )
             ),
         ] = False,
         user_scripts: Annotated[
             str | None,
             Query(
                 alias='user-scripts',
-                description='To use your JavaScript scripts on a webpage, put your script files into the `user_scripts` directory. '
-                            'Then, list the scripts you need in the `user-scripts` parameter, separating them with commas. '
-                            'These scripts will run after the page loads but before the article parser starts. '
-                            'This means you can use these scripts to do things like remove ad blocks or automatically click the cookie acceptance button. '
-                            'Keep in mind, script names cannot include commas, as they are used for separation.<br>For example, you might pass `remove-ads.js, click-cookie-accept-button.js`.<br><br>'
-                            'If you plan to run asynchronous long-running scripts, check `user-scripts-timeout` parameter.'
+                description=(
+                    'To use your JavaScript scripts on a webpage, put your script files into the `user_scripts` directory. '
+                    'Then, list the scripts you need in the `user-scripts` parameter, separating them with commas. '
+                    'These scripts will run after the page loads but before the article parser starts. This means you can use these scripts'
+                    ' to do things like remove ad blocks or automatically click the cookie acceptance button. '
+                    'Keep in mind, script names cannot include commas, as they are used for separation.<br>'
+                    'For example, you might pass `remove-ads.js, click-cookie-accept-button.js`.<br><br>'
+                    'If you plan to run asynchronous long-running scripts, check `user-scripts-timeout` parameter.'
+                ),
             ),
         ] = None,
         user_scripts_timeout: Annotated[
@@ -108,7 +124,8 @@ class BrowserQueryParams:
         incognito: Annotated[
             bool,
             Query(
-                description="Allows creating `incognito` browser contexts. Incognito browser contexts don't write any browsing data to disk.<br><br>",
+                description="Allows creating `incognito` browser contexts. "
+                            "Incognito browser contexts don't write any browsing data to disk.<br><br>",
             ),
         ] = True,
         timeout: Annotated[
@@ -123,15 +140,17 @@ class BrowserQueryParams:
             WaitUntilEnum,
             Query(
                 alias='wait-until',
-                description='When to consider navigation succeeded, defaults to `domcontentloaded`. Events can be either:<br>'
-                            '`load` - consider operation to be finished when the `load` event is fired.<br>'
-                            '`domcontentloaded` - consider operation to be finished when the DOMContentLoaded event is fired.<br>'
-                            '`networkidle` -  consider operation to be finished when there are no network connections for at least 500 ms.<br>'
-                            '`commit` - consider operation to be finished when network response is received and the document started loading.<br>'
-                            'See for details: [https://playwright.dev/python/docs/navigations](https://playwright.dev/python/docs/navigations#navigation-lifecycle)<br><br>',
-
+                description=(
+                    'When to consider navigation succeeded, defaults to `domcontentloaded`. Events can be either:<br>'
+                    '`load` - consider operation to be finished when the `load` event is fired.<br>'
+                    '`domcontentloaded` - consider operation to be finished when the DOMContentLoaded event is fired.<br>'
+                    '`networkidle` -  consider operation to be finished when there are no network connections for at least 500 ms.<br>'
+                    '`commit` - consider operation to be finished when network response is received and the document started loading.<br>'
+                    'See for details: [https://playwright.dev/python/docs/navigations]'
+                    '(https://playwright.dev/python/docs/navigations#navigation-lifecycle)<br><br>'
+                )
             ),
-        ] = WaitUntilEnum.domcontentloaded,
+        ] = WaitUntilEnum.DOMCONTENTLOADED,
         sleep: Annotated[
             int,
             Query(
@@ -184,7 +203,8 @@ class BrowserQueryParams:
             int,
             Query(
                 alias='screen-width',
-                description='Emulates consistent window screen size available inside web page via window.screen. Is only used when the viewport is set.<br>'
+                description='Emulates consistent window screen size available inside web page via window.screen. '
+                            'Is only used when the viewport is set.<br>'
                             'The page width in pixels. Defaults to 828 (iPhone 11 Resolution).<br><br>',
                 ge=1,
             ),
@@ -193,7 +213,8 @@ class BrowserQueryParams:
             int,
             Query(
                 alias='screen-height',
-                description='Emulates consistent window screen size available inside web page via window.screen. Is only used when the viewport is set.<br>'
+                description='Emulates consistent window screen size available inside web page via window.screen. '
+                            'Is only used when the viewport is set.<br>'
                             'The page height in pixels. Defaults to 1792 (iPhone 11 Resolution).<br><br>',
                 ge=1,
             ),
@@ -202,10 +223,13 @@ class BrowserQueryParams:
             int,
             Query(
                 alias='scroll-down',
-                description='Scroll down the page by a specified number of pixels.<br>'
-                            'This is particularly useful when dealing with lazy-loading pages (pages that are loaded only as you scroll down).<br>'
-                            'This parameter is used in conjunction with the `sleep` parameter.<br>'
-                            "Make sure to set a positive value for the `sleep` parameter, otherwise, the scroll function won't work.<br><br>",
+                description=(
+                    'Scroll down the page by a specified number of pixels.<br>'
+                    'This is particularly useful when dealing with lazy-loading pages '
+                    '(pages that are loaded only as you scroll down).<br>'
+                    'This parameter is used in conjunction with the `sleep` parameter.<br>'
+                    "Make sure to set a positive value for the `sleep` parameter, otherwise, the scroll function won't work.<br><br>"
+                ),
                 ge=0,
             ),
         ] = 0,
@@ -229,7 +253,8 @@ class BrowserQueryParams:
             str | None,
             Query(
                 description='Specify user locale, for example en-GB, de-DE, etc.<br>'
-                            'Locale will affect navigator.language value, Accept-Language request header value as well as number and date formatting rules.',
+                            'Locale will affect navigator.language value, '
+                            'Accept-Language request header value as well as number and date formatting rules.',
             ),
         ] = None,
         timezone: Annotated[
@@ -242,14 +267,16 @@ class BrowserQueryParams:
             str | None,
             Query(
                 alias='http-credentials',
-                description='Credentials for HTTP authentication (string containing username and password separated by a colon, e.g. `username:password`).',
+                description='Credentials for HTTP authentication '
+                            '(string containing username and password separated by a colon, e.g. `username:password`).',
             ),
         ] = None,
         extra_http_headers: Annotated[
             list | None,
             Query(
                 alias='extra-http-headers',
-                description='Contains additional HTTP headers to be sent with every request. Example: `X-API-Key:123456;X-Auth-Token:abcdef`.',
+                description='Contains additional HTTP headers to be sent with every request. '
+                            'Example: `X-API-Key:123456;X-Auth-Token:abcdef`.',
             ),
         ] = None,
     ):
@@ -283,8 +310,8 @@ class BrowserQueryParams:
                     'username': p.username or '',  # expected only string, not None
                     'password': p.password or '',  # same
                 }
-            except ValueError:
-                raise query_parsing_error('http_credentials', 'Invalid HTTP credentials', http_credentials)  # pragma: no cover
+            except ValueError as exc:
+                raise query_parsing_error('http_credentials', 'Invalid HTTP credentials', http_credentials) from exc  # pragma: no cover
 
         if extra_http_headers:
             try:
@@ -293,8 +320,8 @@ class BrowserQueryParams:
                 # check if headers were parsed correctly
                 if not self.extra_http_headers:
                     raise MessageParseError()
-            except MessageParseError:
-                raise query_parsing_error('extra_http_headers', 'Invalid HTTP header', extra_http_headers)
+            except MessageParseError as exc:
+                raise query_parsing_error('extra_http_headers', 'Invalid HTTP header', extra_http_headers) from exc
 
 
 class ProxyQueryParams:

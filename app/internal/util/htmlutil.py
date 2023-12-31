@@ -3,8 +3,8 @@ from collections.abc import MutableMapping
 from bs4 import BeautifulSoup
 
 
-title_max_distance = 350
-acceptable_link_text_len = 40
+TITLE_MAX_DISTANCE = 350
+ACCEPTABLE_LINK_TEXT_LEN = 40
 
 
 def improve_content(title: str, content: str) -> str:
@@ -37,7 +37,7 @@ def improve_content(title: str, content: str) -> str:
 
         # stop if distance is too big
         title_distance += len(el.text)
-        if title_distance > title_max_distance:
+        if title_distance > TITLE_MAX_DISTANCE:
             # will be used article['title'] as title
             break
 
@@ -60,7 +60,7 @@ def improve_link(link: MutableMapping) -> MutableMapping:
         if len(line) > len(text):
             text = line
         # stop if the line is long enough
-        if len(text) > acceptable_link_text_len:
+        if len(text) > ACCEPTABLE_LINK_TEXT_LEN:
             break
 
     link['text'] = text

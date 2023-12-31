@@ -28,7 +28,7 @@ async def result_html(
 
 
 @router.get('/result/{r_id}', include_in_schema=False)
-async def result_html(
+async def result_json(
     r_id: Annotated[str, Path(title='Result ID', description='Unique result ID')],
 ):
     data = cache.load_result(key=r_id)

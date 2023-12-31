@@ -70,7 +70,7 @@ def test_various_query_params():
         assert response.text == 'PlaywrightError: NS_ERROR_UNKNOWN_PROXY_HOST'
 
         # test user scripts
-        with open(USER_SCRIPTS_DIR / 'my-script.js', 'w') as f:
+        with open(USER_SCRIPTS_DIR / 'my-script.js', mode='w', encoding='utf-8') as f:
             f.write('console.log("Hello world!");')
 
         url = 'https://en.wikipedia.org/wiki/World_Wide_Web'

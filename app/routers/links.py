@@ -1,13 +1,14 @@
 import asyncio
 import datetime
 import hashlib
-import tldextract
-import validators
 
 from operator import itemgetter
 from statistics import median
 
 from typing import Annotated, Mapping, Sequence
+
+import tldextract
+import validators
 
 from fastapi import APIRouter, Query, Depends, status
 from fastapi.requests import Request
@@ -15,6 +16,7 @@ from fastapi.exceptions import HTTPException
 from pydantic import BaseModel
 from playwright.async_api import Browser
 
+from settings import PARSER_SCRIPTS_DIR
 from internal import cache
 from internal.browser import (
     new_context,
@@ -29,7 +31,6 @@ from .query_params import (
     ProxyQueryParams,
     LinkParserQueryParams,
 )
-from settings import PARSER_SCRIPTS_DIR
 
 
 router = APIRouter(prefix='/api/links', tags=['links'])
@@ -55,7 +56,8 @@ class URLParam:
         url: Annotated[
             str,
             Query(
-                description='Page URL. The page should contain hyperlinks to news articles. For example, this could be the main page of a website.<br><br>',
+                description='Page URL. The page should contain hyperlinks to news articles. '
+                            'For example, this could be the main page of a website.<br><br>',
                 examples=['http://example.com/'],
             ),
         ],
@@ -104,7 +106,7 @@ async def parser_links(
 
             # evaluating JavaScript: parse DOM and extract links of articles
             parser_args = {}
-            with open(PARSER_SCRIPTS_DIR / 'links.js') as fd:
+            with open(PARSER_SCRIPTS_DIR / 'links.js', encoding='utf-8') as fd:
                 links = await page.evaluate(fd.read() % parser_args)
 
     # parser error: links are not extracted, result has 'err' field
@@ -120,7 +122,7 @@ async def parser_links(
     # get stat for groups of links and filter groups with
     # median length of text and words more than 40 and 3
     links = []
-    for key, group in links_dict.items():
+    for _, group in links_dict.items():
         stat = get_stat(
             group,
             text_len_threshold=link_parser_params.text_len_threshold,

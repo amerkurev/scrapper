@@ -7,4 +7,3 @@ def test_levenshtein_similarity():
     assert levenshtein_similarity('hello', 'hell') == 0.8
     assert levenshtein_similarity('hello', 'helo') == 0.8
     assert levenshtein_similarity('hello', 'buy') == 0.0
-
