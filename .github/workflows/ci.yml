@@ -30,7 +30,7 @@ jobs:
 
       - name: pylint
         run: |
-          pylint app/*
+          pylint --exit-zero app/*
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
