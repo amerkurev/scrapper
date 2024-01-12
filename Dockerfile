@@ -5,6 +5,14 @@ FROM mcr.microsoft.com/playwright/python:v1.40.0-jammy
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r ./requirements.txt && rm requirements.txt
 
+LABEL org.opencontainers.image.title=Scrapper
+LABEL org.opencontainers.image.description="Web scraper with a simple REST API living in Docker and using a Headless browser and Readability.js for parsing."
+LABEL org.opencontainers.image.url=https://scrapper.dev
+LABEL org.opencontainers.image.documentation="https://github.com/amerkurev/scrapper#usage"
+LABEL org.opencontainers.image.vendor="amerkurev"
+LABEL org.opencontainers.image.licenses=Apache-2.0
+LABEL org.opencontainers.image.source="https://github.com/amerkurev/scrapper"
+
 ARG GIT_BRANCH
 ARG GITHUB_SHA
 
