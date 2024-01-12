@@ -238,7 +238,7 @@ Caddy handles SSL certificate issuance and renewal through Let's Encrypt and sup
 
 To configure Caddy with Scrapper:
 
-1. **Customize the [Caddyfile](Caddyfile)**: Update `scrapper.localhost` to your domain name. For Basic Authentication, generate a secure hashed password with `caddy hash-password` and update the [Caddyfile](Caddyfile) with this hash.
+1. **Customize the [Caddyfile](Caddyfile)**: Update `scrapper.localhost` to your domain name. For Basic Authentication, generate a secure hashed password with [`caddy hash-password`](https://caddyserver.com/docs/command-line#caddy-hash-password) and update the Caddyfile with this hash.
 
    To generate a password hash:
    ```console
