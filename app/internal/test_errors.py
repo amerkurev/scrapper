@@ -1,14 +1,13 @@
-from .errors import (
-    ArticleParsingError,
-    LinksParsingError,
-    QueryParsingError,
-)
+from fastapi.exceptions import HTTPException, RequestValidationError
+
+from .errors import ArticleParsingError, LinksParsingError, QueryParsingError
 
 
 def test_errors():
     page_url = 'https://example.com'
     msg = "The page doesn't contain any articles."
     err = ArticleParsingError(page_url, msg)
+    assert isinstance(err, HTTPException)
     assert err.status_code == 400
     assert err.detail == [
         {
@@ -21,6 +20,7 @@ def test_errors():
 
     msg = "The page doesn't contain any links."
     err = LinksParsingError(page_url, msg)
+    assert isinstance(err, HTTPException)
     assert err.status_code == 400
     assert err.detail == [
         {
@@ -35,6 +35,7 @@ def test_errors():
     msg = 'Invalid URL'
     value = 'example.com'
     err = QueryParsingError(field, msg, value)
+    assert isinstance(err, RequestValidationError)
     assert err.errors() == [
         {
             'type': f'{field}_parsing',
@@ -48,6 +49,7 @@ def test_errors():
     msg = 'Invalid HTTP credentials'
     value = {'username': 'user', 'password': 'pass'}
     err = QueryParsingError(field, msg, value)
+    assert isinstance(err, RequestValidationError)
     assert err.errors() == [
         {
             'type': f'{field}_parsing',
