@@ -5,6 +5,8 @@ from email.parser import Parser as HeaderParser
 from typing import Annotated
 from urllib.parse import urlparse
 
+import validators
+
 from fastapi import Query
 
 from internal.errors import QueryParsingError
@@ -16,6 +18,21 @@ class WaitUntilEnum(str, Enum):
     DOMCONTENTLOADED = 'domcontentloaded'
     NETWORKIDLE = 'networkidle'
     COMMIT = 'commit'
+
+
+class URLParam:
+    def __init__(
+        self,
+        url: Annotated[
+            str,
+            Query(
+                description='Page URL.<br><br>',
+            )
+        ],
+    ):
+        if validators.url(url) is not True:
+            raise QueryParsingError('url', 'Invalid URL', url)
+        self.url = url
 
 
 class CommonQueryParams:

@@ -8,7 +8,6 @@ from statistics import median
 from typing import Annotated, Mapping, Sequence
 
 import tldextract
-import validators
 
 from fastapi import APIRouter, Query, Depends
 from fastapi.requests import Request
@@ -23,8 +22,9 @@ from internal.browser import (
     get_screenshot,
 )
 from internal.util import htmlutil, split_url
-from internal.errors import LinksParsingError, QueryParsingError
+from internal.errors import LinksParsingError
 from .query_params import (
+    URLParam,
     CommonQueryParams,
     BrowserQueryParams,
     ProxyQueryParams,
@@ -49,24 +49,7 @@ class Links(BaseModel):
     links: Annotated[list[dict], Query(description='list of links')]
 
 
-class URLParam:
-    def __init__(
-        self,
-        url: Annotated[
-            str,
-            Query(
-                description='Page URL. The page should contain hyperlinks to news articles. '
-                            'For example, this could be the main page of a website.<br><br>',
-                examples=['http://example.com/'],
-            ),
-        ],
-    ):
-        if validators.url(url) is not True:
-            raise QueryParsingError('url', 'Invalid URL', url)
-        self.url = url
-
-
-@router.get('')
+@router.get('', summary='Parse news links from the given URL', response_model=Links)
 async def parser_links(
     request: Request,
     url: Annotated[URLParam, Depends()],
@@ -74,7 +57,11 @@ async def parser_links(
     browser_params: Annotated[BrowserQueryParams, Depends()],
     proxy_params: Annotated[ProxyQueryParams, Depends()],
     link_parser_params: Annotated[LinkParserQueryParams, Depends()],
-) -> Links:
+) -> dict:
+    """
+    Parse news links from the given URL.<br><br>
+    The page from the URL should contain hyperlinks to news articles. For example, this could be the main page of a website.
+    """
     # split URL into parts: host with scheme, path with query, query params as a dict
     host_url, full_path, query_dict = split_url(request.url)
 
@@ -155,7 +142,7 @@ async def parser_links(
 
     # save result to disk
     cache.dump_result(r, key=r_id, screenshot=screenshot)
-    return Links(**r)
+    return r
 
 
 def allowed_domain(href: str, domain: str) -> bool:

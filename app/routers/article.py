@@ -3,7 +3,6 @@ import datetime
 from typing import Annotated
 
 import tldextract
-import validators
 
 from fastapi import APIRouter, Query, Depends
 from fastapi.requests import Request
@@ -18,8 +17,9 @@ from internal.browser import (
     get_screenshot,
 )
 from internal.util import htmlutil, split_url
-from internal.errors import ArticleParsingError, QueryParsingError
+from internal.errors import ArticleParsingError
 from .query_params import (
+    URLParam,
     CommonQueryParams,
     BrowserQueryParams,
     ProxyQueryParams,
@@ -52,23 +52,7 @@ class Article(BaseModel):
     publishedTime: Annotated[str | None, Query(description='article publication time')]
 
 
-class URLParam:
-    def __init__(
-        self,
-        url: Annotated[
-            str,
-            Query(
-                description='Page URL. The page should contain the text of the article that needs to be extracted.<br><br>',
-                examples=['http://example.com/article.html'],
-            ),
-        ],
-    ):
-        if validators.url(url) is not True:
-            raise QueryParsingError('url', 'Invalid URL', url)
-        self.url = url
-
-
-@router.get('')
+@router.get('', summary='Parse article from the given URL', response_model=Article)
 async def parse_article(
     request: Request,
     url: Annotated[URLParam, Depends()],
@@ -76,7 +60,11 @@ async def parse_article(
     browser_params: Annotated[BrowserQueryParams, Depends()],
     proxy_params: Annotated[ProxyQueryParams, Depends()],
     readability_params: Annotated[ReadabilityQueryParams, Depends()],
-) -> Article:
+) -> dict:
+    """
+    Parse article from the given URL.<br><br>
+    The page from the URL should contain the text of the article that needs to be extracted.
+    """
     # pylint: disable=duplicate-code
     # split URL into parts: host with scheme, path with query, query params as a dict
     host_url, full_path, query_dict = split_url(request.url)
@@ -145,4 +133,4 @@ async def parse_article(
 
     # save result to disk
     cache.dump_result(article, key=r_id, screenshot=screenshot)
-    return Article(**article)
+    return article
