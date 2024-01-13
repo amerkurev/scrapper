@@ -15,6 +15,12 @@ def test_get_links():
     _get_result(api_url, url)
 
 
+def test_get_any_page():
+    api_url = '/api/page'
+    url = 'https://en.wikipedia.org/wiki/Robots.txt'
+    _get_result(api_url, url)
+
+
 def _get_result(api_url: str, url: str):
     with TestClient(app) as client:
         # empty url
