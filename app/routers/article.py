@@ -5,9 +5,8 @@ from typing import Annotated
 import tldextract
 import validators
 
-from fastapi import APIRouter, Query, Depends, status
+from fastapi import APIRouter, Query, Depends
 from fastapi.requests import Request
-from fastapi.exceptions import HTTPException
 from pydantic import BaseModel
 from playwright.async_api import Browser
 
@@ -19,8 +18,8 @@ from internal.browser import (
     get_screenshot,
 )
 from internal.util import htmlutil, split_url
+from internal.errors import ArticleParsingError, QueryParsingError
 from .query_params import (
-    query_parsing_error,
     CommonQueryParams,
     BrowserQueryParams,
     ProxyQueryParams,
@@ -65,7 +64,7 @@ class URLParam:
         ],
     ):
         if validators.url(url) is not True:
-            raise query_parsing_error('url', 'Invalid URL', url)
+            raise QueryParsingError('url', 'Invalid URL', url)
         self.url = url
 
 
@@ -118,11 +117,11 @@ async def parse_article(
                 article = await page.evaluate(fd.read() % parser_args)
 
     if article is None:
-        raise article_parsing_error(page_url, "The page doesn't contain any articles.")
+        raise ArticleParsingError(page_url, "The page doesn't contain any articles.")  # pragma: no cover
 
     # parser error: article is not extracted, result has 'err' field
     if 'err' in article:
-        raise article_parsing_error(page_url, article['err'])
+        raise ArticleParsingError(page_url, article['err'])  # pragma: no cover
 
     # set common fields
     article['id'] = r_id
@@ -147,16 +146,3 @@ async def parse_article(
     # save result to disk
     cache.dump_result(article, key=r_id, screenshot=screenshot)
     return Article(**article)
-
-
-def article_parsing_error(url: str, msg: str) -> HTTPException:  # pragma: no cover
-    obj = {
-        'type': 'article_parsing',
-        'loc': ('readability.js',),
-        'msg': msg,
-        'input': url,
-    }
-    return HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail=[obj]
-    )

@@ -10,9 +10,8 @@ from typing import Annotated, Mapping, Sequence
 import tldextract
 import validators
 
-from fastapi import APIRouter, Query, Depends, status
+from fastapi import APIRouter, Query, Depends
 from fastapi.requests import Request
-from fastapi.exceptions import HTTPException
 from pydantic import BaseModel
 from playwright.async_api import Browser
 
@@ -24,8 +23,8 @@ from internal.browser import (
     get_screenshot,
 )
 from internal.util import htmlutil, split_url
+from internal.errors import LinksParsingError, QueryParsingError
 from .query_params import (
-    query_parsing_error,
     CommonQueryParams,
     BrowserQueryParams,
     ProxyQueryParams,
@@ -63,7 +62,7 @@ class URLParam:
         ],
     ):
         if validators.url(url) is not True:
-            raise query_parsing_error('url', 'Invalid URL', url)
+            raise QueryParsingError('url', 'Invalid URL', url)
         self.url = url
 
 
@@ -111,7 +110,7 @@ async def parser_links(
 
     # parser error: links are not extracted, result has 'err' field
     if 'err' in links:
-        raise links_parsing_error(page_url, links['err'])
+        raise LinksParsingError(page_url, links['err'])  # pragma: no cover
 
     # filter links by domain
     domain = tldextract.extract(url.url).domain
@@ -157,19 +156,6 @@ async def parser_links(
     # save result to disk
     cache.dump_result(r, key=r_id, screenshot=screenshot)
     return Links(**r)
-
-
-def links_parsing_error(url: str, msg: str) -> HTTPException:  # pragma: no cover
-    obj = {
-        'type': 'links_parsing',
-        'loc': ('links.js',),
-        'msg': msg,
-        'input': url,
-    }
-    return HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail=[obj]
-    )
 
 
 def allowed_domain(href: str, domain: str) -> bool:

@@ -21,7 +21,10 @@ async def result_html(
 ):
     data = cache.load_result(key=r_id)
     if not data:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Not found result with id: {r_id}')
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'Not found result with id: {r_id}'
+        )
 
     context = {'request': request, 'data': data, 'revision': revision}
     return templates.TemplateResponse('view.html', context=context)
@@ -33,7 +36,10 @@ async def result_json(
 ):
     data = cache.load_result(key=r_id)
     if not data:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Not found result with id: {r_id}')
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'Not found result with id: {r_id}'
+        )
     return data
 
 
@@ -43,5 +49,8 @@ async def result_screenshot(
 ):
     path = cache.screenshot_location(r_id)
     if not path.exists():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Not found result with id: {r_id}')
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'Not found result with id: {r_id}'
+        )
     return FileResponse(path, media_type=f'image/{SCREENSHOT_TYPE}')

@@ -2,12 +2,12 @@
 from enum import Enum
 from email.errors import MessageParseError
 from email.parser import Parser as HeaderParser
-from typing import Any, Annotated
+from typing import Annotated
 from urllib.parse import urlparse
 
 from fastapi import Query
-from fastapi.exceptions import RequestValidationError
 
+from internal.errors import QueryParsingError
 from settings import USER_SCRIPTS_DIR
 
 
@@ -16,16 +16,6 @@ class WaitUntilEnum(str, Enum):
     DOMCONTENTLOADED = 'domcontentloaded'
     NETWORKIDLE = 'networkidle'
     COMMIT = 'commit'
-
-
-def query_parsing_error(field: str, msg: str, value: Any) -> RequestValidationError:
-    obj = {
-        'type': f'{field}_parsing',
-        'loc': ('query', field),
-        'msg': msg,
-        'input': value,
-    }
-    return RequestValidationError([obj])
 
 
 class CommonQueryParams:
@@ -113,7 +103,7 @@ class CommonQueryParams:
                 # check if all files exist
                 for script in user_scripts:
                     if not (USER_SCRIPTS_DIR / script).exists():
-                        raise query_parsing_error('user_scripts', 'User script not found', script)
+                        raise QueryParsingError('user_scripts', 'User script not found', script)
                 self.user_scripts = user_scripts
 
 
@@ -310,8 +300,8 @@ class BrowserQueryParams:
                     'username': p.username or '',  # expected only string, not None
                     'password': p.password or '',  # same
                 }
-            except ValueError as exc:
-                raise query_parsing_error('http_credentials', 'Invalid HTTP credentials', http_credentials) from exc  # pragma: no cover
+            except ValueError as exc:  # pragma: no cover
+                raise QueryParsingError('http_credentials', 'Invalid HTTP credentials', http_credentials) from exc
 
         if extra_http_headers:
             try:
@@ -321,7 +311,7 @@ class BrowserQueryParams:
                 if not self.extra_http_headers:
                     raise MessageParseError()
             except MessageParseError as exc:
-                raise query_parsing_error('extra_http_headers', 'Invalid HTTP header', extra_http_headers) from exc
+                raise QueryParsingError('extra_http_headers', 'Invalid HTTP header', extra_http_headers) from exc
 
 
 class ProxyQueryParams:
