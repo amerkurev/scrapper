@@ -103,6 +103,37 @@ def test_various_query_params():
             'url': 'https://en.wikipedia.org/wiki/African_humid_period',
             'cache': False,
             'screenshot': True,
+            'device': 'Desktop Firefox',  # to raise (Page.screenshot): Cannot take screenshot larger than 32767
         }
         response = client.get(api_url, params=params)
         assert response.status_code == 200
+
+        # test viewport and screen settings
+        url = 'https://en.wikipedia.org/wiki/World_Wide_Web'
+        params = {
+            'url': url,
+            'cache': False,
+            'viewport-width': 390,
+            'viewport-height': 844,
+            'screen-width': 1170,
+            'screen-height': 2532,
+            'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_4 like Mac OS X) '
+        }
+        response = client.get(api_url, params=params)
+        assert response.status_code == 200
+
+        # test wrong device name
+        params = {
+            'url': url,
+            'device': 'not-exists',
+        }
+        response = client.get(api_url, params=params)
+        assert response.status_code == 422
+        assert response.json() == {
+            'detail': [{
+                'input': 'not-exists',
+                'loc': ['query', 'device'],
+                'msg': 'Device not found',
+                'type': 'device_parsing',
+            }]
+        }

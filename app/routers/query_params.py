@@ -234,7 +234,8 @@ class BrowserQueryParams:
                     'and whether it has touch enabled.<br>Individual parameters like `user-agent`, `viewport-width`, and `viewport-height` '
                     'can also be used; in such cases, they will override the `device` settings.<br>'
                     'List of [available devices]'
-                    '(https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json).<br><br>'
+                    '(https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json).'
+                    '<br><br>'
                 ),
             ),
         ] = 'iPhone 12',

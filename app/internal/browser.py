@@ -31,6 +31,7 @@ async def new_context(
 
     # PlaywrightError: options.isMobile is not supported in Firefox
     del options['is_mobile']
+    del options['default_browser_type']
 
     options |= {
         'bypass_csp': True,
