@@ -101,8 +101,8 @@ async def parse_article(
                 'nbTopCandidates': readability_params.nb_top_candidates,
                 'charThreshold': readability_params.char_threshold,
             }
-            with open(PARSER_SCRIPTS_DIR / 'article.js', encoding='utf-8') as fd:
-                article = await page.evaluate(fd.read() % parser_args)
+            with open(PARSER_SCRIPTS_DIR / 'article.js', encoding='utf-8') as f:
+                article = await page.evaluate(f.read() % parser_args)
 
     if article is None:
         raise ArticleParsingError(page_url, "The page doesn't contain any articles.")  # pragma: no cover

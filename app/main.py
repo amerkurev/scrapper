@@ -54,8 +54,7 @@ async def root(request: Request):
         'timeout=60000',
         'wait-until=domcontentloaded',
         'sleep=0',
-        'viewport-width=414',
-        'viewport-height=896',
+        'device=iPhone 12',
     )
     context = {
         'request': request,

@@ -1,4 +1,5 @@
 import contextlib
+import copy
 from collections.abc import Sequence
 
 from playwright.async_api import Browser, BrowserContext, Page, Route
@@ -11,7 +12,12 @@ from settings import (
     STEALTH_SCRIPTS_DIR,
     SCREENSHOT_TYPE,
     SCREENSHOT_QUALITY,
+    DEVICE_REGISTRY,
 )
+
+
+def get_device(device: str) -> dict:
+    return copy.deepcopy(DEVICE_REGISTRY[device])
 
 
 @contextlib.asynccontextmanager
@@ -20,47 +26,59 @@ async def new_context(
     params: BrowserQueryParams,
     proxy: ProxyQueryParams,
 ) -> BrowserContext:
-    # https://playwright.dev/python/docs/api/class-browser#browser-new-context
-    browser_args = {
+    # https://playwright.dev/python/docs/emulation
+    options = get_device(params.device)
+
+    # PlaywrightError: options.isMobile is not supported in Firefox
+    del options['is_mobile']
+
+    options |= {
         'bypass_csp': True,
-        'viewport': {
-            'width': params.viewport_width,
-            'height': params.viewport_height,
-        },
-        'screen': {
-            'width': params.screen_width,
-            'height': params.screen_height,
-        },
         'ignore_https_errors': params.ignore_https_errors,
-        'user_agent': params.user_agent,
         'locale': params.locale,
         'timezone_id': params.timezone,
         'http_credentials': params.http_credentials,
         'extra_http_headers': params.extra_http_headers,
     }
+
+    # viewport and screen settings:
+    if params.viewport_width:
+        options['viewport']['width'] = params.viewport_width
+    if params.viewport_height:
+        options['viewport']['height'] = params.viewport_height
+    if params.screen_width:
+        options['screen']['width'] = params.screen_width
+    if params.screen_height:
+        options['screen']['height'] = params.screen_height
+
+    # user agent settings:
+    if params.user_agent:
+        options['user_agent'] = params.user_agent
+
     # proxy settings:
     if proxy.proxy_server:
-        browser_args['proxy'] = {
+        options['proxy'] = {
             'server': proxy.proxy_server,
         }
         if proxy.proxy_username:
-            browser_args['proxy']['username'] = proxy.proxy_username
+            options['proxy']['username'] = proxy.proxy_username
         if proxy.proxy_password:
-            browser_args['proxy']['password'] = proxy.proxy_password
+            options['proxy']['password'] = proxy.proxy_password
         if proxy.proxy_bypass:
-            browser_args['proxy']['bypass'] = proxy.proxy_bypass
+            options['proxy']['bypass'] = proxy.proxy_bypass
 
+    # https://playwright.dev/python/docs/api/class-browser#browser-new-context
     if params.incognito:
         # create a new incognito browser context
         # (more efficient way, because it doesn't create a new browser instance)
-        context = await browser.new_context(**browser_args)
+        context = await browser.new_context(**options)
     else:
         # create a persistent browser context
         # (less efficient way, because it creates a new browser instance)
         context = await browser.browser_type.launch_persistent_context(
             headless=True,
             user_data_dir=USER_DATA_DIR,
-            **browser_args,
+            **options,
         )
     try:
         yield context

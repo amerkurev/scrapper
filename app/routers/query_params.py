@@ -10,7 +10,7 @@ import validators
 from fastapi import Query
 
 from internal.errors import QueryParsingError
-from settings import USER_SCRIPTS_DIR
+from settings import USER_SCRIPTS_DIR, DEVICE_REGISTRY
 
 
 class WaitUntilEnum(str, Enum):
@@ -191,41 +191,53 @@ class BrowserQueryParams:
             ),
         ] = None,
         viewport_width: Annotated[
-            int,
+            int | None,
             Query(
                 alias='viewport-width',
-                description='The viewport width in pixels. The default value is 414 (iPhone 11 Viewport).<br><br>',
+                description='The viewport width in pixels. '
+                            "It's better to use the `device` parameter instead of specifying it explicitly.<br><br>",
                 ge=1,
             ),
-        ] = 414,
+        ] = None,
         viewport_height: Annotated[
-            int,
+            int | None,
             Query(
                 alias='viewport-height',
-                description='The viewport height in pixels. The default value is 896 (iPhone 11 Viewport).<br><br>',
+                description='The viewport height in pixels. '
+                            "It's better to use the `device` parameter instead of specifying it explicitly.<br><br>",
                 ge=1,
             ),
-        ] = 896,
+        ] = None,
         screen_width: Annotated[
-            int,
+            int | None,
             Query(
                 alias='screen-width',
                 description='Emulates consistent window screen size available inside web page via window.screen. '
-                            'Is only used when the viewport is set.<br>'
-                            'The page width in pixels. Defaults to 828 (iPhone 11 Resolution).<br><br>',
+                            'Is only used when the viewport is set. The page width in pixels.<br><br>',
                 ge=1,
             ),
-        ] = 828,
+        ] = None,
         screen_height: Annotated[
-            int,
+            int | None,
             Query(
                 alias='screen-height',
                 description='Emulates consistent window screen size available inside web page via window.screen. '
-                            'Is only used when the viewport is set.<br>'
-                            'The page height in pixels. Defaults to 1792 (iPhone 11 Resolution).<br><br>',
+                            'Is only used when the viewport is set. The page height in pixels.<br><br>',
                 ge=1,
             ),
-        ] = 1792,
+        ] = None,
+        device: Annotated[
+            str,
+            Query(
+                description=(
+                    'Simulates browser behavior for a specific device, such as user agent, screen size, viewport, '
+                    'and whether it has touch enabled.<br>Individual parameters like `user-agent`, `viewport-width`, and `viewport-height` '
+                    'can also be used; in such cases, they will override the `device` settings.<br>'
+                    'List of [available devices]'
+                    '(https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json).<br><br>'
+                ),
+            ),
+        ] = 'iPhone 12',
         scroll_down: Annotated[
             int,
             Query(
@@ -253,7 +265,7 @@ class BrowserQueryParams:
             Query(
                 alias='user-agent',
                 description='Specify user agent to emulate.<br>'
-                            'By default, Playwright uses a user agent that matches the browser version.',
+                            "It's better to use the `device` parameter instead of specifying it explicitly.<br><br>",
             ),
         ] = None,
         locale: Annotated[
@@ -296,6 +308,7 @@ class BrowserQueryParams:
         self.viewport_height = viewport_height
         self.screen_width = screen_width
         self.screen_height = screen_height
+        self.device = device
         self.scroll_down = scroll_down
         self.ignore_https_errors = ignore_https_errors
         self.user_agent = user_agent
@@ -308,6 +321,9 @@ class BrowserQueryParams:
             resource = list(filter(None, map(str.strip, resource.split(','))))
             if resource:
                 self.resource = resource
+
+        if device not in DEVICE_REGISTRY:
+            raise QueryParsingError('device', 'Device not found', device)
 
         if http_credentials:
             fake_url = f'http://{http_credentials}@localhost'

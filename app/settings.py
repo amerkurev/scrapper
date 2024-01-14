@@ -1,4 +1,6 @@
+import json
 import os
+from functools import cache
 from pathlib import Path
 
 
@@ -21,3 +23,15 @@ SCREENSHOT_QUALITY = int(os.environ.get('SCREENSHOT_QUALITY', 80))  # 0-100
 assert BROWSER_CONTEXT_LIMIT > 0, 'BROWSER_CONTEXT_LIMIT must be greater than 0'
 assert SCREENSHOT_TYPE in ('jpeg', 'png'), 'SCREENSHOT_TYPE must be jpeg or png'
 assert 0 <= SCREENSHOT_QUALITY <= 100, 'SCREENSHOT_QUALITY must be between 0 and 100'
+
+
+@cache
+def load_device_registry():
+    # https://playwright.dev/python/docs/emulation#devices
+    # https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json
+    src_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'internal', 'deviceDescriptorsSource.json')
+    with open(src_file, encoding='utf-8') as f:
+        return json.load(f)
+
+
+DEVICE_REGISTRY = load_device_registry()

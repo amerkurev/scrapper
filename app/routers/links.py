@@ -93,8 +93,8 @@ async def parser_links(
 
             # evaluating JavaScript: parse DOM and extract links of articles
             parser_args = {}
-            with open(PARSER_SCRIPTS_DIR / 'links.js', encoding='utf-8') as fd:
-                links = await page.evaluate(fd.read() % parser_args)
+            with open(PARSER_SCRIPTS_DIR / 'links.js', encoding='utf-8') as f:
+                links = await page.evaluate(f.read() % parser_args)
 
     # parser error: links are not extracted, result has 'err' field
     if 'err' in links:

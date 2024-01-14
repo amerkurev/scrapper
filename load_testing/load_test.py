@@ -142,8 +142,8 @@ def process_args() -> Options:
 
 
 def get_pages_from_file(filename: str) -> list[str]:
-    with open(filename, 'r') as fd:
-        pages = list(filter(None, map(str.strip, fd)))
+    with open(filename, 'r') as f:
+        pages = list(filter(None, map(str.strip, f)))
     return pages
 
 

@@ -12,6 +12,7 @@ from settings import USER_SCRIPTS_DIR, BROWSER_CONTEXT_LIMIT
 class State(TypedDict):
     # https://playwright.dev/python/docs/api/class-browsertype
     browser: Browser
+    semaphore: asyncio.Semaphore
 
 
 @contextlib.asynccontextmanager
@@ -22,4 +23,4 @@ async def lifespan(_: FastAPI):
     async with async_playwright() as playwright:
         firefox = playwright.firefox
         browser = await firefox.launch(headless=True)
-        yield {'browser': browser, 'semaphore': semaphore}
+        yield State(browser=browser, semaphore=semaphore)
