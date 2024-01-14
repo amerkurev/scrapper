@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import hashlib
 
+from collections import defaultdict
 from operator import itemgetter
 from statistics import median
 
@@ -155,12 +156,9 @@ def allowed_domain(href: str, domain: str) -> bool:
 
 def group_links(links: Sequence[Mapping]) -> dict:
     # group links by 'CSS selector', 'color', 'font', 'parent padding', 'parent margin' and 'parent background color' properties
-    links_dict = {}
+    links_dict = defaultdict(list)
     for link in links:
-        key = make_key(link)
-        if key not in links_dict:
-            links_dict[key] = []
-        links_dict[key].append(link)
+        links_dict[make_key(link)].append(link)
     return links_dict
 
 
