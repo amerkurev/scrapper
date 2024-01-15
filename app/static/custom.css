@@ -375,10 +375,6 @@ main {
   text-align: center;
 }
 
-code {
-  width: 100%
-}
-
 .errors,
 .errors pre {
   color: #e53935;
