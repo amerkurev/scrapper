@@ -13,8 +13,12 @@ def improve_content(title: str, content: str) -> str:
     # 1. remove all p and div tags that contain one word or less (or only digits),
     # and not contain any images (or headers)
     for el in tree.find_all(['p', 'div']):
-        # skip if the element has any images (or headers)
-        if el.find(['img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']):
+        # skip if the element has any images, headers, code blocks, lists, tables, forms, etc.
+        if el.find([
+            'img', 'picture', 'svg', 'canvas', 'video', 'audio', 'iframe', 'embed', 'object', 'param', 'source',
+            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            'pre', 'code', 'blockquote', 'dl', 'ol', 'ul', 'table', 'form',
+        ]):
             continue
         text = el.get_text(strip=True)
         # remove the element if it contains one word or less (or only digits)
