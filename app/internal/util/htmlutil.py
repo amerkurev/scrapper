@@ -95,7 +95,9 @@ def social_meta_tags(full_page_content: str) -> dict:
 
 def levenshtein_similarity(str1: str, str2: str) -> float:
     # remove all non-alphabetic characters and convert to lowercase
+    # noinspection PyTypeChecker
     str1 = ''.join(filter(str.isalpha, str1)).lower()
+    # noinspection PyTypeChecker
     str2 = ''.join(filter(str.isalpha, str2)).lower()
 
     # Create a matrix to hold the distances
@@ -117,3 +119,8 @@ def levenshtein_similarity(str1: str, str2: str) -> float:
 
     # return normalized distance
     return 1 - d[-1][-1] / max(len(str1), len(str2))
+
+
+def improve_text_content(text: str) -> str:
+    s = '\n'.join(filter(None, map(str.strip, text.splitlines())))
+    return s

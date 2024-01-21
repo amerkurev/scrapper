@@ -131,6 +131,10 @@ async def parse_article(
             content=article['content'],
         )
 
+    if 'textContent' in article:
+        article['textContent'] = htmlutil.improve_text_content(article['textContent'])
+        article['length'] = len(article['textContent']) - article['textContent'].count('\n')
+
     # save result to disk
     cache.dump_result(article, key=r_id, screenshot=screenshot)
     return article
