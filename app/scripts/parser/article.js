@@ -1,5 +1,21 @@
 
 () => {
+    function findComments(el) {
+        let arr = [];
+        for (let i = 0; i < el.childNodes.length; i++) {
+            let node = el.childNodes[i];
+            // 8 is the Node.COMMENT_NODE constant
+            // https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+            if(node.nodeType === 8) {
+                arr.push(node);
+            } else {
+                // recursively search for comments in child nodes
+                arr.push.apply(arr, findComments(node));
+            }
+        }
+        return arr;
+    };
+
     try {
         // mark elements that are not visible
         let elements = document.body.getElementsByTagName("*");
@@ -12,8 +28,11 @@
                 elements[i].classList.add("scrapper-hidden");
             }
         }
-        // remove marked elements
+        // remove invisible elements
         document.querySelectorAll(".scrapper-hidden").forEach(el => el.remove());
+
+        // find and remove comments
+        findComments(document.body).forEach(el => el.remove());
 
         // parse the article with Mozilla's Readability.js (https://videoinu.com/blog/firefox-reader-view-heuristics/)
         let documentClone = document.cloneNode(true);
