@@ -24,7 +24,9 @@
             if (style.display === "none" ||
                 style.visibility === "hidden" ||
                 style.opacity === "0" ||
-                style.opacity === "0.0") {
+                style.opacity === "0.0" ||
+                (style.height === "0px" && style.width === "0px") ||
+                (style.height === "1px" && style.width === "1px")) {
                 elements[i].classList.add("scrapper-hidden");
             }
         }
