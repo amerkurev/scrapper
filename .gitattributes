@@ -1,1 +1,4 @@
 * text=auto eol=lf
+# Apply to all files and directories in the directory
+app/scripts/readability/** -linguist-detectable
+app/scripts/stealth/** -linguist-detectable
