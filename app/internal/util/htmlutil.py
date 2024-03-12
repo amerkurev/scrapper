@@ -34,7 +34,12 @@ def improve_content(title: str, content: str) -> str:
             text = el.parent.get_text(strip=True)
             # stop if the header is similar to the title
             min_len = min(len(text), len(title))
-            if levenshtein_similarity(text[:min_len], title[:min_len]) > 0.9:
+            # remove all non-alphabetic characters and convert to lowercase
+            # noinspection PyTypeChecker
+            str1 = ''.join(filter(str.isalpha, text[:min_len])).lower()
+            # noinspection PyTypeChecker
+            str2 = ''.join(filter(str.isalpha, title[:min_len])).lower()
+            if str1 and str2 and levenshtein_similarity(str1, str2) > 0.9:
                 title = text
                 el.parent.decompose()  # 'real' move will be below, at 3.1 or 3.2
                 break
@@ -94,12 +99,6 @@ def social_meta_tags(full_page_content: str) -> dict:
 
 
 def levenshtein_similarity(str1: str, str2: str) -> float:
-    # remove all non-alphabetic characters and convert to lowercase
-    # noinspection PyTypeChecker
-    str1 = ''.join(filter(str.isalpha, str1)).lower()
-    # noinspection PyTypeChecker
-    str2 = ''.join(filter(str.isalpha, str2)).lower()
-
     # Create a matrix to hold the distances
     d = [[0] * (len(str2) + 1) for _ in range(len(str1) + 1)]
 
