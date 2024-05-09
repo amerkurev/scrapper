@@ -9,7 +9,7 @@ info:
 
 # before run: install python packages from requirements.txt
 run:
-	- @uvicorn --app-dir app main:app --port 3000
+	- @uvicorn --app-dir app main:app --port 3001
 
 test:
 	- @$(PWD)/runtest.sh && coverage html
@@ -24,7 +24,7 @@ docker:
 
 docker-run: docker
 	- @# Using --ipc=host is recommended when using Chrome. Chrome can run out of memory without this flag.
-	- @docker run -it --rm --ipc=host -p 3000:3000 -v $(PWD)/user_data:/home/user/user_data -v $(PWD)/user_scripts:/home/user/user_scripts --name $(BIN) amerkurev/$(BIN):master
+	- @docker run -it --rm --ipc=host -p 3001:3001 -v $(PWD)/user_data:/home/user/user_data -v $(PWD)/user_scripts:/home/user/user_scripts --name $(BIN) amerkurev/$(BIN):master
 
 docker-test: docker
 	- @docker run -t --rm --name $(BIN) amerkurev/$(BIN):master ./runtest.sh

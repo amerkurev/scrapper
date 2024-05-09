@@ -12,7 +12,13 @@ services:
       - "caddy_config:/config"
 
   scrapper:
-    image: amerkurev/scrapper:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+        - linux/arm64
+    image: fizzbuzz2/scrapper:v1.2.0
     restart: unless-stopped
     volumes:
       - "./user_data:/home/user/user_data"

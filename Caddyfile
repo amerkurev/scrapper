@@ -1,5 +1,5 @@
 scrapper.localhost {
-	reverse_proxy scrapper:3000
+	reverse_proxy scrapper:3001
 
 	# https://caddyserver.com/docs/v2-upgrade#basicauth
 	basicauth {
