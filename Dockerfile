@@ -60,6 +60,6 @@ WORKDIR $USER_HOME
 EXPOSE $APP_PORT
 # to view healthcheck status:
 # docker inspect --format "{{json .State.Health }}" <container name> | jq
-HEALTHCHECK --interval=30s --start-period=45s --start-interval=1s --timeout=10s CMD curl --fail http://localhost:$APP_PORT/ping || exit 1
+HEALTHCHECK --interval=30s --start-period=5s --start-interval=1s --timeout=10s CMD curl --fail http://localhost:$APP_PORT/ping || exit 1
 
 CMD uvicorn --app-dir $APP_DIR main:app --host $APP_HOST --port $APP_PORT
