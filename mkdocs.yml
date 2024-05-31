@@ -97,4 +97,3 @@ nav:
   - API Reference: sections/api/index.md
   - HTTPS and Authentication: sections/auth/index.md
   - Docker Hub: https://hub.docker.com/r/amerkurev/scrapper
-  - Releases: https://github.com/amerkurev/scrapper/releases
