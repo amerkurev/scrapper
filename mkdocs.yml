@@ -1,0 +1,100 @@
+# yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
+
+# https://www.mkdocs.org/user-guide/configuration/
+site_name: Scrapper
+site_url: https://scrapper.dev/
+site_description: Web scraper with a simple REST API living in Docker and using a Headless browser and Readability.js for parsing.
+site_author: https://github.com/amerkurev
+
+repo_url: https://github.com/amerkurev/scrapper
+repo_name: scrapper
+
+edit_uri: edit/master/
+
+theme:
+  name: material
+  # https://icon-sets.iconify.design/?query=django
+  logo: images/logo.svg
+  favicon: images/favicon.svg
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - toc.integrate
+    - content.code.copy
+    - content.code.annotate
+    # - navigation.instant
+    - navigation.instant.progress
+    - navigation.tabs
+    - search.suggest
+    - search.highlight
+    - search.share
+    - navigation.footer
+    - content.action.edit
+#    - content.action.view
+    - content.tabs.link
+    - content.tooltips
+    - navigation.top
+    # - navigation.expand
+    # - navigation.tracking
+  # https://squidfunk.github.io/mkdocs-material/setup/changing-the-colors/#system-preference
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+
+# noinspection YAMLSchemaValidation
+markdown_extensions:
+  - smarty
+  - sane_lists
+  # https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown/
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+  # https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown-extensions/
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.betterem
+  - pymdownx.details
+  - pymdownx.snippets
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+
+# noinspection YAMLSchemaValidation
+plugins:
+  - search
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - About: index.md
+  - Usage: sections/usage/index.md
+  - API Reference: sections/api/index.md
+  - HTTPS and Authentication: sections/auth/index.md
+  - Docker Hub: https://hub.docker.com/r/amerkurev/scrapper
+  - Releases: https://github.com/amerkurev/scrapper/releases

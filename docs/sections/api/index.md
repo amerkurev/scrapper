@@ -1,117 +1,6 @@
-# Scrapper 🧹
+# API Reference
 
-<div markdown="1">
-[![Build](https://github.com/amerkurev/scrapper/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/amerkurev/scrapper/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/github/amerkurev/scrapper/badge.svg?branch=master)](https://coveralls.io/github/amerkurev/scrapper?branch=master)
-[![Linting: Pylint](https://img.shields.io/badge/pylint-9.95-green)](https://github.com/amerkurev/scrapper/actions/)
-[![License](https://img.shields.io/badge/license-apache2.0-blue.svg)](https://github.com/amerkurev/scrapper/blob/master/LICENSE)
-[![Docker Hub](https://img.shields.io/docker/automated/amerkurev/scrapper.svg)](https://hub.docker.com/r/amerkurev/scrapper/tags)
-</div>
-
-If you were looking for a web scraper that actually works, you just found it. It's called Scrapper!
-Downloading a page from the Internet and then extracting an article from it in a structured format is not as easy as it may seem at first glance.
-Sometimes it can be damn hard. But Scrapper will help you with this, I hope :) To do this, Scrapper has plenty of features.
-
-Scrapper is a free and open-source product. It combines the power and experience of related open-source projects, so give it a try first.
-
-<details>
-  <summary><b>Quick start</b></summary>
-
-Quick start a scrapper instance:
-```console
-docker run -d -p 3000:3000 --name scrapper amerkurev/scrapper:latest
-```
-Scrapper will be available at http://localhost:3000/. For more details, see [Usage](#usage)
-</details>
-
-## Demo
-Watch a 30-second demo reel showcasing the web interface of Scrapper.
-
-https://user-images.githubusercontent.com/28217522/225941167-633576fa-c9e2-4c63-b1fd-879be2d137fa.mp4
-
-
-## Features
-The main features of Scrapper are:
-
-- **The headless browser is already built-in.** Modern websites actively use JavaScript on their pages, fight against crawlers, and sometimes require user actions, such as agreeing to the use of cookies on the site. All of these tasks are solved by the Scrapper using the excellent [Playwright](https://github.com/microsoft/playwright) project. The Scrapper container image is based on the Playwright image, which already includes all modern browsers.
-- **The Read mode in the browser is used for parsing.** Millions of people use the "Read" mode in the browser to display only the text of the article on the screen while hiding the other elements of the page. Scrapper follows the same path by using the excellent [Readability.js](https://github.com/mozilla/readability) library from Mozilla. The parsing result will be the same as in the [Read mode](https://support.mozilla.org/kb/firefox-reader-view-clutter-free-web-pages) of your favorite browser.
-- **A simple and beautiful web interface.** Working with Scrapper is easy and enjoyable because you can do it right in your browser. The simple web interface allows you to debug your query, experiment with each parameter in the API, and see the result in HTML, JSON, or a screenshot. The beautiful design helps achieve an excellent [Pico](https://github.com/picocss/pico) project. A dark theme for comfortable reading is also available.
-- **The Scrapper REST API is incredibly simple** to use as it only requires a [single call](#api-reference) and just a few parameters making it easy to integrate into any project. Furthermore, the web interface offers a visual query-builder that simplifies the learning process for the user.
-- **Scrapper can search for news links** on the main pages of websites. This is difficult because there may be not only links to news but also links to other parts of the website. However, Scrapper can distinguish between them and select only links to news articles.
-
-And many other features:
-
-- **Stealth mode.** Various methods are used to make it difficult for websites to detect a Headless browser and bypass web scraping protection.
-- **Caching results.** All parsing results are saved to disk, and you can access them later by API without repeating the whole request.
-- **Page screenshots.** Headless browsers don't have a window, but screenshots allow you to see the page as it appears to the parser. This is very useful!
-- **Incognito mode or persistent sessions.** You can configure the browser to work in incognito mode or without it. In this case, the browser will save session data such as cookies and local storage to disk. To use them again.
-- **Proxy support.** HTTP/SOCKS4/SOCKS5 proxy work is supported.
-- **Fully customizable.** You can control a lot through the API: additional HTTP headers, viewport for device emulation, Readability parser settings, and much more.
-- **Delivered as a Docker image.** Scrapper is built and delivered as a Docker image, which is very easy to deploy for testing and production. No dependencies or installations on the host. All you need to run Scrapper is Docker.
-- **Free license.** Scrapper doesn't ask for money, insert ads, or track your actions ever. And if you want to help the project develop further, just give us a star on GitHub ⭐
-
-
-## Usage
-### Getting Scrapper
-The Scrapper Docker image is based on the Playwright image, which includes all the dependencies needed to run a browser in Docker and also includes the browsers themselves.
-As a result, the image size is quite large, around 2 GB. Make sure you have enough free disk space, especially if you plan to take and store screenshots frequently.
-
-To get the latest version of Scrapper, run:
-```console
-docker pull amerkurev/scrapper:latest
-```
-
-### Creating directories
-Scrapper uses two directories on the disk. The first one is the `user_data` directory. This directory contains browser session data such as cookies and local storage.
-Additionally, the cache of Scrapper's own results (including screenshots) is stored in this directory.
-
-The second directory is `user_scripts`. In this directory, you can place your own JavaScript scripts, which you can then embed on pages through the Scrapper API.
-For example, to remove ads blocks or click the "Accept Cookies" button (see the `user-scripts` parameter in the [API Reference](#api-reference) section for more information).
-
-**Scrapper does not work from the root** user inside the container. Instead, it uses a user with UID `1001`.
-Since you will be mounting the `user_data` and `user_scripts` directories from the host using [Bind Mount](https://docs.docker.com/storage/bind-mounts/), you will need to set write permissions for UID `1001` on these directories on the host.
-
-Here is an example of how to do this:
-```console
-mkdir -p user_data user_scripts
-
-chown 1001:1001 user_data/ user_scripts/
-
-ls -l
-```
-The last command (`ls -l`) should output a result similar to this:
-```
-drwxr-xr-x 2 1001 1001 4096 Mar 17 23:23 user_data
-drwxr-xr-x 2 1001 1001 4096 Mar 17 23:23 user_scripts
-```
-
-### Managing Scrapper Cache
-Over time, the Scrapper cache will grow in size, especially if you are making frequent requests with screenshots.
-The scrapper's cache is stored in the `user_data/_res` directory. You will need to set up automatic clearing of this directory yourself.
-
-For example, you could add the following task to your cron jobs:
-```console
-find /path/to/user_data/_res -ctime +7 -delete
-```
-This command will use the `find` utility to locate all files in the cache that were created more than 7 days ago. All such files will be deleted because the `find` utility accepts the `-delete` option.
-
-This is just an example of how you might deal with the scrapper's cache growing over time. You can come up with other strategies for this and implement them yourself.
-The main thing to remember is where Scrapper stores its cache data - it's in the `user_data/_res`.
-
-### Using Scrapper
-Once the directories have been created and write permissions have been set, you can run Scrapper using the following command:
-```console
-docker run -d -p 3000:3000 -v $(pwd)/user_data:/home/user/user_data -v $(pwd)/user_scripts:/home/user/user_scripts --name scrapper amerkurev/scrapper:latest
-```
-The Scrapper web interface should now be available at http://localhost:3000/. Use any modern browser to access it.
-
-To connect to Scrapper logs, use the following command:
-```console
-docker logs -f scrapper
-```
-
-## API Reference
-### GET /api/article?url=...
+## GET /api/article?url=...
 The Scrapper API is very simple. Essentially, it is just one call that can easily be demonstrated using the cURL:
 
 ```console
@@ -213,13 +102,15 @@ If an error (or multiple errors) occurs during the execution of a request, the r
 ```
 Some errors do not have a detailed description in the response to the request. In this case, you should refer to the log of the Docker container to investigate the cause of the error.
 
-### GET /api/links?url=...
+## GET /api/links?url=...
 To collect links to news articles on the main pages of websites, use a different query on the `/api/links` endpoint. The query parameters are similar, but the [Readability settings](#readability-settings) are not required for this query because no text is extracted.
 Instead, the Link parser is used, which has its own set of parameters. A description of these parameters is provided below.
 
 ```console
 curl -X GET "localhost:3000/api/links?url=https://www.cnet.com/"
 ```
+
+### Request Parameters
 
 #### Link parser settings
 | Parameter               | Description                                                                                                                                                                                                                                                         | Default |
@@ -243,47 +134,3 @@ The response to the `/api/links` request returns a JSON object that contains fie
 | `screenshotUri` | URL of the screenshot of the page                                   | str      |
 | `links`         | list of collected links                                             | list     |
 | `title`         | page title                                                          | str      |
-
-## HTTPS and Authentication
-Enhance the security of your Scrapper deployment with HTTPS and Basic Authentication by integrating [Caddy server](https://github.com/caddyserver/caddy).
-
-This approach is recommended for instances exposed to the internet and can be configured with minimal effort using Docker Compose.
-
-### Configuring Caddy for Security
-
-Caddy handles SSL certificate issuance and renewal through Let's Encrypt and supports Basic Authentication for added security.
-
-To configure Caddy with Scrapper:
-
-1. **Customize the [Caddyfile](Caddyfile)**: Update `scrapper.localhost` to your domain name. For Basic Authentication, generate a secure hashed password with [`caddy hash-password`](https://caddyserver.com/docs/command-line#caddy-hash-password) and update the Caddyfile with this hash.
-
-   To generate a password hash:
-   ```console
-   caddy hash-password -plaintext 'your_new_password'
-   ```
-   Replace `your_new_password` with a strong password, then insert the hashed result into the [Caddyfile](Caddyfile).
-
-2. **Launch with Docker Compose**: With your [`docker-compose.yml`](docker-compose.yml) and edited Caddyfile ready, deploy the services:
-   ```console
-   docker compose up -d
-   ```
-
-### Secure Access to Scrapper
-
-Once deployed, access Scrapper at `https://your_domain`. You'll be asked for the username and password specified in the Caddyfile.
-
-### Automatic Certificate Renewal
-
-Caddy automatically renews SSL certificates before they expire, requiring no action from the user. Enjoy uninterrupted HTTPS protection for your Scrapper instance without manual intervention.
-
-## Supported architectures
-
-- linux/amd64
-- linux/arm64
-
-## Status
-The project is under active development and may have breaking changes till `v1` is released. 
-However, we are trying our best not to break things unless there is a good reason. As of version `v0.8.0`, Scrapper is considered good enough for real-life usage, and many setups are running it in production.
-
-## License
-[Apache-2.0 license](LICENSE)
