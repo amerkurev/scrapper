@@ -1,6 +1,7 @@
 # Scrapper 🧹
 
 <div markdown="1">
+
 [![Build](https://github.com/amerkurev/scrapper/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/amerkurev/scrapper/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/amerkurev/scrapper/badge.svg?branch=master)](https://coveralls.io/github/amerkurev/scrapper?branch=master)
 [![Linting: Pylint](https://img.shields.io/badge/pylint-9.95-green)](https://github.com/amerkurev/scrapper/actions/)
