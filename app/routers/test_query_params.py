@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
 from main import app
-from settings import USER_SCRIPTS_DIR
+# from settings import USER_SCRIPTS_DIR
 
 
 def test_various_query_params():
@@ -70,33 +70,33 @@ def test_various_query_params():
         assert 'PlaywrightError: NS_ERROR_' in response.text
 
         # test user scripts
-        with open(USER_SCRIPTS_DIR / 'my-script.js', mode='w', encoding='utf-8') as f:
-            f.write('console.log("Hello world!");')
+        # with open(USER_SCRIPTS_DIR / 'my-script.js', mode='w', encoding='utf-8') as f:
+        #     f.write('console.log("Hello world!");')
 
-        url = 'https://en.wikipedia.org/wiki/World_Wide_Web'
-        params = {
-            'url': url,
-            'cache': False,
-            'user-scripts': 'my-script.js',
-        }
-        response = client.get(api_url, params=params)
-        assert response.status_code == 200
+        # url = 'https://en.wikipedia.org/wiki/World_Wide_Web'
+        # params = {
+        #     'url': url,
+        #     'cache': False,
+        #     'user-scripts': 'my-script.js',
+        # }
+        # response = client.get(api_url, params=params)
+        # assert response.status_code == 200
 
-        # test user script that not exists
-        params = {
-            'url': url,
-            'user-scripts': 'not-exists.js',
-        }
-        response = client.get(api_url, params=params)
-        assert response.status_code == 422
-        assert response.json() == {
-            'detail': [{
-                'input': 'not-exists.js',
-                'loc': ['query', 'user_scripts'],
-                'msg': 'User script not found',
-                'type': 'user_scripts_parsing',
-            }]
-        }
+        # # test user script that not exists
+        # params = {
+        #     'url': url,
+        #     'user-scripts': 'not-exists.js',
+        # }
+        # response = client.get(api_url, params=params)
+        # assert response.status_code == 422
+        # assert response.json() == {
+        #     'detail': [{
+        #         'input': 'not-exists.js',
+        #         'loc': ['query', 'user_scripts'],
+        #         'msg': 'User script not found',
+        #         'type': 'user_scripts_parsing',
+        #     }]
+        # }
 
         # test huge page with taking screenshot
         params = {

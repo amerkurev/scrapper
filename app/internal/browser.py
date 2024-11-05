@@ -7,8 +7,6 @@ from playwright.async_api import Error as PlaywrightError
 from routers.query_params import CommonQueryParams, BrowserQueryParams, ProxyQueryParams
 
 from settings import (
-    USER_DATA_DIR,
-    USER_SCRIPTS_DIR,
     STEALTH_SCRIPTS_DIR,
     SCREENSHOT_TYPE,
     SCREENSHOT_QUALITY,
@@ -78,7 +76,7 @@ async def new_context(
         # (less efficient way, because it creates a new browser instance)
         context = await browser.browser_type.launch_persistent_context(
             headless=True,
-            user_data_dir=USER_DATA_DIR,
+            # user_data_dir=USER_DATA_DIR,
             **options,
         )
     try:
@@ -128,13 +126,13 @@ async def page_processing(
             await page.mouse.wheel(0, 0)
 
     # add user scripts for DOM manipulation
-    if params.user_scripts:
-        for script in params.user_scripts:
-            await page.add_script_tag(path=USER_SCRIPTS_DIR / script)
+    # if params.user_scripts:
+    #     for script in params.user_scripts:
+    #         await page.add_script_tag(path=USER_SCRIPTS_DIR / script)
 
     # wait for the given timeout in milliseconds after user scripts were injected.
-    if params.user_scripts_timeout:
-        await page.wait_for_timeout(params.user_scripts_timeout)
+    # if params.user_scripts_timeout:
+    #     await page.wait_for_timeout(params.user_scripts_timeout)
 
 
 def resource_blocker(whitelist: Sequence[str]):  # list of resource types to allow

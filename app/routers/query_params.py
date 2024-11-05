@@ -10,8 +10,8 @@ import validators
 from fastapi import Query
 
 from internal.errors import QueryParsingError
-from settings import USER_SCRIPTS_DIR, DEVICE_REGISTRY
-
+# from settings import USER_SCRIPTS_DIR, DEVICE_REGISTRY
+from settings import DEVICE_REGISTRY
 
 class WaitUntilEnum(str, Enum):
     LOAD = 'load'
@@ -81,47 +81,47 @@ class CommonQueryParams:
                 )
             ),
         ] = False,
-        user_scripts: Annotated[
-            str | None,
-            Query(
-                alias='user-scripts',
-                description=(
-                    'To use your JavaScript scripts on a webpage, put your script files into the `user_scripts` directory. '
-                    'Then, list the scripts you need in the `user-scripts` parameter, separating them with commas. '
-                    'These scripts will run after the page loads but before the article parser starts. This means you can use these scripts'
-                    ' to do things like remove ad blocks or automatically click the cookie acceptance button. '
-                    'Keep in mind, script names cannot include commas, as they are used for separation.<br>'
-                    'For example, you might pass `remove-ads.js, click-cookie-accept-button.js`.<br><br>'
-                    'If you plan to run asynchronous long-running scripts, check `user-scripts-timeout` parameter.'
-                ),
-            ),
-        ] = None,
-        user_scripts_timeout: Annotated[
-            int,
-            Query(
-                alias='user-scripts-timeout',
-                description='Waits for the given timeout in milliseconds after injecting users scripts.<br>'
-                            'For example if you want to navigate through page to specific content, set a longer period (higher value).<br>'
-                            'The default value is 0, which means no sleep.<br><br>',
-                ge=0,
-            ),
-        ] = 0,
+        # user_scripts: Annotated[
+        #     str | None,
+        #     Query(
+        #         alias='user-scripts',
+        #         description=(
+        #             'To use your JavaScript scripts on a webpage, put your script files into the `user_scripts` directory. '
+        #             'Then, list the scripts you need in the `user-scripts` parameter, separating them with commas. '
+        #             'These scripts will run after the page loads but before the article parser starts. This means you can use these scripts'
+        #             ' to do things like remove ad blocks or automatically click the cookie acceptance button. '
+        #             'Keep in mind, script names cannot include commas, as they are used for separation.<br>'
+        #             'For example, you might pass `remove-ads.js, click-cookie-accept-button.js`.<br><br>'
+        #             'If you plan to run asynchronous long-running scripts, check `user-scripts-timeout` parameter.'
+        #         ),
+        #     ),
+        # ] = None,
+        # user_scripts_timeout: Annotated[
+        #     int,
+        #     Query(
+        #         alias='user-scripts-timeout',
+        #         description='Waits for the given timeout in milliseconds after injecting users scripts.<br>'
+        #                     'For example if you want to navigate through page to specific content, set a longer period (higher value).<br>'
+        #                     'The default value is 0, which means no sleep.<br><br>',
+        #         ge=0,
+        #     ),
+        # ] = 0,
     ):
         self.cache = cache
         self.full_content = full_content
         self.stealth = stealth
         self.screenshot = screenshot
-        self.user_scripts = None
-        self.user_scripts_timeout = user_scripts_timeout
+        # self.user_scripts = None
+        # self.user_scripts_timeout = user_scripts_timeout
 
-        if user_scripts:
-            user_scripts = list(filter(None, map(str.strip, user_scripts.split(','))))
-            if user_scripts:
-                # check if all files exist
-                for script in user_scripts:
-                    if not (USER_SCRIPTS_DIR / script).exists():
-                        raise QueryParsingError('user_scripts', 'User script not found', script)
-                self.user_scripts = user_scripts
+        # if user_scripts:
+        #     user_scripts = list(filter(None, map(str.strip, user_scripts.split(','))))
+        #     if user_scripts:
+        #         # check if all files exist
+        #         for script in user_scripts:
+        #             if not (USER_SCRIPTS_DIR / script).exists():
+        #                 raise QueryParsingError('user_scripts', 'User script not found', script)
+        #         self.user_scripts = user_scripts
 
 
 class BrowserQueryParams:

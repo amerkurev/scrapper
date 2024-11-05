@@ -2,11 +2,15 @@ import json
 import os
 from functools import cache
 from pathlib import Path
+from dotenv import load_dotenv
 
+load_dotenv()
 
+ENV = os.environ.get('ENV', 'development')
 BASE_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 USER_DATA_DIR = Path(os.environ.get('USER_DATA_DIR', BASE_DIR / 'user_data'))
-USER_SCRIPTS_DIR = Path(os.environ.get('USER_SCRIPTS_DIR', BASE_DIR / 'user_scripts'))
+# USER_SCRIPTS_DIR = Path(os.environ.get('USER_SCRIPTS_DIR', BASE_DIR / 'user_scripts'))
+GCS_BUCKET_NAME=os.environ.get('GCS_BUCKET_NAME', 'scrapper')
 APP_DIR = Path(os.environ.get('APP_DIR', BASE_DIR / 'app'))
 TEMPLATES_DIR = APP_DIR / 'templates'
 STATIC_DIR = APP_DIR / 'static'

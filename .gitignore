@@ -29,4 +29,7 @@ scrapper.egg-info/
 # Playwright
 user_data
 user_data_dir
-user_scripts
+
+venv
+
+.env

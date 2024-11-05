@@ -51,6 +51,30 @@ And many other features:
 - **Delivered as a Docker image.** Scrapper is built and delivered as a Docker image, which is very easy to deploy for testing and production. No dependencies or installations on the host. All you need to run Scrapper is Docker.
 - **Free license.** Scrapper doesn't ask for money, insert ads, or track your actions ever. And if you want to help the project develop further, just give us a star on GitHub ⭐
 
+## Important Changes
+
+This forked version of Scrapper includes two significant changes:
+
+1. **File Storage Location Change**:
+
+Instead of using local storage, this version uses Google Cloud Storage (GCS) for file storage. This change offers the following benefits:
+
+- Improved scalability: GCS allows efficient storage and management of large amounts of data.
+- High availability: GCS provides data redundancy and high availability.
+- Access control: You can utilize GCS's fine-grained access control features.
+
+Note: This change may require additional setup steps, such as configuring GCS authentication and creating buckets. Please refer to the GCS documentation for detailed instructions.
+
+2. **Removal of User Scripts Option**:
+
+The user scripts feature available in the original version has been removed in this modified version. This change results in:
+- Enhanced security: Reduces risks associated with executing arbitrary JavaScript code.
+- Simplification: Decreases system complexity, making maintenance easier.
+- Performance improvement: Eliminates the overhead of script execution.
+
+As a result of this change, the `user-scripts` and `user-scripts-timeout` parameters are no longer available. Any functionality that relied on user scripts may need to be implemented differently.
+
+These modifications may affect some aspects of Scrapper's usage and configuration as described in this README. In particular, sections related to file storage and management, as well as any features that utilized user scripts, may differ from the original implementation.
 
 ## Usage
 ### Getting Scrapper

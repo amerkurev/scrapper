@@ -1,66 +1,93 @@
-name: build
+name: Build and Deploy
 
 on:
   push:
-    branches:
-      - master
-    tags:
-      - '*'
+    branches: [ main ]
+    tags: [ '*' ]
     paths-ignore:
       - '*.md'
   pull_request:
     paths-ignore:
       - '*.md'
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  SERVICE_NAME: ${{ secrets.GCP_SERVICE_NAME }}
+  REGION: ${{ secrets.GCP_REGION }}
+  REGISTRY_HOST: ${{ secrets.GCP_REGISTRY_HOST }}
 
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Test and submit coverage report
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
         run: |
           pip install -r requirements.txt
           playwright install firefox
-          ./runtest.sh coveralls
+
+      - name: Test and submit coverage report
+        run: ./runtest.sh coveralls
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run code linter
-        run: |
-          pylint --exit-zero app/*
+        run: pylint --exit-zero app/*
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+  build-and-deploy:
+    needs: test-and-lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.2.0
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
 
-      - name: Available platforms
-        run: |
-          echo "Name:      ${{ steps.buildx.outputs.name }}"
-          echo "Endpoint:  ${{ steps.buildx.outputs.endpoint }}"
-          echo "Status:    ${{ steps.buildx.outputs.status }}"
-          echo "Flags:     ${{ steps.buildx.outputs.flags }}"
-          echo "Platforms: ${{ steps.buildx.outputs.platforms }}"
-      - name: Deploy tagged (latest) to GitHub Packages (ghcr.io) and DockerHub
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker ${{ env.REGISTRY_HOST }}
+
+      - name: Build and push Docker image
         env:
-          GITHUB_PACKAGE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
-          USERNAME: ${{ github.actor }}
+          GIT_BRANCH: ${{ github.ref_name }}
           GITHUB_SHA: ${{ github.sha }}
-          GITHUB_REF: ${{ github.ref }}
         run: |
-          ref="$(echo ${GITHUB_REF} | cut -d'/' -f3)"
-          echo GITHUB_REF - $ref
-          echo ${GITHUB_PACKAGE_TOKEN} | docker login ghcr.io -u ${USERNAME} --password-stdin
-          echo ${DOCKER_HUB_TOKEN} | docker login -u ${USERNAME} --password-stdin
-          docker buildx build --push \
-              --build-arg CI=github --build-arg GITHUB_SHA=${GITHUB_SHA} --build-arg GIT_BRANCH=${ref} \
-              --platform linux/amd64,linux/arm64 \
-              -t ghcr.io/${USERNAME}/scrapper:${ref} -t ghcr.io/${USERNAME}/scrapper:latest \
-              -t ${USERNAME}/scrapper:${ref} -t ${USERNAME}/scrapper:latest .
+          docker build \
+            --build-arg CI=github \
+            --build-arg GITHUB_SHA=$GITHUB_SHA \
+            --build-arg GIT_BRANCH=$GIT_BRANCH \
+            -t ${{ env.REGISTRY_HOST }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+            -t ${{ env.REGISTRY_HOST }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest .
+          docker push ${{ env.REGISTRY_HOST }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          docker push ${{ env.REGISTRY_HOST }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest
+
+      - name: Deploy to Cloud Run
+        if: github.ref == 'refs/heads/main'
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.REGISTRY_HOST }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated
+
+      - name: Clean up old images
+        if: github.ref == 'refs/heads/main'
+        run: |
+          gcloud artifacts docker images delete \
+            ${{ env.REGISTRY_HOST }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }} \
+            --quiet \
+            --limit-numeric=5 \
+            --order-by=~CREATE_TIME

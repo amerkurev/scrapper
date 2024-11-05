@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
     volumes:
       - "./user_data:/home/user/user_data"
-      - "./user_scripts:/home/user/user_scripts"
+      # - "./user_scripts:/home/user/user_scripts"
 
 volumes:
   caddy_data:

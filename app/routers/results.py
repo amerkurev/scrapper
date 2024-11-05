@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Path, HTTPException, status
+from fastapi import APIRouter, Path, HTTPException, status, Response
 from fastapi.requests import Request
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.templating import Jinja2Templates
@@ -47,10 +47,10 @@ async def result_json(
 async def result_screenshot(
     r_id: Annotated[str, Path(title='Result ID', description='Unique result ID')],
 ):
-    path = cache.screenshot_location(r_id)
-    if not path.exists():
+    screenshot = cache.load_screenshot(r_id)
+    if not screenshot:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Not found result with id: {r_id}'
+            detail=f'Not found screenshot with id: {r_id}'
         )
-    return FileResponse(path, media_type=f'image/{SCREENSHOT_TYPE}')
+    return Response(content=screenshot, media_type=f'image/{SCREENSHOT_TYPE}')
