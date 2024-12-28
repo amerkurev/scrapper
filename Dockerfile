@@ -1,14 +1,13 @@
-FROM mcr.microsoft.com/playwright/python:v1.43.0
+FROM mcr.microsoft.com/playwright/python:v1.49.1
 # python==3.10.12, playwright==1.40.0
 
 # RUN apt update
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r ./requirements.txt && rm requirements.txt
-
-
+RUN pip install uv
+RUN uv pip install -r ./requirements.txt --system
 
 ARG USER=user
-ARG USER_UID=1001
+ARG USER_UID=2000
 ARG USER_HOME=/home/$USER
 ARG USER_DATA_DIR=$USER_HOME/user_data
 ARG USER_SCRIPTS_DIR=$USER_HOME/user_scripts
@@ -38,7 +37,6 @@ USER $USER
 
 RUN mkdir -p $USER_DATA_DIR $USER_SCRIPTS
 COPY --chown=$USER:$USER app $APP_DIR
-
 
 SHELL ["/bin/bash", "-c"]
 

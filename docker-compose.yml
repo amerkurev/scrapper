@@ -1,7 +1,6 @@
-version: "3.9"
 services:
   caddy:
-    image: caddy:2.7-alpine
+    image: caddy:2.8-alpine
     restart: unless-stopped
     ports:
       - "80:80"
@@ -18,7 +17,7 @@ services:
       platforms:
         - linux/amd64
         - linux/arm64
-    image: fizzbuzz2/scrapper:v1.2.0
+    image: fizzbuzz2/scrapper:v1.3.0
     restart: unless-stopped
     volumes:
       - "./user_data:/home/user/user_data"
