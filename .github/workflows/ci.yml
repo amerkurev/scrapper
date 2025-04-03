@@ -18,26 +18,30 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Test and submit coverage report
-        run: |
-          pip install -r requirements.txt
-          playwright install firefox
-          ./runtest.sh coveralls
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Run code linter
-        run: |
-          pylint --exit-zero app/*
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        env:
+          GITHUB_REF: ${{ github.ref }}
+        run: |
+          make info
+          make build
+
+      - name: Test and Lint
+        run: |
+          make test
+          make lint
+
+      - name: Report coverage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pip install coveralls
+          cd app && coveralls --service=github
 
       - name: Available platforms
         run: |
@@ -46,6 +50,7 @@ jobs:
           echo "Status:    ${{ steps.buildx.outputs.status }}"
           echo "Flags:     ${{ steps.buildx.outputs.flags }}"
           echo "Platforms: ${{ steps.buildx.outputs.platforms }}"
+
       - name: Deploy tagged (latest) to GitHub Packages (ghcr.io) and DockerHub
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         env:
@@ -60,7 +65,7 @@ jobs:
           echo ${GITHUB_PACKAGE_TOKEN} | docker login ghcr.io -u ${USERNAME} --password-stdin
           echo ${DOCKER_HUB_TOKEN} | docker login -u ${USERNAME} --password-stdin
           docker buildx build --push \
-              --build-arg CI=github --build-arg GITHUB_SHA=${GITHUB_SHA} --build-arg GIT_BRANCH=${ref} \
+              --build-arg CI=github --build-arg GIT_SHA=${GITHUB_SHA} --build-arg GIT_TAG=${ref} \
               --platform linux/amd64,linux/arm64 \
               -t ghcr.io/${USERNAME}/scrapper:${ref} -t ghcr.io/${USERNAME}/scrapper:latest \
               -t ${USERNAME}/scrapper:${ref} -t ${USERNAME}/scrapper:latest .

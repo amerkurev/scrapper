@@ -5,8 +5,8 @@
 [![Build](https://github.com/amerkurev/scrapper/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/amerkurev/scrapper/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/amerkurev/scrapper/badge.svg?branch=master)](https://coveralls.io/github/amerkurev/scrapper?branch=master)
 [![Linting: Pylint](https://img.shields.io/badge/pylint-9.95-green)](https://github.com/amerkurev/scrapper/actions/)
-[![Docker pulls](https://img.shields.io/docker/pulls/amerkurev/scrapper.svg)](https://hub.docker.com/r/amerkurev/scrapper)&nbsp;
-[![License](https://img.shields.io/badge/license-apache2.0-blue.svg)](https://github.com/amerkurev/scrapper/blob/master/LICENSE)
+[![Docker pulls](https://img.shields.io/docker/pulls/amerkurev/scrapper.svg)](https://hub.docker.com/r/amerkurev/scrapper)
+[![License](https://img.shields.io/badge/license-mit-blue.svg)](https://github.com/amerkurev/scrapper/blob/master/LICENSE)
 </div>
 
 If you were looking for a web scraper that actually works, you just found it. It's called Scrapper!
@@ -42,7 +42,6 @@ The main features of Scrapper are:
 
 And many other features:
 
-- **Stealth mode.** Various methods are used to make it difficult for websites to detect a Headless browser and bypass web scraping protection.
 - **Caching results.** All parsing results are saved to disk, and you can access them later by API without repeating the whole request.
 - **Page screenshots.** Headless browsers don't have a window, but screenshots allow you to see the page as it appears to the parser. This is very useful!
 - **Incognito mode or persistent sessions.** You can configure the browser to work in incognito mode or without it. In this case, the browser will save session data such as cookies and local storage to disk. To use them again.
@@ -134,7 +133,6 @@ To make it easier to build requests, use the web interface where the final reque
 | `url`                     | Page URL. The page should contain the text of the article that needs to be extracted.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |         |
 | `cache`                   | All results of the parsing process will be cached in the `user_data` directory. Cache can be disabled by setting the cache option to false. In this case, the page will be fetched and parsed every time. Cache is enabled by default.                                                                                                                                                                                                                                                                                                                                                                                                                                                | `true`  |
 | `full-content`            | If this option is set to true, the result will have the full HTML contents of the page (`fullContent` field in the response).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | `false` |
-| `stealth`                 | Stealth mode allows you to bypass anti-scraping techniques. It is disabled by default.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | `false` |
 | `screenshot`              | If this option is set to true, the result will have the link to the screenshot of the page (`screenshot` field in the response). <b>Important implementation details</b>: Initially, Scrapper attempts to take a screenshot of the entire scrollable page. If it fails because the image is too large, it will only capture the currently visible viewport.                                                                                                                                                                                                                                                                                                                           | `false` |
 | `user-scripts`            | To use your JavaScript scripts on a webpage, put your script files into the `user_scripts` directory. Then, list the scripts you need in the `user-scripts` parameter, separating them with commas. These scripts will run after the page loads but before the article parser starts. This means you can use these scripts to do things like remove ad blocks or automatically click the cookie acceptance button. Keep in mind, script names cannot include commas, as they are used for separation.<br>For example, you might pass `remove-ads.js, click-cookie-accept-button.js`.<br>If you plan to run asynchronous long-running scripts, check `user-scripts-timeout` parameter. |         |
 | `user-scripts-timeout`    | Waits for the given timeout in milliseconds after users scripts injection. For example if you want to navigate through page to specific content, set a longer period (higher value). The default value is 0, which means no sleep.                                                                                                                                                                                                                                                                                                                                                                                                                                                    | `0`     |
@@ -151,7 +149,7 @@ To make it easier to build requests, use the web interface where the final reque
 | `viewport-height`     | The viewport height in pixels. It's better to use the `device` parameter instead of specifying it explicitly.                                                                                                                                                                                                                                                                                                                                                                                                          |                    |
 | `screen-width`        | The page width in pixels. Emulates consistent window screen size available inside web page via window.screen. Is only used when the viewport is set.                                                                                                                                                                                                                                                                                                                                                                   |                    |
 | `screen-height`       | The page height in pixels.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |                    |
-| `device`              | Simulates browser behavior for a specific device, such as user agent, screen size, viewport, and whether it has touch enabled.<br/>Individual parameters like `user-agent`, `viewport-width`, and `viewport-height` can also be used; in such cases, they will override the `device` settings.<br/>List of [available devices](https://github.com/amerkurev/scrapper/blob/master/app/internal/deviceDescriptorsSource.json).                                                                                           | `iPhone 12`        |
+| `device`              | Simulates browser behavior for a specific device, such as user agent, screen size, viewport, and whether it has touch enabled.<br/>Individual parameters like `user-agent`, `viewport-width`, and `viewport-height` can also be used; in such cases, they will override the `device` settings.<br/>List of [available devices](https://github.com/amerkurev/scrapper/blob/master/app/internal/deviceDescriptorsSource.json).                                                                                           | `Desktop Chrome`        |
 | `scroll-down`         | Scroll down the page by a specified number of pixels. This is particularly useful when dealing with lazy-loading pages (pages that are loaded only as you scroll down). This parameter is used in conjunction with the `sleep` parameter. Make sure to set a positive value for the `sleep` parameter, otherwise, the scroll function won't work.                                                                                                                                                                      | `0`                |
 | `ignore-https-errors` | Whether to ignore HTTPS errors when sending network requests. The default setting is to ignore HTTPS errors.                                                                                                                                                                                                                                                                                                                                                                                                           | `true`             |
 | `user-agent`          | Specific user agent. It's better to use the `device` parameter instead of specifying it explicitly.                                                                                                                                                                                                                                                                                                                                                                                                                    |                    |
@@ -245,38 +243,6 @@ The response to the `/api/links` request returns a JSON object that contains fie
 | `links`         | list of collected links                                             | list     |
 | `title`         | page title                                                          | str      |
 
-## HTTPS and Authentication
-Enhance the security of your Scrapper deployment with HTTPS and Basic Authentication by integrating [Caddy server](https://github.com/caddyserver/caddy).
-
-This approach is recommended for instances exposed to the internet and can be configured with minimal effort using Docker Compose.
-
-### Configuring Caddy for Security
-
-Caddy handles SSL certificate issuance and renewal through Let's Encrypt and supports Basic Authentication for added security.
-
-To configure Caddy with Scrapper:
-
-1. **Customize the [Caddyfile](Caddyfile)**: Update `scrapper.localhost` to your domain name. For Basic Authentication, generate a secure hashed password with [`caddy hash-password`](https://caddyserver.com/docs/command-line#caddy-hash-password) and update the Caddyfile with this hash.
-
-   To generate a password hash:
-   ```console
-   caddy hash-password -plaintext 'your_new_password'
-   ```
-   Replace `your_new_password` with a strong password, then insert the hashed result into the [Caddyfile](Caddyfile).
-
-2. **Launch with Docker Compose**: With your [`docker-compose.yml`](docker-compose.yml) and edited Caddyfile ready, deploy the services:
-   ```console
-   docker compose up -d
-   ```
-
-### Secure Access to Scrapper
-
-Once deployed, access Scrapper at `https://your_domain`. You'll be asked for the username and password specified in the Caddyfile.
-
-### Automatic Certificate Renewal
-
-Caddy automatically renews SSL certificates before they expire, requiring no action from the user. Enjoy uninterrupted HTTPS protection for your Scrapper instance without manual intervention.
-
 ## Supported architectures
 
 - linux/amd64
@@ -287,4 +253,5 @@ The project is under active development and may have breaking changes till `v1` 
 However, we are trying our best not to break things unless there is a good reason. As of version `v0.8.0`, Scrapper is considered good enough for real-life usage, and many setups are running it in production.
 
 ## License
-[Apache-2.0 license](LICENSE)
+
+[MIT](LICENSE)

@@ -1,35 +1,57 @@
-GIT_BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
-GITHUB_SHA=$(shell git rev-parse --short HEAD)
-REV=$(GIT_BRANCH)-$(GITHUB_SHA)-$(shell date +%Y%m%d-%H:%M:%S)
-BIN=scrapper
+ifdef GITHUB_REF
+    # CI environment - use provided ref
+    GIT_TAG=$(shell echo $(GITHUB_REF) | cut -d'/' -f3)
+else
+    # Local environment - calculate from git
+	GIT_TAG=$(shell git describe --tags --abbrev=0 2>/dev/null || git rev-parse --abbrev-ref HEAD)
+endif
+
+ifdef GITHUB_SHA
+	# CI environment - use provided sha
+	GIT_SHA=$(GITHUB_SHA)
+else
+	# Local environment - calculate from git
+	GIT_SHA=$(shell git rev-parse --short HEAD)
+endif
+
+REV=$(GIT_TAG)-$(GIT_SHA)
 PWD=$(shell pwd)
+BIN=scrapper
 
 info:
 	- @echo "revision $(REV)"
 
-# before run: install python packages from requirements.txt
-run:
-	- @uvicorn --app-dir app main:app --port 3000
+pip-sync:
+	- @pip-compile requirements.in
+	- @pip-sync requirements.txt
 
-test:
-	- @$(PWD)/runtest.sh && coverage html
+build:
+	- @docker buildx build --load --build-arg GIT_SHA="${GIT_SHA}" --build-arg GIT_TAG="${GIT_TAG}" -t amerkurev/$(BIN):latest --progress=plain .
 
 lint:
-	- @pylint $(PWD)/app/*
+	- @ruff check app
 
-docker:
-	- @docker buildx build \
-	--build-arg GITHUB_SHA=${GITHUB_SHA} --build-arg GIT_BRANCH=${GIT_BRANCH} \
-	-t amerkurev/$(BIN):master --progress=plain .
+fmt: lint
+	- @ruff format app
 
-docker-run: docker
+test:
+	- @docker run --rm -t -v $(PWD)/app:/home/pwuser/app amerkurev/$(BIN) ./pytest.sh
+
+cov:
+	- @docker run --rm -t -v $(PWD)/app:/home/pwuser/app amerkurev/$(BIN) coverage html
+
+dev: build
 	- @# Using --ipc=host is recommended when using Chrome. Chrome can run out of memory without this flag.
-	- @docker run -it --rm --ipc=host -p 3000:3000 -v $(PWD)/user_data:/home/user/user_data -v $(PWD)/user_scripts:/home/user/user_scripts --name $(BIN) amerkurev/$(BIN):master
+	- @docker run \
+	  -it \
+	  --rm \
+	  --ipc=host \
+	  --env-file=.env \
+	  -v $(PWD)/app:/home/pwuser/app \
+	  -v $(PWD)/user_data:/home/pwuser/user_data \
+	  -v $(PWD)/user_scripts:/home/pwuser/user_scripts \
+	  --name $(BIN) \
+	  -p 3000:3000 \
+	  amerkurev/$(BIN)
 
-docker-test: docker
-	- @docker run -t --rm --name $(BIN) amerkurev/$(BIN):master ./runtest.sh
-
-docker-lint: docker
-	- @docker run -t --rm --name $(BIN) amerkurev/$(BIN):master pylint app/*
-
-.PHONY: info run test lint docker
+.PHONY: info build lint fmt test cov dev

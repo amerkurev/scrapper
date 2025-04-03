@@ -4,7 +4,7 @@
 [![Build](https://github.com/amerkurev/scrapper/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/amerkurev/scrapper/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/amerkurev/scrapper/badge.svg?branch=master)](https://coveralls.io/github/amerkurev/scrapper?branch=master)
 [![Linting: Pylint](https://img.shields.io/badge/pylint-9.95-green)](https://github.com/amerkurev/scrapper/actions/)
-[![License](https://img.shields.io/badge/license-apache2.0-blue.svg)](https://github.com/amerkurev/scrapper/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-mit-blue.svg)](https://github.com/amerkurev/scrapper/blob/master/LICENSE)
 [![Docker Hub](https://img.shields.io/docker/automated/amerkurev/scrapper.svg)](https://hub.docker.com/r/amerkurev/scrapper/tags)
 </div>
 
@@ -39,7 +39,6 @@ The main features of Scrapper are:
 
 And many other features:
 
-- **Stealth mode.** Various methods are used to make it difficult for websites to detect a Headless browser and bypass web scraping protection.
 - **Caching results.** All parsing results are saved to disk, and you can access them later by API without repeating the whole request.
 - **Page screenshots.** Headless browsers don't have a window, but screenshots allow you to see the page as it appears to the parser. This is very useful!
 - **Incognito mode or persistent sessions.** You can configure the browser to work in incognito mode or without it. In this case, the browser will save session data such as cookies and local storage to disk. To use them again.
@@ -58,4 +57,5 @@ The project is under active development and may have breaking changes till `v1` 
 However, we are trying our best not to break things unless there is a good reason. As of version `v0.8.0`, Scrapper is considered good enough for real-life usage, and many setups are running it in production.
 
 ## License
-[Apache-2.0 license](https://github.com/amerkurev/scrapper/blob/master/LICENSE)
+
+[MIT](LICENSE)

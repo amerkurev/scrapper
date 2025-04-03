@@ -26,7 +26,8 @@ def dump_result(data: Any, key: str, screenshot: bytes | None = None) -> None:
 
     # save screenshot
     if screenshot:
-        with open(screenshot_location(key), mode='wb') as f:
+        path = screenshot_location(key)
+        with open(path, mode='wb') as f:
             f.write(screenshot)
 
 
@@ -43,4 +44,4 @@ def json_location(filename: str) -> Path:
 
 
 def screenshot_location(filename: str) -> Path:
-    return USER_DATA_DIR / '_res' / filename[:2] / (filename + '.' + SCREENSHOT_TYPE)
+    return USER_DATA_DIR / '_res' / filename[:2] / (filename + '.' + SCREENSHOT_TYPE.value)

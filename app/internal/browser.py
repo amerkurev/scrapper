@@ -4,19 +4,18 @@ from collections.abc import Sequence
 
 from playwright.async_api import Browser, BrowserContext, Page, Route
 from playwright.async_api import Error as PlaywrightError
-from routers.query_params import CommonQueryParams, BrowserQueryParams, ProxyQueryParams
+from router.query_params import CommonQueryParams, BrowserQueryParams, ProxyQueryParams
 
 from settings import (
     USER_DATA_DIR,
     USER_SCRIPTS_DIR,
-    STEALTH_SCRIPTS_DIR,
     SCREENSHOT_TYPE,
     SCREENSHOT_QUALITY,
     DEVICE_REGISTRY,
 )
 
 
-def get_device(device: str) -> dict:
+def get_device_options(device: str) -> dict:
     return copy.deepcopy(DEVICE_REGISTRY[device])
 
 
@@ -25,13 +24,16 @@ async def new_context(
     browser: Browser,
     params: BrowserQueryParams,
     proxy: ProxyQueryParams,
-) -> BrowserContext:
+):
     # https://playwright.dev/python/docs/emulation
-    options = get_device(params.device)
+    options = get_device_options(params.device)
+
+    if 'default_browser_type' in options:
+        del options['default_browser_type']
 
     # PlaywrightError: options.isMobile is not supported in Firefox
-    del options['is_mobile']
-    del options['default_browser_type']
+    if browser.browser_type.name == 'firefox':
+        del options['is_mobile']
 
     options |= {
         'bypass_csp': True,
@@ -69,6 +71,8 @@ async def new_context(
             options['proxy']['bypass'] = proxy.proxy_bypass
 
     # https://playwright.dev/python/docs/api/class-browser#browser-new-context
+    context: BrowserContext
+
     if params.incognito:
         # create a new incognito browser context
         # (more efficient way, because it doesn't create a new browser instance)
@@ -95,10 +99,6 @@ async def page_processing(
     browser_params: BrowserQueryParams,
     init_scripts: Sequence[str] = None,
 ):
-    # add stealth scripts for bypassing anti-scraping mechanisms
-    if params.stealth:
-        await use_stealth_mode(page)
-
     # add extra init scripts
     if init_scripts:
         for path in init_scripts:
@@ -110,7 +110,6 @@ async def page_processing(
         await page.route('**/*', handler)
 
     # navigate to the given url
-    # noinspection PyTypeChecker
     await page.goto(url, timeout=browser_params.timeout, wait_until=browser_params.wait_until)
 
     # wait for the given timeout in milliseconds and scroll down the page
@@ -143,18 +142,14 @@ def resource_blocker(whitelist: Sequence[str]):  # list of resource types to all
             await route.continue_()
         else:
             await route.abort()
+
     return block
-
-
-async def use_stealth_mode(page: Page):
-    for script in STEALTH_SCRIPTS_DIR.glob('*.js'):
-        await page.add_init_script(path=script)
 
 
 async def get_screenshot(page: Page):
     # First try to take a screenshot of the full scrollable page,
     # if it fails, take a screenshot of the currently visible viewport.
-    kwargs = {'type': SCREENSHOT_TYPE, 'quality': SCREENSHOT_QUALITY}
+    kwargs = {'type': SCREENSHOT_TYPE.value, 'quality': SCREENSHOT_QUALITY}
     try:
         # try to take a full page screenshot
         return await page.screenshot(full_page=True, **kwargs)
@@ -162,4 +157,4 @@ async def get_screenshot(page: Page):
         # if the page is too large, take a screenshot of the currently visible viewport
         if 'Cannot take screenshot larger than ' in exc.message:
             return await page.screenshot(full_page=False, **kwargs)
-        raise exc  # pragma: no cover
+        raise exc
