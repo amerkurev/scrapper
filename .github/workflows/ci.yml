@@ -34,6 +34,7 @@ jobs:
       - name: Test and Lint
         run: |
           make test
+          pip install ruff
           make lint
 
       - name: Report coverage
