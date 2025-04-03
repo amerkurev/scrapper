@@ -25,7 +25,7 @@ async def result_html(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Not found result with id: {r_id}')
 
     context = {'request': request, 'data': data, 'revision': REVISION}
-    return templates.TemplateResponse('view.html', context=context)
+    return templates.TemplateResponse(request=request, name='view.html', context=context)
 
 
 @router.get('/result/{r_id}', include_in_schema=False)

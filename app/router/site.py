@@ -34,4 +34,4 @@ async def root(request: Request, _: AuthRequired):
         'revision': settings.REVISION,
         'for_example': '&#10;'.join(for_example),
     }
-    return templates.TemplateResponse('index.html', context=context)
+    return templates.TemplateResponse(request=request, name='index.html', context=context)
