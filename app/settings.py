@@ -86,7 +86,7 @@ class Settings(BaseSettings):
 
     # uvicorn settings
     workers: PositiveInt = Field(
-        alias='UVICORN_WORKERS', default=1, description='Number of web server worker processes'
+        alias='UVICORN_WORKERS', default=2, description='Number of web server worker processes'
     )
     debug: bool = Field(alias='DEBUG', default=False, description='Enable debug mode')
 

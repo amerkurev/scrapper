@@ -90,10 +90,3 @@ plugins:
 
 extra_css:
   - stylesheets/extra.css
-
-nav:
-  - About: index.md
-  - Usage: sections/usage/index.md
-  - API Reference: sections/api/index.md
-  - HTTPS and Authentication: sections/auth/index.md
-  - Docker Hub: https://hub.docker.com/r/amerkurev/scrapper
