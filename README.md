@@ -1,4 +1,4 @@
-# Scrapper 🧹
+# Scrapper
 
 <div markdown="1">
 
