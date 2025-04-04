@@ -22,9 +22,9 @@ theme:
     - toc.integrate
     - content.code.copy
     - content.code.annotate
-    # - navigation.instant
-    - navigation.instant.progress
-    - navigation.tabs
+#    - navigation.instant
+#    - navigation.instant.progress
+#    - navigation.tabs
     - search.suggest
     - search.highlight
     - search.share
