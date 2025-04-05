@@ -76,6 +76,17 @@ drwxr-xr-x 2 1001 1001 4096 Mar 17 23:23 user_data
 drwxr-xr-x 2 1001 1001 4096 Mar 17 23:23 user_scripts
 ```
 
+> **Important note for macOS users**
+>
+> If you're running Scrapper on macOS, **do not** set ownership to UID 1001:1001 for the directories. Simply create the folders and Scrapper will work with your current user permissions:
+>
+> ```console
+> mkdir -p user_data user_scripts
+> ```
+>
+> Setting `chown 1001:1001` on macOS will prevent Scrapper from writing to these directories!
+
+
 ### Managing Scrapper Cache
 The Scrapper cache is stored in the `user_data/_res` directory. For automated cache management, configure periodic cleanup:
 
