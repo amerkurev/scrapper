@@ -153,7 +153,7 @@ htpasswd -bB .htpasswd another_user anotherpassword
 docker run -d --name scrapper \
     -v $(pwd)/user_data:/home/pwuser/user_data \
     -v $(pwd)/user_scripts:/home/pwuser/user_scripts \
-    -v ${PWD}/.htpasswd:/.htpasswd \
+    -v $(pwd)/.htpasswd:/.htpasswd \
     -p 3000:3000 \
     amerkurev/scrapper:latest
 ```
@@ -163,7 +163,7 @@ docker run -d --name scrapper \
 docker run -d --name scrapper \
     -v $(pwd)/user_data:/home/pwuser/user_data \
     -v $(pwd)/user_scripts:/home/pwuser/user_scripts \
-    -v ${PWD}/custom/path/.htpasswd:/auth/.htpasswd \
+    -v $(pwd)/custom/path/.htpasswd:/auth/.htpasswd \
     -e BASIC_HTPASSWD=/auth/.htpasswd \
     -p 3000:3000 \
     amerkurev/scrapper:latest
@@ -185,8 +185,8 @@ openssl req -x509 -newkey rsa:4096 -nodes -keyout key.pem -out cert.pem -days 36
 docker run -d --name scrapper \
     -v $(pwd)/user_data:/home/pwuser/user_data \
     -v $(pwd)/user_scripts:/home/pwuser/user_scripts \
-    -v ${PWD}/cert.pem:/.ssl/cert.pem \
-    -v ${PWD}/key.pem:/.ssl/key.pem \
+    -v $(pwd)/cert.pem:/.ssl/cert.pem \
+    -v $(pwd)/key.pem:/.ssl/key.pem \
     -p 3000:3000 \
     amerkurev/scrapper:latest
 ```
