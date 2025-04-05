@@ -10,15 +10,13 @@
 
 Scrapper is a web scraper tool designed to download web pages and extract articles in a structured format. The application combines functionality from several open-source projects to provide an effective solution for web content extraction.
 
-<details>
-  <summary><b>Quick start</b></summary>
+## Quick start
 
 Start a Scrapper instance with:
 ```console
 docker run -d -p 3000:3000 --name scrapper amerkurev/scrapper:latest
 ```
 Scrapper will be available at http://localhost:3000/. For more details, see [Usage](#usage)
-</details>
 
 
 ## Demo
