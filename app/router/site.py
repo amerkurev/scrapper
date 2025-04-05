@@ -20,7 +20,7 @@ async def favicon():
 @router.get('/links', response_class=HTMLResponse, include_in_schema=False)
 async def root(request: Request, _: AuthRequired):
     for_example = (
-        'cache=yes',
+        'cache=no',
         'full-content=no',
         'screenshot=no',
         'incognito=yes',

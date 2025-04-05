@@ -43,13 +43,12 @@ class CommonQueryParams:
             bool,
             Query(
                 description=(
-                    'All results of the parsing process will be cached in the `user_data` directory.<br>'
-                    'Cache can be disabled by setting the cache option to false. '
-                    'In this case, the page will be fetched and parsed every time.<br>'
-                    'Cache is enabled by default.<br><br>'
+                    'All scraping results are always saved to disk. This parameter determines whether to retrieve results from cache or execute a new request. '
+                    'When set to true, existing cached results will be returned if available. '
+                    'By default, cache reading is disabled, so each request is processed anew.<br><br>'
                 ),
             ),
-        ] = True,
+        ] = False,
         full_content: Annotated[
             bool,
             Query(
