@@ -1,0 +1,7 @@
+article {
+  max-width: 800px !important;
+}
+
+[dir="ltr"] .md-header__title {
+  margin-left: 0;
+}
